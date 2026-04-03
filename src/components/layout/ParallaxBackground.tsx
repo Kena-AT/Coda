@@ -1,65 +1,71 @@
-import React, { useEffect } from 'react';
-import { motion, useSpring, useMotionValue } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
 
 export const ParallaxBackground: React.FC = () => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // Smooth out mouse movement
-  const springConfig = { damping: 20, stiffness: 100 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
+  const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    // Generate a fixed grid of dots
+    const spacing = 40;
+    const padding = 100;
+    const newDots = [];
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    for (let x = -padding; x < width + padding; x += spacing) {
+      for (let y = -padding; y < height + padding; y += spacing) {
+        newDots.push({ x, y });
+      }
+    }
+    setDots(newDots);
+
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse position to -1 to 1
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-      mouseX.set(x);
-      mouseY.set(y);
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-[#0a0a0c]">
       {/* Scanline Effect */}
       <div className="cyber-scanline" />
       
-      {/* Layer 1: Distant Stars/Glows (Slowest) */}
-      <motion.div 
-        style={{
-          x: smoothX.get() * 10,
-          y: smoothY.get() * 10,
-        }}
-        className="absolute inset-[-10%] opacity-20"
-      >
-        <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-[#e60000] blur-[150px] rounded-full opacity-30" />
-        <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-[#00f5ff] blur-[180px] rounded-full opacity-10" />
-      </motion.div>
+      <svg className="absolute inset-0 w-full h-full">
+        {dots.map((dot, i) => {
+          // Calculate distance from mouse to dot
+          const dx = mousePos.x - dot.x;
+          const dy = mousePos.y - dot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          // Influence radius
+          const radius = 250;
+          let offsetX = 0;
+          let offsetY = 0;
 
-      {/* Layer 2: Grid (Medium) */}
-      <motion.div 
-        style={{
-          x: smoothX.get() * -25,
-          y: smoothY.get() * -25,
-        }}
-        className="absolute inset-[-20%] cyber-grid opacity-[0.03]"
-      />
+          if (dist < radius) {
+            // Move dots away from mouse subtly
+            const force = (1 - dist / radius) * 15;
+            offsetX = -(dx / dist) * force;
+            offsetY = -(dy / dist) * force;
+          }
 
-      {/* Layer 3: Foreground Accents (Fastest) */}
-      <motion.div 
-        style={{
-          x: smoothX.get() * -50,
-          y: smoothY.get() * -50,
-        }}
-        className="absolute inset-[-30%] opacity-[0.05] pointer-events-none"
-      >
-        <div className="absolute top-[40%] left-[45%] w-1 h-32 bg-white blur-[2px]" />
-        <div className="absolute top-[10%] right-[25%] w-32 h-[1px] bg-[#e60000] blur-[1px]" />
-      </motion.div>
+          return (
+            <circle 
+              key={i}
+              cx={dot.x + offsetX} 
+              cy={dot.y + offsetY} 
+              r="1" 
+              fill="#e60000" 
+              className="opacity-40 transition-all duration-200 ease-out"
+            />
+          );
+        })}
+      </svg>
+
+      {/* Subtle Ambient Glows */}
+      <div className="absolute top-[20%] left-[10%] w-[600px] h-[600px] bg-[#e60000] blur-[250px] rounded-full opacity-[0.05]" />
     </div>
   );
 };
