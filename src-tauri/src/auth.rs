@@ -6,7 +6,7 @@ use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Deserialize, Serialize};
 use crate::db::get_db_connection;
 use tauri::AppHandle;
-use chrono::{Utc, Duration};
+use chrono::Utc;
 
 const SECRET_KEY: &[u8] = b"coda_secret_key_change_this_for_production"; // In real desktop app, we might use OS keychain
 const MAX_LOCKOUT_ATTEMPTS: i32 = 5;
@@ -67,7 +67,7 @@ pub fn login(app_handle: AppHandle, username: String, password: String) -> Resul
         ))
     }).map_err(|_| "Invalid username or password".to_string())?;
 
-    let (hash, lockout_count, last_failed) = user_data;
+    let (hash, lockout_count, _last_failed) = user_data;
 
     if lockout_count >= MAX_LOCKOUT_ATTEMPTS {
         return Ok(AuthResponse {
@@ -83,11 +83,11 @@ pub fn login(app_handle: AppHandle, username: String, password: String) -> Resul
     if argon2.verify_password(password.as_bytes(), &parsed_hash).is_ok() {
         // Reset lockout on success
         conn.execute("UPDATE users SET lockout_count = 0, last_failed_attempt = NULL WHERE username = ?", [&username])
-            .map_err(|e| e.to_string())?;
+            .map_err(|e: rusqlite::Error| e.to_string())?;
 
         // Generate JWT
         let expiration = Utc::now()
-            .checked_add_signed(Duration::hours(24))
+            .checked_add_signed(chrono::Duration::hours(24))
             .expect("valid timestamp")
             .timestamp() as usize;
 
@@ -97,7 +97,7 @@ pub fn login(app_handle: AppHandle, username: String, password: String) -> Resul
         };
 
         let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(SECRET_KEY))
-            .map_err(|e| e.to_string())?;
+            .map_err(|e: jsonwebtoken::errors::Error| e.to_string())?;
 
         Ok(AuthResponse {
             success: true,
@@ -107,7 +107,7 @@ pub fn login(app_handle: AppHandle, username: String, password: String) -> Resul
     } else {
         // Increment lockout on failure
         conn.execute("UPDATE users SET lockout_count = lockout_count + 1, last_failed_attempt = CURRENT_TIMESTAMP WHERE username = ?", [&username])
-            .map_err(|e| e.to_string())?;
+            .map_err(|e: rusqlite::Error| e.to_string())?;
 
         Ok(AuthResponse {
             success: false,

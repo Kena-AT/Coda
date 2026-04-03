@@ -1,49 +1,43 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import React, { useState } from 'react';
+import { WelcomePage } from './components/auth/WelcomePage';
+import { SignUpPage } from './components/auth/SignUpPage';
+import { SignInPage } from './components/auth/SignInPage';
+
+type AuthStep = 'welcome' | 'signup' | 'signin';
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [step, setStep] = useState<AuthStep>('welcome');
+  const [user, setUser] = useState<{username: string} | null>(null);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  if (user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <h1 className="text-4xl font-bold">Dashboard Coming Soon...</h1>
+      </div>
+    );
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
+    <main className="min-h-screen">
+      {step === 'welcome' && (
+        <WelcomePage 
+          onGetStarted={() => setStep('signup')} 
+          onLogin={() => setStep('signin')} 
         />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      )}
+      {step === 'signup' && (
+        <SignUpPage 
+          onBack={() => setStep('welcome')} 
+          onSuccess={() => setStep('signin')} 
+        />
+      )}
+      {step === 'signin' && (
+        <SignInPage 
+          onBack={() => setStep('welcome')} 
+          onSignUp={() => setStep('signup')}
+          onSuccess={(username) => setUser({ username })}
+        />
+      )}
     </main>
   );
 }
