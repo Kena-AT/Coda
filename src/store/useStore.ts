@@ -27,12 +27,16 @@ interface AppState {
 
   sessionCopies: Record<number, number>;
   incrementCopy: (id: number) => void;
+
+  selectedSnippetId: number | null;
+  setSelectedSnippetId: (id: number | null) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
   user: null,
   snippets: [],
   loading: false,
+  selectedSnippetId: null,
 
   setUser: (user) => set({ user }),
   setSnippets: (snippets) => set({ snippets }),
@@ -45,6 +49,8 @@ export const useStore = create<AppState>((set) => ({
   updateSnippetInStore: (id, updates) => set((state) => ({
     snippets: state.snippets.map((s) => s.id === id ? { ...s, ...updates } : s)
   })),
+
+  setSelectedSnippetId: (id) => set({ selectedSnippetId: id }),
 
   sessionCopies: {},
   incrementCopy: (id) => set((state) => ({

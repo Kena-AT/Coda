@@ -42,6 +42,17 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         [],
     ).map_err(|e| e.to_string())?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS snippet_versions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            snippet_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE CASCADE
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
     Ok(())
 }
 

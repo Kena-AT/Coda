@@ -10726,7 +10726,7 @@
                       "name": "Text",
                       "fill": "#fff7f5ff",
                       "textGrowth": "fixed-width-height",
-                      "width": 79.22000122070312,
+                      "width": 85,
                       "height": 16,
                       "content": "SAVE_CRIMSON",
                       "lineHeight": 1.3333333333333333,

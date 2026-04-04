@@ -16,6 +16,14 @@ pub struct Snippet {
     pub updated_at: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SnippetVersion {
+    pub id: i32,
+    pub snippet_id: i32,
+    pub content: String,
+    pub created_at: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SnippetResponse {
     pub success: bool,
@@ -124,13 +132,39 @@ pub fn update_snippet(
     language: String,
     tags: Option<String>
 ) -> Result<SnippetResponse, String> {
-    let conn = get_db_connection(&app_handle)?;
+    let mut conn = get_db_connection(&app_handle)?;
     
-    match conn.execute(
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+
+    // Get current content to backup into versions table before overriding
+    let current_content: String = match tx.query_row(
+        "SELECT content FROM snippets WHERE id = ?",
+        [id],
+        |row| row.get(0)
+    ) {
+        Ok(c) => c,
+        Err(_) => return Ok(SnippetResponse { success: false, message: "Snippet not found".to_string(), data: None })
+    };
+
+    // Skip creating a version if the content matches EXACTLY (optional, but good for spam)
+    if current_content != content {
+        if let Err(e) = tx.execute(
+            "INSERT INTO snippet_versions (snippet_id, content) VALUES (?, ?)",
+            rusqlite::params![id, current_content],
+        ) {
+            return Ok(SnippetResponse { success: false, message: format!("Failed to save version backup: {}", e), data: None });
+        }
+    }
+
+    // Update main snippet
+    match tx.execute(
         "UPDATE snippets SET title = ?, content = ?, language = ?, tags = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
         rusqlite::params![title, content, language, tags, id],
     ) {
         Ok(_) => {
+            if let Err(e) = tx.commit() {
+                return Ok(SnippetResponse { success: false, message: format!("Transaction commit failed: {}", e), data: None });
+            }
             state.snippet_cache.remove(&user_id);
             Ok(SnippetResponse {
                 success: true,
@@ -186,4 +220,97 @@ pub fn toggle_archive(app_handle: AppHandle, state: State<'_, AppState>, user_id
             data: None,
         }),
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VersionResponse {
+    pub success: bool,
+    pub message: String,
+    pub data: Option<Vec<SnippetVersion>>,
+}
+
+#[tauri::command]
+pub fn get_snippet_versions(app_handle: AppHandle, snippet_id: i32) -> Result<VersionResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    let mut stmt = conn.prepare("SELECT id, snippet_id, content, created_at FROM snippet_versions WHERE snippet_id = ? ORDER BY created_at DESC").map_err(|e| e.to_string())?;
+
+    let version_iter = stmt.query_map([snippet_id], |row| {
+        Ok(SnippetVersion {
+            id: row.get(0)?,
+            snippet_id: row.get(1)?,
+            content: row.get(2)?,
+            created_at: row.get(3)?,
+        })
+    }).map_err(|e| e.to_string())?;
+
+    let mut versions = Vec::new();
+    for v in version_iter {
+        versions.push(v.map_err(|e| e.to_string())?);
+    }
+
+    Ok(VersionResponse {
+        success: true,
+        message: "Versions retrieved".to_string(),
+        data: Some(versions),
+    })
+}
+
+#[tauri::command]
+pub fn rollback_snippet(
+    app_handle: AppHandle,
+    state: State<'_, AppState>,
+    user_id: i32,
+    snippet_id: i32,
+    version_id: i32
+) -> Result<SnippetResponse, String> {
+    let mut conn = get_db_connection(&app_handle)?;
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+
+    // Get rollback content
+    let rollback_content: String = match tx.query_row(
+        "SELECT content FROM snippet_versions WHERE id = ?",
+        [version_id],
+        |row| row.get(0)
+    ) {
+        Ok(c) => c,
+        Err(_) => return Ok(SnippetResponse { success: false, message: "Target version not found".to_string(), data: None })
+    };
+
+    // Get current content
+    let current_content: String = match tx.query_row(
+        "SELECT content FROM snippets WHERE id = ?",
+        [snippet_id],
+        |row| row.get(0)
+    ) {
+        Ok(c) => c,
+        Err(_) => return Ok(SnippetResponse { success: false, message: "Snippet not found".to_string(), data: None })
+    };
+
+    // Backup current before rollback
+    if let Err(e) = tx.execute(
+        "INSERT INTO snippet_versions (snippet_id, content) VALUES (?, ?)",
+        rusqlite::params![snippet_id, current_content],
+    ) {
+        return Ok(SnippetResponse { success: false, message: format!("Failed to backup current state: {}", e), data: None });
+    }
+
+    // Overwrite snippet
+    if let Err(e) = tx.execute(
+        "UPDATE snippets SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        rusqlite::params![rollback_content, snippet_id],
+    ) {
+        return Ok(SnippetResponse { success: false, message: format!("Failed to apply rollback: {}", e), data: None });
+    }
+
+    if let Err(e) = tx.commit() {
+        return Ok(SnippetResponse { success: false, message: format!("Transaction commit failed: {}", e), data: None });
+    }
+
+    state.snippet_cache.remove(&user_id);
+    Ok(SnippetResponse {
+        success: true,
+        message: "Rollback successful".to_string(),
+        data: None,
+    })
 }

@@ -31,7 +31,9 @@ pub fn run() {
             snippet::list_snippets,
             snippet::update_snippet,
             snippet::delete_snippet,
-            snippet::toggle_archive
+            snippet::toggle_archive,
+            snippet::get_snippet_versions,
+            snippet::rollback_snippet
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
