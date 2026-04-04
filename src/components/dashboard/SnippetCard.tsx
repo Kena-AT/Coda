@@ -4,8 +4,7 @@ import {
   Trash2, 
   Archive, 
   Edit3, 
-  ChevronRight,
-  Code2
+  ChevronRight
 } from 'lucide-react';
 import { Snippet } from '../../store/useStore';
 import toast from 'react-hot-toast';

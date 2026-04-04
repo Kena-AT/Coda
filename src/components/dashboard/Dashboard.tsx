@@ -14,12 +14,16 @@ import { Sidebar } from '../layout/Sidebar';
 import { SnippetEditor } from './SnippetEditor';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
+import Fuse from 'fuse.js';
+import { HighlightText } from './HighlightText';
 
 export const Dashboard: React.FC = () => {
   const { user, setUser, snippets, setSnippets, loading, setLoading, sessionCopies, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
   const [activeTab, setActiveTab] = useState('library');
   const [searchQuery, setSearchQuery] = useState('');
   const [languageFilter, setLanguageFilter] = useState('all');
+  const [tagFilter, setTagFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<'modified_desc' | 'modified_asc' | 'alpha'>('modified_desc');
 
   const fetchSnippets = async () => {
     if (!user) return;
@@ -60,12 +64,50 @@ export const Dashboard: React.FC = () => {
     }
   }, [selectedSnippetId]);
 
-  const filteredSnippets = snippets.filter(s => {
-    const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          s.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLanguage = languageFilter === 'all' || s.language.toLowerCase() === languageFilter.toLowerCase();
-    return matchesSearch && matchesLanguage;
-  });
+  const processedSnippets = React.useMemo(() => {
+    let result = snippets;
+
+    // 1. Fuzzy Search
+    if (searchQuery.trim()) {
+      const fuse = new Fuse(snippets, {
+        keys: ['title', 'content', 'tags'],
+        includeMatches: true,
+        threshold: 0.3, // 0.0 is perfect match, 1.0 is anything
+        ignoreLocation: true
+      });
+      result = fuse.search(searchQuery).map(res => res.item);
+    }
+
+    // 2. Language Filter
+    if (languageFilter !== 'all') {
+      result = result.filter(s => s.language.toLowerCase() === languageFilter.toLowerCase());
+    }
+
+    // 3. Tag Filter
+    if (tagFilter !== 'all') {
+      result = result.filter(s => {
+        if (!s.tags) return false;
+        return s.tags.toLowerCase().includes(tagFilter.toLowerCase());
+      });
+    }
+
+    // 4. Sorting
+    result = [...result].sort((a, b) => {
+      if (sortBy === 'modified_desc') {
+        return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
+      }
+      if (sortBy === 'modified_asc') {
+        return new Date(a.updated_at || 0).getTime() - new Date(b.updated_at || 0).getTime();
+      }
+      if (sortBy === 'alpha') {
+        return a.title.localeCompare(b.title);
+      }
+      return 0;
+    });
+
+    return result;
+  }, [snippets, searchQuery, languageFilter, tagFilter, sortBy]);
+
 
   const handleDelete = async (id: number) => {
     if (!confirm('Permanent deletion for object ID: ' + id + '?')) return;
@@ -166,26 +208,46 @@ export const Dashboard: React.FC = () => {
                             <select 
                               value={languageFilter}
                               onChange={(e) => setLanguageFilter(e.target.value)}
-                              className="bg-transparent text-[10px] font-main font-bold text-white outline-none uppercase tracking-[1px] appearance-none pr-3"
+                              className="bg-[#0e0e0e] text-[10px] font-main font-bold text-white outline-none uppercase tracking-[1px] appearance-none pr-3 cursor-pointer"
+                              style={{ colorScheme: 'dark' }}
                             >
-                              <option value="all">ALL_EXT</option>
-                              <option value="javascript">JS</option>
-                              <option value="typescript">TS</option>
-                              <option value="rust">RS</option>
-                              <option value="python">PY</option>
+                              <option value="all" style={{ background: '#0e0e0e', color: '#fff' }}>ALL_EXT</option>
+                              <option value="javascript" style={{ background: '#0e0e0e', color: '#fff' }}>JS</option>
+                              <option value="typescript" style={{ background: '#0e0e0e', color: '#fff' }}>TS</option>
+                              <option value="rust" style={{ background: '#0e0e0e', color: '#fff' }}>RS</option>
+                              <option value="python" style={{ background: '#0e0e0e', color: '#fff' }}>PY</option>
+                              <option value="go" style={{ background: '#0e0e0e', color: '#fff' }}>GO</option>
+                              <option value="sql" style={{ background: '#0e0e0e', color: '#fff' }}>SQL</option>
                             </select>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-[#adaaad] text-[10px] uppercase tracking-[1px]">Modified</span>
-                        <div className="flex items-center bg-[#0e0e0e] border border-[#222226] px-3 h-[26px]">
-                            <span className="text-[10px] font-main font-bold text-white uppercase tracking-[1px]">ANYTIME</span>
+                        <span className="text-[#adaaad] text-[10px] uppercase tracking-[1px]">Sort</span>
+                        <div className="flex items-center bg-[#0e0e0e] border border-[#222226] pl-2 h-[26px]">
+                            <div className="w-0.5 h-4 bg-[#e60000] mr-2" />
+                            <select 
+                              value={sortBy}
+                              onChange={(e) => setSortBy(e.target.value as 'modified_desc' | 'modified_asc' | 'alpha')}
+                              className="bg-[#0e0e0e] text-[10px] font-main font-bold text-white outline-none uppercase tracking-[1px] appearance-none pr-3 cursor-pointer"
+                              style={{ colorScheme: 'dark' }}
+                            >
+                              <option value="modified_desc" style={{ background: '#0e0e0e', color: '#fff' }}>LATEST</option>
+                              <option value="modified_asc" style={{ background: '#0e0e0e', color: '#fff' }}>OLDEST</option>
+                              <option value="alpha" style={{ background: '#0e0e0e', color: '#fff' }}>A-Z</option>
+                            </select>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-[#adaaad] text-[10px] uppercase tracking-[1px]">Tag</span>
-                        <div className="flex items-center bg-[#0e0e0e] border border-[#222226] px-3 h-[26px]">
-                            <span className="text-[10px] font-main font-bold text-white uppercase tracking-[1px]">NO_FILTER</span>
+                        <div className="flex items-center bg-[#0e0e0e] border border-[#222226] pl-2 h-[26px]">
+                            <div className="w-0.5 h-4 bg-[#e60000] mr-2" />
+                            <input
+                              type="text"
+                              value={tagFilter === 'all' ? '' : tagFilter}
+                              onChange={(e) => setTagFilter(e.target.value.trim() || 'all')}
+                              placeholder="NO_FILTER"
+                              className="w-[90px] bg-transparent text-[10px] font-main font-bold text-white outline-none uppercase tracking-[1px] placeholder:text-[#adaaad]/40"
+                            />
                         </div>
                       </div>
                   </div>
@@ -214,13 +276,15 @@ export const Dashboard: React.FC = () => {
                   <div className="flex flex-col gap-2">
                     {loading ? (
                         <div className="p-8 text-center text-[#adaaad] text-xs font-mono uppercase">Querying...</div>
-                    ) : filteredSnippets.length > 0 ? (
-                        filteredSnippets.map((snippet) => (
+                    ) : processedSnippets.length > 0 ? (
+                        processedSnippets.map((snippet) => (
                           <div key={snippet.id} className="grid grid-cols-12 gap-4 items-center px-4 py-4 hover:bg-[#19191c]/40 border border-transparent hover:border-[#222226] transition-colors group">
-                            <div className="col-span-5 flex items-center">
-                                <span className="text-[#e60000] font-bold font-main text-sm truncate tracking-[0.5px]">
-                                  {snippet.title}
-                                </span>
+                            <div className="col-span-5 flex items-center overflow-hidden">
+                                <HighlightText
+                                  text={snippet.title}
+                                  query={searchQuery}
+                                  className="text-[#e60000] font-bold font-main text-sm truncate tracking-[0.5px]"
+                                />
                             </div>
                             <div className="col-span-3 flex items-center">
                                 <div className="px-3 py-1 bg-[#19191c] border border-[#222226] text-[#adaaad] text-[10px] font-main uppercase tracking-[1px]">
@@ -244,8 +308,13 @@ export const Dashboard: React.FC = () => {
                           </div>
                         ))
                     ) : (
-                        <div className="p-12 text-center text-[#adaaad] text-[11px] font-main uppercase tracking-[2px]">
-                          No snippets found in ROOT_VAULT
+                        <div className="p-12 text-center flex flex-col gap-3 items-center">
+                          <div className="text-[#e60000] text-[10px] font-mono tracking-[2px] uppercase opacity-60">
+                            {searchQuery ? `NO_MATCH :: "${searchQuery}"` : 'ROOT_VAULT :: EMPTY'}
+                          </div>
+                          <div className="text-[#adaaad] text-[11px] font-main uppercase tracking-[2px]">
+                            {searchQuery ? 'No snippets match your query' : 'No snippets found in ROOT_VAULT'}
+                          </div>
                         </div>
                     )}
                   </div>
@@ -265,7 +334,7 @@ export const Dashboard: React.FC = () => {
                       </h3>
                     </div>
                     <div className="space-y-6">
-                      {filteredSnippets.slice(0, 3).map((snippet, idx) => {
+                      {processedSnippets.slice(0, 3).map((snippet, idx) => {
                         const copies = sessionCopies[snippet.id!] || 0;
                         const visualWidth = Math.min(100, Math.max(15, (copies * 10) + (snippet.content.length % 20)));
                         return (
@@ -283,7 +352,7 @@ export const Dashboard: React.FC = () => {
                           </div>
                         );
                       })}
-                      {filteredSnippets.length === 0 && (
+                      {processedSnippets.length === 0 && (
                         <div className="text-[10px] text-[#adaaad] font-mono">No analytics data available.</div>
                       )}
                     </div>

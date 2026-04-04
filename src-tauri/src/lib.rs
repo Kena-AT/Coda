@@ -3,7 +3,6 @@ mod db;
 mod snippet;
 
 use dashmap::DashMap;
-use std::sync::Arc;
 
 pub struct AppState {
     pub snippet_cache: DashMap<i32, Vec<snippet::Snippet>>,

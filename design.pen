@@ -10748,10 +10748,11 @@
     {
       "type": "frame",
       "id": "nm1F9",
-      "x": -3175.3636620676652,
-      "y": -2417.145035186564,
+      "x": -4739,
+      "y": -597,
       "name": "Templates & Recommendations",
       "width": 1280,
+      "height": 1027,
       "fill": [
         "#131313ff",
         {
@@ -14308,8 +14309,8 @@
     {
       "type": "frame",
       "id": "LeQGz",
-      "x": -4755.363662067665,
-      "y": -583.1450351865642,
+      "x": -4755,
+      "y": 1591,
       "name": "Smart Recommendations Panel",
       "width": 1280,
       "fill": "#131313ff",
@@ -17320,8 +17321,8 @@
     {
       "type": "frame",
       "id": "lUym9",
-      "x": -3175.3636620676652,
-      "y": -583.1450351865642,
+      "x": -3175,
+      "y": 1591,
       "name": "Analytics & Usage Panel / Modal",
       "width": 1280,
       "height": 1348,
@@ -21559,8 +21560,8 @@
     {
       "type": "frame",
       "id": "usBSb",
-      "x": -4755.363662067665,
-      "y": 1715.8549648134358,
+      "x": -4755,
+      "y": 3890,
       "name": "Cross-Project Linking Panel",
       "width": 1280,
       "height": 1024,
@@ -24454,8 +24455,8 @@
     {
       "type": "frame",
       "id": "RZp0s",
-      "x": -3443.3636620676652,
-      "y": 1715.8549648134358,
+      "x": -3443,
+      "y": 3890,
       "name": "Smart Archiving Notifications Modal",
       "width": 1280,
       "fill": "#131313ff",
@@ -26794,8 +26795,8 @@
     {
       "type": "frame",
       "id": "lAaxz",
-      "x": -4739.363662067665,
-      "y": 3293.854964813436,
+      "x": -4739,
+      "y": 5468,
       "name": "Import Modal",
       "width": 1280,
       "fill": "#131313ff",
@@ -28755,8 +28756,8 @@
     {
       "type": "frame",
       "id": "PvMFv",
-      "x": -3427.3636620676652,
-      "y": 3293.854964813436,
+      "x": -3427,
+      "y": 5468,
       "name": "Export Modal",
       "width": 1280,
       "fill": "#131313ff",
@@ -31407,8 +31408,8 @@
     {
       "type": "frame",
       "id": "ykHkr",
-      "x": -4739.363662067665,
-      "y": 4802.854964813436,
+      "x": -4739,
+      "y": 6977,
       "name": "Global Error Modal",
       "width": 1280,
       "fill": [
@@ -32790,8 +32791,8 @@
     {
       "type": "frame",
       "id": "gvSYu",
-      "x": -4739.363662067665,
-      "y": 6416.854964813436,
+      "x": -4739,
+      "y": 8591,
       "name": "Snippet Editor Inline Validation",
       "width": 1280,
       "height": 1024,
@@ -35591,8 +35592,8 @@
     {
       "type": "frame",
       "id": "9YcsA",
-      "x": -3225.3636620676652,
-      "y": 6415.854964813436,
+      "x": -3225,
+      "y": 8590,
       "name": "Login Form Inline Validation",
       "width": 1280,
       "fill": [
@@ -37015,8 +37016,8 @@
     {
       "type": "frame",
       "id": "3ydhq",
-      "x": -4739.363662067665,
-      "y": 8409.854964813436,
+      "x": -4739,
+      "y": 10584,
       "name": "App Settings with Navigation",
       "width": 1280,
       "fill": [
@@ -40713,8 +40714,8 @@
     {
       "type": "frame",
       "id": "8h2lR",
-      "x": -3427.3636620676652,
-      "y": 8409.854964813436,
+      "x": -3427,
+      "y": 10584,
       "name": "Logout Confirmation",
       "width": 1280,
       "fill": "#131313ff",
@@ -41593,8 +41594,8 @@
     {
       "type": "frame",
       "id": "SdgjT",
-      "x": -2115.3636620676652,
-      "y": 8409.854964813436,
+      "x": -2115,
+      "y": 10584,
       "name": "Change Master Password",
       "width": 1280,
       "fill": [
@@ -43929,8 +43930,8 @@
     {
       "type": "frame",
       "id": "47Nah",
-      "x": -803.3636620676652,
-      "y": 8409.854964813436,
+      "x": -803,
+      "y": 10584,
       "name": "Local Backup / Restore Page",
       "width": 1280,
       "fill": "#131313ff",
@@ -46419,8 +46420,8 @@
     {
       "type": "frame",
       "id": "iSple",
-      "x": 508.63633793233475,
-      "y": 8409.854964813436,
+      "x": 509,
+      "y": 10584,
       "name": "About / Version Info Page",
       "width": 1280,
       "height": 1462,
@@ -49614,8 +49615,8 @@
     {
       "type": "frame",
       "id": "qbNoE",
-      "x": -4755,
-      "y": 11086,
+      "x": -4754.636337932335,
+      "y": 13260.145035186564,
       "name": "Trash Repository",
       "width": 1280,
       "fill": "#131313ff",
@@ -51920,8 +51921,8 @@
     {
       "type": "frame",
       "id": "bp0yJ",
-      "x": -3175,
-      "y": 11086,
+      "x": -3174.6363379323348,
+      "y": 13260.145035186564,
       "name": "Favorites Vault",
       "width": 1280,
       "fill": [
@@ -54983,8 +54984,8 @@
     {
       "type": "frame",
       "id": "uI7a2",
-      "x": -1595,
-      "y": 10980,
+      "x": -1594.6363379323348,
+      "y": 13154.145035186564,
       "name": "Tags Management",
       "width": 1280,
       "fill": "#131313ff",
@@ -59193,8 +59194,8 @@
     {
       "type": "frame",
       "id": "2sc08",
-      "x": -15,
-      "y": 11089,
+      "x": -14.636337932334754,
+      "y": 13263.145035186564,
       "name": "Trash Restore Confirmation",
       "width": 1280,
       "fill": "#131313ff",

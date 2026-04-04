@@ -53,6 +53,31 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         [],
     ).map_err(|e| e.to_string())?;
 
+    conn.execute_batch(
+        "
+        CREATE VIRTUAL TABLE IF NOT EXISTS snippets_fts USING fts5(
+            title, content, tags, content='snippets', content_rowid='id'
+        );
+
+        CREATE TRIGGER IF NOT EXISTS snippets_ai AFTER INSERT ON snippets BEGIN
+            INSERT INTO snippets_fts(rowid, title, content, tags) 
+            VALUES (new.id, new.title, new.content, new.tags);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS snippets_ad AFTER DELETE ON snippets BEGIN
+            INSERT INTO snippets_fts(snippets_fts, rowid, title, content, tags) 
+            VALUES ('delete', old.id, old.title, old.content, old.tags);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS snippets_au AFTER UPDATE ON snippets BEGIN
+            INSERT INTO snippets_fts(snippets_fts, rowid, title, content, tags) 
+            VALUES ('delete', old.id, old.title, old.content, old.tags);
+            INSERT INTO snippets_fts(rowid, title, content, tags) 
+            VALUES (new.id, new.title, new.content, new.tags);
+        END;
+        "
+    ).map_err(|e| e.to_string())?;
+
     Ok(())
 }
 
