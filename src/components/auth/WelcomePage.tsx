@@ -35,7 +35,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
         >
           <div className="flex items-center justify-center gap-3 mb-8">
             <span className="w-12 h-[1px] bg-[#e60000]" />
-            <span className="text-[#e60000] font-mono text-[10px] tracking-[5px] uppercase">ARCHIVE // CODE // V1.2</span>
+            <span className="text-[#e60000] font-mono text-[10px] tracking-[5px] uppercase">ARCHIVE // CODE // V1.0</span>
             <span className="w-12 h-[1px] bg-[#e60000]" />
           </div>
 
