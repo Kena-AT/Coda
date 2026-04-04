@@ -8,8 +8,10 @@ import {
   Save, 
   RotateCcw, 
   Terminal, 
-  History
+  History,
+  LayoutTemplate
 } from 'lucide-react';
+import { BoilerplateSelector } from './BoilerplateSelector';
 
 interface Version {
   id: number;
@@ -25,6 +27,7 @@ export const SnippetEditor: React.FC = () => {
   const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
   const [isDiffMode, setIsDiffMode] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   // Load existing snippet
   useEffect(() => {
@@ -143,6 +146,14 @@ export const SnippetEditor: React.FC = () => {
               {selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}
             </h2>
             <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setShowTemplates(true)}
+                className="px-6 py-2 border border-[#e60000] text-[#e60000] flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase hover:bg-[#e60000] hover:text-white transition-all group"
+                title="Protocol Template Override"
+              >
+                <LayoutTemplate className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                TEMPLATE_OVERRIDE
+              </button>
               <button 
                 onClick={handleSave}
                 disabled={saving}
@@ -291,6 +302,17 @@ export const SnippetEditor: React.FC = () => {
         )}
 
       </aside>
+
+      {showTemplates && (
+        <BoilerplateSelector 
+          onClose={() => setShowTemplates(false)}
+          onSelect={(content: string) => {
+             setSnippet({ ...snippet, content });
+             toast.success('Matrix template merged successfully');
+          }}
+          currentContent={snippet.content || ''}
+        />
+      )}
     </div>
   );
 };
