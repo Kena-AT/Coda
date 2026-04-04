@@ -21,6 +21,7 @@ pub struct Claims {
 pub struct AuthResponse {
     pub success: bool,
     pub token: Option<String>,
+    pub user_id: Option<i32>,
     pub message: String,
 }
 
@@ -42,11 +43,13 @@ pub fn signup(app_handle: AppHandle, username: String, password: String) -> Resu
         Ok(_) => Ok(AuthResponse {
             success: true,
             token: None,
+            user_id: None,
             message: "User created successfully. Please sign in.".to_string(),
         }),
         Err(e) => Ok(AuthResponse {
             success: false,
             token: None,
+            user_id: None,
             message: format!("Signup failed: {}", e),
         }),
     }
@@ -56,23 +59,25 @@ pub fn signup(app_handle: AppHandle, username: String, password: String) -> Resu
 pub fn login(app_handle: AppHandle, username: String, password: String) -> Result<AuthResponse, String> {
     let conn = get_db_connection(&app_handle)?;
     
-    let mut stmt = conn.prepare("SELECT master_password_hash, lockout_count, last_failed_attempt FROM users WHERE username = ?")
+    let mut stmt = conn.prepare("SELECT id, master_password_hash, lockout_count, last_failed_attempt FROM users WHERE username = ?")
         .map_err(|e| e.to_string())?;
     
     let user_data = stmt.query_row([&username], |row| {
         Ok((
-            row.get::<_, String>(0)?,
-            row.get::<_, i32>(1)?,
-            row.get::<_, Option<String>>(2)?,
+            row.get::<_, i32>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, i32>(2)?,
+            row.get::<_, Option<String>>(3)?,
         ))
     }).map_err(|_| "Invalid username or password".to_string())?;
 
-    let (hash, lockout_count, _last_failed) = user_data;
+    let (id, hash, lockout_count, _last_failed) = user_data;
 
     if lockout_count >= MAX_LOCKOUT_ATTEMPTS {
         return Ok(AuthResponse {
             success: false,
             token: None,
+            user_id: None,
             message: "Account locked due to too many failed attempts. Support needed.".to_string(),
         });
     }
@@ -102,6 +107,7 @@ pub fn login(app_handle: AppHandle, username: String, password: String) -> Resul
         Ok(AuthResponse {
             success: true,
             token: Some(token),
+            user_id: Some(id),
             message: "Login successful".to_string(),
         })
     } else {
@@ -112,6 +118,7 @@ pub fn login(app_handle: AppHandle, username: String, password: String) -> Resul
         Ok(AuthResponse {
             success: false,
             token: None,
+            user_id: None,
             message: "Invalid username or password".to_string(),
         })
     }

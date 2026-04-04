@@ -25,6 +25,23 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         [],
     ).map_err(|e| e.to_string())?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS snippets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            language TEXT NOT NULL,
+            tags TEXT,
+            is_archived BOOLEAN DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, title)
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
     Ok(())
 }
 

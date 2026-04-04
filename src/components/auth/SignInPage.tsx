@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { motion } from 'framer-motion';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
 
 interface SignInPageProps {
   onBack: () => void;
   onSignUp: () => void;
-  onSuccess: (username: string) => void;
+  onSuccess: (id: number, username: string) => void;
 }
 
 export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSuccess }) => {
@@ -23,7 +22,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
     try {
       const response: any = await invoke('login', { username, password });
       if (response.success) {
-        onSuccess(username);
+        onSuccess(response.user_id, username);
       } else {
         setError(response.message);
       }
@@ -35,111 +34,141 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0c] p-6 selection:bg-[#e60000] selection:text-white overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#0e0e10] p-6 selection:bg-[#e60000] selection:text-white overflow-hidden relative">
       <ParallaxBackground />
 
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex w-full max-w-4xl h-[640px] bg-[#121214]/80 backdrop-blur-3xl border border-[#222226] shadow-[0_0_50px_rgba(0,0,0,0.5)] z-10 relative overflow-hidden"
-      >
+      <main className="w-full max-w-[896px] h-[741px] flex bg-[#19191c]/80 backdrop-blur-xl border border-[#222226] shadow-[0_25px_43px_-12px_rgba(0,0,0,0.25)] relative z-10 overflow-hidden">
+        
         {/* Left Side: Visual Anchor */}
-        <div className="hidden lg:flex w-[320px] bg-[#1a1a1d]/60 p-12 flex-col justify-between border-r border-[#222226] relative">
-          <div className="z-10 space-y-6">
+        <div className="hidden md:flex w-[373px] bg-[#1f1f22] p-10 flex-col justify-between relative overflow-hidden">
+          {/* Abstract technological background representation */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1f1f22] to-transparent opacity-50 z-0" />
+          
+          <div className="z-10 w-full">
+            <h1 className="text-4xl font-main font-bold text-[#e60000] tracking-[-1.8px] mb-2 leading-none cursor-pointer" onClick={onBack}>CODA</h1>
+            <p className="text-[#adaaad] font-main text-xs tracking-[1.2px] uppercase opacity-70">Sovereign Terminal Access</p>
+          </div>
+
+          <div className="z-10 w-full flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-[#e60000] rounded-full" />
-              <h1 className="text-xl font-bold tracking-[2px] font-mono">CODA.SYS</h1>
+              <div className="w-2 h-2 bg-[#f3ffca]" />
+              <span className="text-[#f3ffca] font-main text-[10px] tracking-[1px] uppercase">Root Access Protocol</span>
             </div>
-            <p className="text-[#88888c] text-[9px] font-mono uppercase tracking-[3px] leading-relaxed">
-              ENCRYPTED DATA STREAM SECURED VIA AES-256 AND ARGON2ID. 
-              LOCAL PERSISTENCE OPERATIONAL.
+            <p className="text-[#adaaad] text-xs font-mono leading-[1.6]">
+              Identity verification is required to bridge the local environment with the secure cloud repository. Unauthorized access attempts are logged.
             </p>
           </div>
-
-          <div className="z-10 relative h-48 flex items-center justify-center">
-            <div className="absolute inset-0 border border-[#e600001a] rounded-full animate-ping opacity-20" />
-            <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="w-32 h-32 border border-dashed border-[#e6000033] rounded-full flex items-center justify-center"
-            >
-              <div className="w-16 h-16 border border-[#e60000] rounded-full flex items-center justify-center neon-glow">
-                 <div className="w-2 h-2 bg-[#e60000] rounded-full animate-pulse" />
-              </div>
-            </motion.div>
-          </div>
-
-          <footer className="z-10 text-[8px] font-mono text-[#88888c] space-y-2 uppercase tracking-widest leading-none">
-            <p>0x74d77bd7-6e30-4ab2</p>
-            <p>STATUS: SYSTEM_CORE_READY</p>
-          </footer>
         </div>
 
         {/* Right Side: Interaction Canvas */}
-        <div className="flex-1 bg-[#121214]/40 p-16 flex flex-col justify-center">
-          <div className="mb-12">
-            <div className="inline-block border border-[#e60000] text-[#e60000] text-[8px] font-bold px-3 py-1 mb-6 uppercase tracking-[4px]">Security: Master_Key</div>
-            <h2 className="text-4xl font-bold mb-4 tracking-tight leading-none uppercase">Enter Decryption Key</h2>
-            <p className="text-[#88888c] text-xs leading-relaxed max-w-sm">Access your local encrypted repository by entering your master credentials.</p>
+        <div className="flex-1 bg-[#0e0e10] p-[64px] flex flex-col relative">
+          
+          {/* Back Button */}
+          <button 
+            onClick={onBack}
+            className="absolute top-8 right-8 text-[#adaaad] hover:text-[#e60000] transition-colors flex items-center gap-2 group"
+          >
+            <span className="text-[10px] font-main tracking-[2px] uppercase opacity-0 group-hover:opacity-100 transition-opacity">Return_to_Central</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+
+          {/* Header */}
+          <div className="w-full flex justify-between items-start mb-10">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-3xl font-main font-bold text-[#fffbfe] tracking-[-0.75px] uppercase">AUTH_INIT</h2>
+              <div className="w-12 h-1 bg-[#e60000]" />
+            </div>
+            <div className="text-right">
+              <span className="text-[#adaaad] font-main text-[10px] block mb-1">Local Node:</span>
+              <span className="text-[#e60000] font-main text-[12px]">127.0.0.1:443</span>
+            </div>
           </div>
 
+          {/* Lockout Policy Warning */}
           {error && error.includes('locked') && (
-            <motion.div 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="mb-8 p-4 bg-[#e60000]/10 border border-[#e60000] text-[#e60000] font-bold text-xs flex items-center gap-4"
-            >
-              <div className="uppercase tracking-[2px]">Account Locked // Max attempts 0/5</div>
-            </motion.div>
+            <div className="mb-8 p-4 bg-[#9f0519]/10 border-l-2 border-[#ff716c] flex gap-4">
+              <div className="text-[#ff716c] mt-0.5">
+                <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 0L22 19H0L11 0ZM12 14V16H10V14H12ZM12 7V13H10V7H12Z" fill="#ff716c"/>
+                </svg>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[#ff716c] font-main font-bold text-[12px] tracking-[0.6px] uppercase">Lockout Policy Active</span>
+                <span className="text-[#ffa8a3] font-mono text-[11px] leading-tight">
+                  System will terminate session after 3 consecutive failed attempts. Master Password recovery requires hardware key validation.
+                </span>
+              </div>
+            </div>
           )}
 
-          <form onSubmit={handleSignIn} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-[3px] text-[#88888c] font-bold">Identifier</label>
+          <form onSubmit={handleSignIn} className="flex-1 flex flex-col gap-8 w-full max-w-sm">
+            {/* Username */}
+            <div className="relative">
+              <label className="absolute -top-4 left-0 text-[12px] tracking-[1.2px] text-[#adaaad] font-main uppercase">Identity_Handle</label>
               <input 
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-[#1a1a1d]/40 border border-[#222226] px-6 py-4 outline-none focus:border-[#e60000] transition-all text-sm font-mono"
+                className="w-full bg-transparent border-b border-[#48474a] px-3 py-3 mt-4 text-[#48474a] outline-none focus:border-[#e60000] focus:text-white transition-colors font-main text-[14px]"
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-[3px] text-[#88888c] font-bold">Master_Password</label>
+            {/* Password */}
+            <div className="relative">
+              <label className="absolute -top-4 left-0 text-[10px] tracking-[1px] text-[#adaaad] font-main uppercase">Password</label>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#1a1a1d]/40 border border-[#222226] px-6 py-4 outline-none focus:border-[#e60000] transition-all text-sm"
+                className="w-full bg-transparent border-b border-[#48474a] px-3 py-3 mt-4 text-[#48474a] outline-none focus:border-[#e60000] focus:text-white transition-colors font-main text-[14px]"
                 required
               />
             </div>
 
-            {error && !error.includes('locked') && <p className="text-[#e60000] text-[10px] font-bold uppercase tracking-tight py-2">{error}</p>}
+            {error && !error.includes('locked') && (
+              <p className="text-[#e60000] text-[12px] font-bold tracking-tight">{error}</p>
+            )}
 
-            <div className="pt-6 flex flex-col gap-6">
+            <div className="pt-4 flex flex-col gap-6">
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-[#e60000] py-4 font-bold text-xs tracking-[3px] uppercase shadow-[0_0_20px_rgba(230,0,0,0.1)] hover:shadow-[0_0_30px_rgba(230,0,0,0.3)] transition-all active:scale-[0.98]"
+                className="relative w-full bg-[#e60000] text-[#006165] flex items-center justify-center py-4 font-main font-bold text-[14px] tracking-[2.8px] hover:shadow-[0_0_35px_rgba(0,244,254,0.1)] transition-all uppercase"
               >
-                {loading ? 'VERIFYING...' : 'ACCESS_REPOSITORY'}
+                {loading ? 'VERIFYING...' : 'SIGN IN'}
               </button>
               
-              <div className="flex items-center justify-between px-2">
-                <button type="button" onClick={onBack} className="text-[#88888c] text-[9px] hover:text-[#e60000] transition-all uppercase tracking-[2px]">Cancel</button>
-                <button type="button" onClick={onSignUp} className="text-[#e60000] text-[9px] font-bold hover:underline uppercase tracking-[2px]">Create ID</button>
+              <div className="flex items-center justify-between">
+                <button type="button" className="text-[#adaaad] font-main text-[11px] tracking-[0.55px]">Forgot Password?</button>
+                <div className="text-[#adaaad] font-main text-[11px] tracking-[0.55px]">
+                  New to Coda? <button type="button" onClick={onSignUp} className="text-[#ff59e3] font-bold ml-1 hover:underline">Sign Up.</button>
+                </div>
               </div>
             </div>
           </form>
 
-          <footer className="mt-16 pt-8 border-t border-[#222226] opacity-[0.15] flex justify-between items-center text-[8px] font-mono lowercase">
-            <span>loc: 34.0522° n, 118.2437° w</span>
-            <span>uptime: 100% // status: secure</span>
+          {/* Footer Stats */}
+          <footer className="mt-16 w-full pt-6 flex justify-between items-center text-[9px] font-main tracking-[0.9px] text-[#fffbfe] opacity-40 border-t border-[#48474a]/30">
+            <div className="flex gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="opacity-80">Latency</span>
+                <span className="text-[#f3ffca] text-[10px]">14ms</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="opacity-80">Encryption</span>
+                <span className="text-[#f3ffca] text-[10px]">AES-256</span>
+              </div>
+            </div>
+            <div>
+              Build: stable_v2.0.4
+            </div>
           </footer>
+
         </div>
-      </motion.div>
+      </main>
     </div>
   );
 };

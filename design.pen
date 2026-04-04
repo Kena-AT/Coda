@@ -19,11 +19,63 @@
       "children": [
         {
           "type": "frame",
+          "id": "uvljr",
+          "layoutPosition": "absolute",
+          "x": 0,
+          "y": 0,
+          "name": "Header - Top Navigation Bar",
+          "width": 1280,
+          "height": 56,
+          "fill": "#19191cff",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "gap": 337.1000061035156,
+          "padding": [
+            0,
+            24.020000457763672,
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "zdnL6",
+              "name": "Container",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "V0eTa",
+                  "name": "Coda",
+                  "fill": "#e60000ff",
+                  "content": "Coda",
+                  "lineHeight": 1.4,
+                  "textAlign": "center",
+                  "textAlignVertical": "middle",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 20,
+                  "fontWeight": "700",
+                  "letterSpacing": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "xBgMl",
           "name": "Main",
           "clip": true,
           "width": 1280,
-          "height": 1813,
+          "height": 1895,
           "stroke": {
             "align": "inside",
             "thickness": 1
@@ -93,7 +145,7 @@
                     "mode": "stretch"
                   },
                   "width": 1280,
-                  "height": 974,
+                  "height": 855,
                   "stroke": {
                     "align": "inside",
                     "thickness": 1
@@ -211,7 +263,7 @@
                           "textAlign": "center",
                           "textAlignVertical": "middle",
                           "fontFamily": "Space Grotesk",
-                          "fontSize": 128,
+                          "fontSize": 84,
                           "fontWeight": "700",
                           "letterSpacing": -6.400000095367432
                         }
@@ -350,7 +402,7 @@
                               "textGrowth": "fixed-width-height",
                               "width": 116.02999877929688,
                               "height": 28,
-                              "content": "View_Docs",
+                              "content": "Sign In",
                               "lineHeight": 1.5555555555555556,
                               "textAlign": "center",
                               "textAlignVertical": "middle",
@@ -1036,96 +1088,6 @@
                       ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "XAsHa",
-              "name": "CTA Section",
-              "width": "fill_container",
-              "height": "fit_content(733)",
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              },
-              "layout": "vertical",
-              "padding": [
-                128,
-                192
-              ],
-              "children": [
-                {
-                  "type": "rectangle",
-                  "cornerRadius": 9999,
-                  "id": "a7peO",
-                  "layoutPosition": "absolute",
-                  "x": 128,
-                  "y": 146.6015625,
-                  "name": "Background Decoration",
-                  "fill": "#a1faff0d",
-                  "width": 1024,
-                  "height": 439.79998779296875,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1
-                  },
-                  "effect": {
-                    "type": "blur",
-                    "radius": 105
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "uvljr",
-          "layoutPosition": "absolute",
-          "x": 0,
-          "y": 0,
-          "name": "Header - Top Navigation Bar",
-          "width": 1280,
-          "height": 56,
-          "fill": "#19191cff",
-          "stroke": {
-            "align": "inside",
-            "thickness": 1
-          },
-          "gap": 337.1000061035156,
-          "padding": [
-            0,
-            24.020000457763672,
-            0,
-            24
-          ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "frame",
-              "id": "zdnL6",
-              "name": "Container",
-              "stroke": {
-                "align": "inside",
-                "thickness": 1
-              },
-              "layout": "vertical",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "V0eTa",
-                  "name": "Coda",
-                  "fill": "#e60000ff",
-                  "content": "Coda",
-                  "lineHeight": 1.4,
-                  "textAlign": "center",
-                  "textAlignVertical": "middle",
-                  "fontFamily": "Space Grotesk",
-                  "fontSize": 20,
-                  "fontWeight": "700",
-                  "letterSpacing": 2
                 }
               ]
             }
@@ -6309,8 +6271,8 @@
                                       "name": "Text",
                                       "fill": "#e5e2e1ff",
                                       "textGrowth": "fixed-width-height",
-                                      "width": 154.02999877929688,
-                                      "height": 15,
+                                      "width": 174,
+                                      "height": 17,
                                       "content": "HARDWARE_VISUALIZATION",
                                       "lineHeight": 1.5,
                                       "textAlignVertical": "middle",

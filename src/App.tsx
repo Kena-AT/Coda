@@ -2,23 +2,28 @@ import React, { useState } from 'react';
 import { WelcomePage } from './components/auth/WelcomePage';
 import { SignUpPage } from './components/auth/SignUpPage';
 import { SignInPage } from './components/auth/SignInPage';
+import { Dashboard } from './components/dashboard/Dashboard';
+import { useStore } from './store/useStore';
+import { Toaster } from 'react-hot-toast';
 
 type AuthStep = 'welcome' | 'signup' | 'signin';
 
 function App() {
   const [step, setStep] = useState<AuthStep>('welcome');
-  const [user, setUser] = useState<{username: string} | null>(null);
+  const { user, setUser } = useStore();
 
   if (user) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Dashboard Coming Soon...</h1>
-      </div>
+      <main className="min-h-screen">
+        <Toaster position="bottom-right" />
+        <Dashboard />
+      </main>
     );
   }
 
   return (
     <main className="min-h-screen">
+      <Toaster position="bottom-right" />
       {step === 'welcome' && (
         <WelcomePage 
           onGetStarted={() => setStep('signup')} 
@@ -29,13 +34,14 @@ function App() {
         <SignUpPage 
           onBack={() => setStep('welcome')} 
           onSuccess={() => setStep('signin')} 
+          onNavigateToSignIn={() => setStep('signin')}
         />
       )}
       {step === 'signin' && (
         <SignInPage 
           onBack={() => setStep('welcome')} 
           onSignUp={() => setStep('signup')}
-          onSuccess={(username) => setUser({ username })}
+          onSuccess={(id, username) => setUser({ id, username })}
         />
       )}
     </main>

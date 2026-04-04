@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-export const ParallaxBackground: React.FC = () => {
+interface ParallaxBackgroundProps {
+  className?: string;
+  glow?: boolean;
+}
+
+export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ className = '', glow = true }) => {
   const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Generate a fixed grid of dots
@@ -10,7 +16,7 @@ export const ParallaxBackground: React.FC = () => {
     const padding = 100;
     const newDots = [];
     const width = window.innerWidth;
-    const height = window.innerHeight;
+    const height = 1000;
 
     for (let x = -padding; x < width + padding; x += spacing) {
       for (let y = -padding; y < height + padding; y += spacing) {
@@ -19,34 +25,54 @@ export const ParallaxBackground: React.FC = () => {
     }
     setDots(newDots);
 
+    let animationFrameId: number;
+
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      animationFrameId = requestAnimationFrame(() => {
+        setMousePos({ x: e.clientX, y: e.clientY });
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
+  // Compute offset per render
+  const rect = containerRef.current?.getBoundingClientRect();
+  const localMouseX = rect ? mousePos.x - rect.left : mousePos.x;
+  const localMouseY = rect ? mousePos.y - rect.top : mousePos.y;
+
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-[#0a0a0c]">
-      {/* Scanline Effect */}
-      <div className="cyber-scanline" />
+    <div ref={containerRef} className={`absolute inset-0 z-0 pointer-events-none overflow-hidden ${className}`}>
       
+      {glow && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-[800px] h-[800px] bg-[#e60000] blur-[150px] rounded-full opacity-[0.15]" />
+        </div>
+      )}
+
       <svg className="absolute inset-0 w-full h-full">
         {dots.map((dot, i) => {
-          // Calculate distance from mouse to dot
-          const dx = mousePos.x - dot.x;
-          const dy = mousePos.y - dot.y;
+          const dx = localMouseX - dot.x;
+          const dy = localMouseY - dot.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           
-          // Influence radius
-          const radius = 250;
+          // Influence radius - Snappier motion
+          const radius = 300; 
           let offsetX = 0;
           let offsetY = 0;
 
           if (dist < radius) {
-            // Move dots away from mouse subtly
-            const force = (1 - dist / radius) * 15;
+            // Apply squared force decay for more impact at the center
+            const force = Math.pow(1 - dist / radius, 2) * 25;
             offsetX = -(dx / dist) * force;
             offsetY = -(dy / dist) * force;
           }
@@ -56,16 +82,13 @@ export const ParallaxBackground: React.FC = () => {
               key={i}
               cx={dot.x + offsetX} 
               cy={dot.y + offsetY} 
-              r="1" 
+              r="1.5" 
               fill="#e60000" 
-              className="opacity-40 transition-all duration-200 ease-out"
+              className="opacity-60"
             />
           );
         })}
       </svg>
-
-      {/* Subtle Ambient Glows */}
-      <div className="absolute top-[20%] left-[10%] w-[600px] h-[600px] bg-[#e60000] blur-[250px] rounded-full opacity-[0.05]" />
     </div>
   );
 };
