@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
 
@@ -11,6 +12,7 @@ interface SignUpPageProps {
 export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNavigateToSignIn }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -75,16 +77,24 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
           </div>
 
           {/* Master Password Field */}
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <label className="block text-[12px] tracking-[1.2px] text-[#adaaad] font-main uppercase mb-1">Password</label>
             <input 
-              type="password" 
+              type={showPassword ? "text" : "password"} 
               placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-transparent border-b border-[#48474a] px-0 py-3 outline-none focus:border-[#e60000] transition-colors text-white font-mono text-sm placeholder:text-[#48474a]/80"
+              className="w-full bg-transparent border-b border-[#48474a] px-0 py-3 outline-none focus:border-[#e60000] transition-colors text-white font-mono text-sm placeholder:text-[#48474a]/80 pr-10"
               required
             />
+            <button
+               type="button"
+               onClick={() => setShowPassword(!showPassword)}
+               className="absolute right-0 bottom-3 text-[#48474a] hover:text-[#e60000] transition-colors"
+               tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
             {/* Strength Indicator */}
             {password.length > 0 && (
               <div className="pt-4 flex flex-col gap-2">

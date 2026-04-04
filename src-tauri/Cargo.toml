@@ -30,4 +30,5 @@ chrono = "0.4.44"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 password-hash = { version = "0.6.0", features = ["getrandom"] }
 dashmap = "6.1.0"
+sysinfo = "0.32"
 

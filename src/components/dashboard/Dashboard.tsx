@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Sidebar } from '../layout/Sidebar';
+import { HardwareVisualization } from './HardwareVisualization';
+import { recordClientMetric } from '../../hooks/useTelemetry';
 import { SnippetEditor } from './SnippetEditor';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
@@ -65,6 +67,7 @@ export const Dashboard: React.FC = () => {
   }, [selectedSnippetId]);
 
   const processedSnippets = React.useMemo(() => {
+    const t0 = performance.now();
     let result = snippets;
 
     // 1. Fuzzy Search
@@ -105,6 +108,11 @@ export const Dashboard: React.FC = () => {
       return 0;
     });
 
+    const duration = performance.now() - t0;
+    if (searchQuery.trim()) {
+      recordClientMetric('search', duration);
+    }
+
     return result;
   }, [snippets, searchQuery, languageFilter, tagFilter, sortBy]);
 
@@ -120,8 +128,13 @@ export const Dashboard: React.FC = () => {
   };
 
   const copyToClipboard = (id: number, content: string) => {
+    const t0 = performance.now();
     navigator.clipboard.writeText(content);
+    const duration = performance.now() - t0;
+    
     incrementCopy(id);
+    recordClientMetric('copy', duration);
+
     toast.success('Snippet copied to terminal buffer', {
       style: { background: '#19191c', color: '#fffbfe', borderLeft: '4px solid #e60000', fontSize: '12px', fontFamily: 'Space Grotesk' }
     });
@@ -389,34 +402,7 @@ export const Dashboard: React.FC = () => {
                           HARDWARE_VISUALIZATION
                       </h3>
                     </div>
-                    <div className="flex flex-col gap-4">
-                      <div className="w-full aspect-square bg-transparent border border-[#e60000] relative grid grid-cols-2 grid-rows-2 group">
-                          {/* Grid Lines */}
-                          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#e60000]/30" />
-                          <div className="absolute top-0 left-1/2 w-[1px] h-full bg-[#e60000]/30" />
-                          
-                          {/* Graphics Node 1 (Top Left) */}
-                          <div className="absolute top-6 left-6 w-12 h-12 bg-[#8b0000] border border-[#e60000]" />
-                          
-                          {/* Graphics Node 2 (Center Right) */}
-                          <div className="absolute top-[48%] right-10 w-4 h-4 rounded-full bg-[#e60000] -translate-y-1/2" />
-                          
-                          {/* Connecting Line */}
-                          <div className="absolute top-[48%] left-18 w-[calc(100%-80px)] h-[1px] bg-[#e60000] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-1000 delay-300" />
-                          
-                          {/* Graphics Node 3 (Bottom Right Box) */}
-                          <div className="absolute bottom-6 right-8 w-10 h-[30px] border border-[#e60000]" />
-                          
-                          {/* Vertical line from node 2 to node 3 */}
-                          <div className="absolute top-[48%] right-11 w-[1px] h-[35%] bg-[#e60000] origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-1000 delay-500" />
-                          
-                          {/* Radar Sweep Effect */}
-                          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#e60000]/10 to-transparent origin-top animate-scanline opacity-50" />
-                      </div>
-                      <div className="text-[9px] font-main text-[#adaaad] uppercase tracking-[1px]">
-                        CORE_TEMP: 34.2°C
-                      </div>
-                    </div>
+                    <HardwareVisualization />
                 </div>
 
               </aside>

@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::db::get_db_connection;
 use tauri::{AppHandle, State};
 use crate::AppState;
+use std::time::Instant;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Snippet {
@@ -82,6 +83,7 @@ pub fn list_snippets(
         }
     }
 
+    let t0 = Instant::now();
     let conn = get_db_connection(&app_handle)?;
     
     let mut stmt = if include_archived {
@@ -114,6 +116,12 @@ pub fn list_snippets(
         state.snippet_cache.insert(user_id, snippets.clone());
     }
 
+    // Record telemetry for snippet load time
+    let duration_ms = t0.elapsed().as_secs_f64() * 1000.0;
+    if let Ok(mut telem) = state.telemetry.lock() {
+        telem.record_operation("snippet_load", duration_ms);
+    }
+
     Ok(SnippetResponse {
         success: true,
         message: "Snippets retrieved from database".to_string(),
@@ -132,6 +140,7 @@ pub fn update_snippet(
     language: String,
     tags: Option<String>
 ) -> Result<SnippetResponse, String> {
+    let t0 = Instant::now();
     let mut conn = get_db_connection(&app_handle)?;
     
     let tx = conn.transaction().map_err(|e| e.to_string())?;
@@ -166,6 +175,11 @@ pub fn update_snippet(
                 return Ok(SnippetResponse { success: false, message: format!("Transaction commit failed: {}", e), data: None });
             }
             state.snippet_cache.remove(&user_id);
+            // Record save timing
+            let duration_ms = t0.elapsed().as_secs_f64() * 1000.0;
+            if let Ok(mut telem) = state.telemetry.lock() {
+                telem.record_operation("snippet_save", duration_ms);
+            }
             Ok(SnippetResponse {
                 success: true,
                 message: "Snippet updated successfully".to_string(),
