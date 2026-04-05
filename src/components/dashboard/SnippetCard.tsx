@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Snippet } from '../../store/useStore';
 import toast from 'react-hot-toast';
+import { invoke } from '@tauri-apps/api/core';
 
 interface SnippetCardProps {
   snippet: Snippet;
@@ -17,17 +18,25 @@ interface SnippetCardProps {
 }
 
 export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDelete, onArchive }) => {
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(snippet.content);
-    toast.success('Snippet copied to terminal buffer', {
-      style: {
-        background: '#19191c',
-        color: '#fffbfe',
-        borderLeft: '4px solid #e60000',
-        fontSize: '12px',
-        fontFamily: 'Space Grotesk'
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(snippet.content);
+      // Track usage for recommendations
+      if (snippet.id) {
+        await invoke('record_snippet_usage', { snippetId: snippet.id });
       }
-    });
+      toast.success('Snippet copied to terminal buffer', {
+        style: {
+          background: '#19191c',
+          color: '#fffbfe',
+          borderLeft: '4px solid #e60000',
+          fontSize: '12px',
+          fontFamily: 'Space Grotesk'
+        }
+      });
+    } catch (err) {
+      toast.error('Failed to copy snippet');
+    }
   };
 
   const getLanguageColor = (lang: string) => {

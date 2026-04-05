@@ -7,13 +7,16 @@ export interface Snippet {
   title: string;
   content: string;
   language: string;
-  tags?: string;
+  tags: string | null;
   is_archived: boolean;
   copy_count: number;
   edit_count: number;
-  last_used_at?: string;
-  created_at?: string;
-  updated_at?: string;
+  detected_patterns: string | null;
+  impressions: number;
+  clicks: number;
+  last_used_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AppState {

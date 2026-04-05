@@ -3,7 +3,7 @@ mod db;
 mod snippet;
 mod telemetry;
 mod templates;
-mod recommendations;
+mod recommendation_engine;
 mod patterns;
 
 use dashmap::DashMap;
@@ -88,10 +88,11 @@ pub fn run() {
             templates::get_smart_recommendations,
             snippet::record_snippet_usage,
             snippet::get_analytics_summary,
-            recommendations::get_contextual_recommendations,
-            recommendations::get_recommendations_metadata,
-            recommendations::get_stale_snippets,
-            recommendations::get_popular_snippets
+            recommendation_engine::get_contextual_recommendations,
+            recommendation_engine::get_recommendations_metadata,
+            recommendation_engine::get_stale_snippets,
+            recommendation_engine::get_popular_snippets,
+            recommendation_engine::record_recommendation_click
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

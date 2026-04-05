@@ -84,6 +84,15 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         if !columns.contains(&"edit_count".to_string()) {
             conn.execute("ALTER TABLE snippets ADD COLUMN edit_count INTEGER DEFAULT 0", []).map_err(|e| e.to_string())?;
         }
+        if !columns.contains(&"detected_patterns".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN detected_patterns TEXT", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"impressions".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN impressions INTEGER DEFAULT 0", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"clicks".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN clicks INTEGER DEFAULT 0", []).map_err(|e| e.to_string())?;
+        }
     }
 
     conn.execute(

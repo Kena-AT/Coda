@@ -55,7 +55,7 @@ export const AnalyticsPage: React.FC = () => {
       setPopularSnippets(popularRecs.map(r => ({
         id: r.id,
         title: r.title,
-        language: 'TS', // Simplified as Recommendation doesn't have language per plan
+        language: r.language,
         copies: r.match_score,
         reason: r.reason
       })));

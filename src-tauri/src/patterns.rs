@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -45,9 +44,15 @@ pub fn detect_patterns(content: &str) -> Vec<PatternMatch> {
                 score_weight: 0,
             });
             entry.keywords.push(keyword.to_string());
-            entry.score_weight += 10; // 10 points per keyword match
+            entry.score_weight += 10;
         }
     }
 
     matches.into_values().collect()
+}
+
+pub fn get_pattern_tags_json(content: &str) -> String {
+    let patterns = detect_patterns(content);
+    let tags: Vec<String> = patterns.into_iter().map(|p| p.category).collect();
+    serde_json::to_string(&tags).unwrap_or_else(|_| "[]".to_string())
 }

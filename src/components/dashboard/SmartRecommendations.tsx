@@ -10,6 +10,13 @@ interface Recommendation {
   category: string;
   match_score: number;
   reason: string;
+  breakdown: {
+    workflow: number;
+    context: number;
+    patterns: number;
+    popularity: number;
+    ctr_penalty: number;
+  };
 }
 
 interface RecommendationMetadata {
@@ -115,19 +122,39 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                     </span>
                  </div>
                  
-                 <div className="bg-[#131313] border border-[#222226] p-4 flex flex-col gap-3 group-hover:border-[#e60000]/50 transition-all cursor-pointer" onClick={() => onPreview(rec.content)}>
+                 <div 
+                    className="bg-[#131313] border border-[#222226] p-4 flex flex-col gap-3 group-hover:border-[#e60000]/50 transition-all cursor-pointer" 
+                    onClick={async () => {
+                      onPreview(rec.content);
+                      try {
+                        await invoke('record_recommendation_click', { snippetId: rec.id });
+                      } catch (err) {
+                        console.error("CTR tracking failed:", err);
+                      }
+                    }}
+                  >
                     <h4 className="text-[11px] font-main font-bold text-white uppercase tracking-[0.5px] truncate">{rec.title}</h4>
                     <div className="bg-[#0a0a0a] p-3 text-[10px] font-mono text-[#adaaad]/60 overflow-hidden text-ellipsis whitespace-nowrap border border-[#222226]/50">
                        {rec.content}
                     </div>
+
+                    {/* Score Breakdown Tooltip-style info */}
+                    <div className="flex flex-wrap gap-2 pt-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                        {rec.breakdown.workflow > 0 && <span className="text-[7px] font-mono text-[#00ff00]">WORKFLOW+{Math.round(rec.breakdown.workflow)}</span>}
+                        {rec.breakdown.context > 0 && <span className="text-[7px] font-mono text-[#0088ff]">CONTEXT+{Math.round(rec.breakdown.context)}</span>}
+                        {rec.breakdown.patterns > 0 && <span className="text-[7px] font-mono text-[#ffaa00]">PATTERN+{Math.round(rec.breakdown.patterns)}</span>}
+                        {rec.breakdown.popularity > 0 && <span className="text-[7px] font-mono text-[#ff00ff]">VELOCITY+{Math.round(rec.breakdown.popularity)}</span>}
+                        {rec.breakdown.ctr_penalty > 0 && <span className="text-[7px] font-mono text-[#e60000]">CTR_ADJ-{Math.round(rec.breakdown.ctr_penalty)}</span>}
+                    </div>
+
                     <div className="flex justify-between items-center pt-2 mt-2 border-t border-[#222226]/50">
                        <span className="text-[10px] text-[#e60000] font-bold">{rec.match_score}% Match</span>
                        <div className="flex items-center gap-1 text-[9px] text-[#adaaad] group-hover:text-white transition-colors">
-                          <span>Click to Preview</span>
+                          <span>Preview & Sync</span>
                           <ChevronRight size={10} />
                        </div>
                     </div>
-                 </div>
+                  </div>
               </div>
             ))
          ) : (
