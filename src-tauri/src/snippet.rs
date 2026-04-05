@@ -187,32 +187,25 @@ pub fn update_snippet(
     }
 
     // Update main snippet
-    match tx.execute(
-        "UPDATE snippets SET title = ?, content = ?, language = ?, tags = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        rusqlite::params![title, content, language, tags, id],
-    ) {
-        Ok(_) => {
-            if let Err(e) = tx.commit() {
-                return Ok(SnippetResponse { success: false, message: format!("Transaction commit failed: {}", e), data: None });
-            }
-            state.snippet_cache.remove(&user_id);
-            // Record save timing
-            let duration_ms = t0.elapsed().as_secs_f64() * 1000.0;
-            if let Ok(mut telem) = state.telemetry.lock() {
-                telem.record_operation("snippet_save", duration_ms);
-            }
-            Ok(SnippetResponse {
-                success: true,
-                message: "Snippet updated successfully".to_string(),
-                data: None,
-            })
-        },
-        Err(e) => Ok(SnippetResponse {
-            success: false,
-            message: format!("Failed to update snippet: {}", e),
-            data: None,
-        }),
+    tx.execute(
+        "UPDATE snippets SET title = ?, content = ?, language = ?, tags = ?, updated_at = CURRENT_TIMESTAMP, edit_count = edit_count + 1 WHERE id = ? AND user_id = ?",
+        rusqlite::params![title, content, language, tags, id, user_id]
+    ).map_err(|e| e.to_string())?;
+
+    if let Err(e) = tx.commit() {
+        return Ok(SnippetResponse { success: false, message: format!("Transaction commit failed: {}", e), data: None });
     }
+    state.snippet_cache.remove(&user_id);
+    // Record save timing
+    let duration_ms = t0.elapsed().as_secs_f64() * 1000.0;
+    if let Ok(mut telem) = state.telemetry.lock() {
+        telem.record_operation("snippet_save", duration_ms);
+    }
+    Ok(SnippetResponse {
+        success: true,
+        message: "Snippet updated successfully".to_string(),
+        data: None,
+    })
 }
 
 #[tauri::command]
@@ -351,20 +344,55 @@ pub fn rollback_snippet(
 }
 
 #[tauri::command]
-pub fn record_snippet_usage(app_handle: AppHandle, _state: State<'_, AppState>, snippet_id: i32) -> Result<(), String> {
+pub fn record_snippet_usage(app_handle: AppHandle, state: State<'_, AppState>, snippet_id: i32) -> Result<(), String> {
     let conn = get_db_connection(&app_handle)?;
     
+    // 1. Get user_id from snippet_id
+    let user_id: i32 = conn.query_row(
+        "SELECT user_id FROM snippets WHERE id = ?",
+        [snippet_id],
+        |row| row.get(0)
+    ).map_err(|e| e.to_string())?;
+
+    // 2. Record sequence tracking (if last accessed differs)
+    if let Some(last_id) = state.last_accessed_map.get(&user_id) {
+        let last_id = *last_id;
+        if last_id != snippet_id {
+            // Check if sequence exists
+            let exists: bool = conn.query_row(
+                "SELECT EXISTS(SELECT 1 FROM snippet_usage_sequences WHERE user_id = ? AND from_id = ? AND to_id = ?)",
+                rusqlite::params![user_id, last_id, snippet_id],
+                |row| row.get(0)
+            ).unwrap_or(false);
+
+            if exists {
+                conn.execute(
+                    "UPDATE snippet_usage_sequences SET count = count + 1, last_used = CURRENT_TIMESTAMP WHERE user_id = ? AND from_id = ? AND to_id = ?",
+                    rusqlite::params![user_id, last_id, snippet_id]
+                ).map_err(|e| e.to_string())?;
+            } else {
+                conn.execute(
+                    "INSERT INTO snippet_usage_sequences (user_id, from_id, to_id, count) VALUES (?, ?, ?, 1)",
+                    rusqlite::params![user_id, last_id, snippet_id]
+                ).map_err(|e| e.to_string())?;
+            }
+        }
+    }
+
+    // 3. Update last accessed session cache
+    state.last_accessed_map.insert(user_id, snippet_id);
+
+    // 4. Update snippet usage metrics
     conn.execute(
         "UPDATE snippets SET copy_count = copy_count + 1, last_used_at = CURRENT_TIMESTAMP WHERE id = ?",
-        [snippet_id],
+        [snippet_id]
     ).map_err(|e| e.to_string())?;
 
     conn.execute(
         "INSERT INTO activity_log (snippet_id, event_type) VALUES (?, 'COPY')",
-        [snippet_id],
+        [snippet_id]
     ).map_err(|e| e.to_string())?;
 
-    // Invalidate caches if needed, but analytics might be live
     Ok(())
 }
 

@@ -16,6 +16,7 @@ interface RecommendationMetadata {
   total_snippets: number;
   db_size_formatted: string;
   heuristics_engine: string;
+  last_workflow_sync: string;
 }
 
 interface SmartRecommendationsProps {
@@ -24,25 +25,35 @@ interface SmartRecommendationsProps {
   onPreview: (content: string) => void;
 }
 
+const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
+
 export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ currentLanguage, currentTags, onPreview }) => {
-  const { user } = useStore();
+  const { user, selectedSnippetId } = useStore();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [metadata, setMetadata] = useState<RecommendationMetadata | null>(null);
   const [loading, setLoading] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState<'smart' | 'stale'>('smart');
 
   const fetchData = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const [recs, meta] = await Promise.all([
-        invoke<Recommendation[]>('get_contextual_recommendations', {
+      if (activeSubTab === 'smart') {
+        const recs = await invoke<Recommendation[]>('get_contextual_recommendations', {
           userId: user.id,
           currentLanguage,
-          currentTags
-        }),
-        invoke<RecommendationMetadata>('get_recommendations_metadata', { userId: user.id })
-      ]);
-      setRecommendations(recs);
+          currentTags,
+          currentSnippetId: selectedSnippetId
+        });
+        setRecommendations(recs);
+      } else {
+        const recs = await invoke<Recommendation[]>('get_stale_snippets', {
+          userId: user.id
+        });
+        setRecommendations(recs);
+      }
+
+      const meta = await invoke<RecommendationMetadata>('get_recommendations_metadata', { userId: user.id });
       setMetadata(meta);
     } catch (err) {
       console.error(err);
@@ -53,18 +64,37 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
 
   useEffect(() => {
     fetchData();
-  }, [currentLanguage, currentTags]);
+  }, [currentLanguage, currentTags, selectedSnippetId, activeSubTab]);
 
   return (
     <aside className="w-[300px] bg-[#0e0e0e] border-l border-[#222226] flex flex-col pt-10">
       
       {/* Sidebar Header */}
-      <div className="px-6 pb-6 border-b border-[#222226] flex items-center justify-between">
-         <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#e60000]" />
-            <h3 className="text-[12px] font-main font-bold text-white tracking-[1px] uppercase">Smart Recs</h3>
-         </div>
-         <span className="px-1.5 py-0.5 bg-[#e60000] text-white text-[8px] font-bold uppercase tracking-[1px] animate-pulse">LIVE</span>
+      <div className="px-6 py-4 border-b border-[#222226] flex items-center justify-between">
+        <div className="flex flex-col">
+          <h3 className="font-main font-bold text-[10px] text-white tracking-[2px] uppercase">Smart_Intelligence</h3>
+          <span className="text-[9px] text-[#e60000] font-mono mt-1">Rule-Based v1.1.0</span>
+        </div>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setActiveSubTab('smart')}
+            className={cn(
+              "px-2 py-0.5 text-[8px] font-bold tracking-[1px] uppercase border",
+              activeSubTab === 'smart' ? "bg-[#e60000] border-[#e60000] text-white" : "border-[#222226] text-[#adaaad]"
+            )}
+          >
+            SMART
+          </button>
+          <button 
+            onClick={() => setActiveSubTab('stale')}
+            className={cn(
+              "px-2 py-0.5 text-[8px] font-bold tracking-[1px] uppercase border",
+              activeSubTab === 'stale' ? "bg-[#e60000] border-[#e60000] text-white" : "border-[#222226] text-[#adaaad]"
+            )}
+          >
+            STALE
+          </button>
+        </div>
       </div>
 
       {/* Recs List */}
@@ -108,18 +138,19 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
       </div>
 
       {/* Footer Info */}
-      <div className="p-6 bg-[#0a0a0a] border-t border-[#222226] flex flex-col gap-3">
-         {[
-           { label: 'HEURISTICS_ENGINE', val: metadata?.heuristics_engine || 'STABLE' },
-           { label: 'LIBRARY_SIZE', val: `${metadata?.total_snippets || 0} NODES` },
-           { label: 'DB_PAYLOAD', val: metadata?.db_size_formatted || 'N/A' },
-           { label: 'USER_SESSION_ID', val: user?.username.slice(0, 8).toUpperCase() || 'RED_ACT_001' }
-         ].map((item, i) => (
-           <div key={i} className="flex justify-between text-[8px] font-mono text-[#adaaad] uppercase tracking-[1px]">
-              <span>{item.label}</span>
-              <span className="text-white">{item.val}</span>
-           </div>
-         ))}
+      <div className="p-6 bg-[#0a0a0a] border-t border-[#222226] flex flex-col gap-3 text-[8px] font-mono text-[#adaaad] uppercase tracking-[1px]">
+          <div className="flex justify-between">
+            <span>ENGINE:</span>
+            <span className="text-white">{metadata?.heuristics_engine || 'STABLE'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>SYNCED:</span>
+            <span className="text-white">{metadata?.last_workflow_sync || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between pt-1 border-t border-white/5 mt-1">
+            <span>STATUS:</span>
+            <span className="text-[#00ff00]">ACTIVE_STABLE</span>
+          </div>
          
          <button 
            onClick={fetchData}

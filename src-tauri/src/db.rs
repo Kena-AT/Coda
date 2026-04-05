@@ -26,19 +26,34 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
     ).map_err(|e| e.to_string())?;
 
     conn.execute(
+        "CREATE TABLE IF NOT EXISTS projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
         "CREATE TABLE IF NOT EXISTS snippets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
+            project_id INTEGER,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             language TEXT NOT NULL,
             tags TEXT,
             is_archived BOOLEAN DEFAULT 0,
             copy_count INTEGER DEFAULT 0,
+            edit_count INTEGER DEFAULT 0,
             last_used_at DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
             UNIQUE(user_id, title)
         )",
         [],
@@ -62,6 +77,12 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         }
         if !columns.contains(&"last_used_at".to_string()) {
             conn.execute("ALTER TABLE snippets ADD COLUMN last_used_at DATETIME", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"project_id".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN project_id INTEGER", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"edit_count".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN edit_count INTEGER DEFAULT 0", []).map_err(|e| e.to_string())?;
         }
     }
 
@@ -108,6 +129,21 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             event_type TEXT NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE SET NULL
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS snippet_usage_sequences (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            from_id INTEGER NOT NULL,
+            to_id INTEGER NOT NULL,
+            count INTEGER DEFAULT 1,
+            last_used DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (from_id) REFERENCES snippets(id) ON DELETE CASCADE,
+            FOREIGN KEY (to_id) REFERENCES snippets(id) ON DELETE CASCADE
         )",
         [],
     ).map_err(|e| e.to_string())?;

@@ -4,12 +4,14 @@ mod snippet;
 mod telemetry;
 mod templates;
 mod recommendations;
+mod patterns;
 
 use dashmap::DashMap;
 use tauri::Manager;
 
 pub struct AppState {
     pub snippet_cache: DashMap<i32, Vec<snippet::Snippet>>,
+    pub last_accessed_map: DashMap<i32, i32>, // user_id -> snippet_id
     pub telemetry: telemetry::SharedTelemetry,
 }
 
@@ -19,6 +21,7 @@ pub fn run() {
 
     let state = AppState {
         snippet_cache: DashMap::new(),
+        last_accessed_map: DashMap::new(),
         telemetry: telemetry.clone(),
     };
 
@@ -86,7 +89,9 @@ pub fn run() {
             snippet::record_snippet_usage,
             snippet::get_analytics_summary,
             recommendations::get_contextual_recommendations,
-            recommendations::get_recommendations_metadata
+            recommendations::get_recommendations_metadata,
+            recommendations::get_stale_snippets,
+            recommendations::get_popular_snippets
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

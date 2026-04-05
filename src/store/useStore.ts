@@ -3,12 +3,14 @@ import { create } from 'zustand';
 export interface Snippet {
   id?: number;
   user_id: number;
+  project_id?: number;
   title: string;
   content: string;
   language: string;
   tags?: string;
   is_archived: boolean;
   copy_count: number;
+  edit_count: number;
   last_used_at?: string;
   created_at?: string;
   updated_at?: string;

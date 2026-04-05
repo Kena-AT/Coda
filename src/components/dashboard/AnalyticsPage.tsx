@@ -41,6 +41,7 @@ interface AnalyticsSummary {
 export const AnalyticsPage: React.FC = () => {
   const { user } = useStore();
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [popularSnippets, setPopularSnippets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAnalytics = async () => {
@@ -49,9 +50,18 @@ export const AnalyticsPage: React.FC = () => {
     try {
       const data = await invoke<AnalyticsSummary>('get_analytics_summary', { userId: user.id });
       setSummary(data);
-    } catch (err) {
+      
+      const popularRecs: any[] = await invoke('get_popular_snippets', { userId: user.id });
+      setPopularSnippets(popularRecs.map(r => ({
+        id: r.id,
+        title: r.title,
+        language: 'TS', // Simplified as Recommendation doesn't have language per plan
+        copies: r.match_score,
+        reason: r.reason
+      })));
+    } catch (err: any) {
       console.error(err);
-      toast.error('Failed to sync analytics nodes');
+      toast.error(err.toString());
     } finally {
       setLoading(false);
     }
@@ -181,7 +191,34 @@ export const AnalyticsPage: React.FC = () => {
               </div>
            </div>
         </div>
+      </div>
 
+      {/* Popular Snippets / Velocity Radar */}
+      <div className="mb-12">
+        <div className="flex items-center gap-4 mb-8">
+            <div className="w-8 h-[2px] bg-[#e60000]" />
+            <h3 className="text-xl font-main font-bold text-white uppercase tracking-[1px]">High Velocity Snippets</h3>
+        </div>
+        <div className="grid grid-cols-5 gap-4">
+           {popularSnippets.map((s, i) => (
+             <div key={i} className="bg-[#111111] border border-[#222226] p-5 flex flex-col gap-3 group hover:border-[#e60000]/50 transition-all">
+                <div className="flex justify-between items-start">
+                   <div className="px-2 py-0.5 bg-[#e60000] text-white text-[8px] font-bold uppercase tracking-[1px]">RANK_{i+1}</div>
+                   <Activity size={12} className="text-[#e60000]/50" />
+                </div>
+                <h4 className="text-[12px] font-main font-bold text-white uppercase mt-1 truncate">{s.title}</h4>
+                <div className="flex flex-col gap-1 mt-1">
+                   <span className="text-[10px] text-[#e60000] font-bold font-mono">{s.copies} PTS</span>
+                   <span className="text-[8px] text-[#adaaad] font-mono leading-tight">{s.reason}</span>
+                </div>
+             </div>
+           ))}
+           {popularSnippets.length === 0 && (
+             <div className="col-span-5 py-12 text-center text-[#adaaad] font-mono text-[10px] uppercase opacity-40 border border-dashed border-[#222226]">
+                Establishing trend intelligence... Continue usage to populate velocity metrics.
+             </div>
+           )}
+        </div>
       </div>
 
       {/* Snippet Performance Ledger */}

@@ -14,6 +14,7 @@ import {
   LayoutTemplate,
   Zap
 } from 'lucide-react';
+import { RollbackConfirmModal } from './RollbackConfirmModal';
 
 interface Version {
   id: number;
@@ -31,6 +32,7 @@ export const SnippetEditor: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs'>('recs'); // Default to recs for new sprint
+  const [showRollbackModal, setShowRollbackModal] = useState(false);
 
   // Load existing snippet
   useEffect(() => {
@@ -107,7 +109,11 @@ export const SnippetEditor: React.FC = () => {
 
   const handleRollback = async () => {
     if (!selectedVersion) return;
-    if (!confirm('Revert matrix to this specific sequence?')) return;
+    setShowRollbackModal(true);
+  };
+
+  const executeRollback = async () => {
+    if (!selectedVersion) return;
     
     try {
       const response: any = await invoke('rollback_snippet', {
@@ -122,6 +128,7 @@ export const SnippetEditor: React.FC = () => {
         updateSnippetInStore(selectedSnippetId!, { content: selectedVersion.content });
         setIsDiffMode(false);
         setSelectedVersion(null);
+        setShowRollbackModal(false);
         loadVersions(selectedSnippetId!);
       } else {
         toast.error(response.message);
@@ -349,6 +356,14 @@ export const SnippetEditor: React.FC = () => {
           currentContent={snippet.content || ''}
         />
       )}
+
+      <RollbackConfirmModal
+        isOpen={showRollbackModal}
+        onConfirm={executeRollback}
+        onCancel={() => setShowRollbackModal(false)}
+        versionDate={selectedVersion?.created_at ? formatDate(selectedVersion.created_at) : undefined}
+        versionId={selectedVersion?.id}
+      />
     </div>
   );
 };
