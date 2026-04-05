@@ -154,7 +154,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
               <div className="flex items-center justify-between">
                 <button type="button" className="text-[#adaaad] font-main text-[11px] tracking-[0.55px]">Forgot Password?</button>
                 <div className="text-[#adaaad] font-main text-[11px] tracking-[0.55px]">
-                  New to Coda? <button type="button" onClick={onSignUp} className="text-[#ff59e3] font-bold ml-1 hover:underline">Sign Up.</button>
+                  New to Coda? <button type="button" onClick={onSignUp} className="text-[#ff59e3] font-bold ml-1 hover:underline">SIGN UP</button>
                 </div>
               </div>
             </div>
