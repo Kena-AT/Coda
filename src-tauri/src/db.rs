@@ -34,6 +34,8 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             language TEXT NOT NULL,
             tags TEXT,
             is_archived BOOLEAN DEFAULT 0,
+            copy_count INTEGER DEFAULT 0,
+            last_used_at DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id),
@@ -41,6 +43,27 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         )",
         [],
     ).map_err(|e| e.to_string())?;
+
+    // Migration logic: Add columns to existing snippets table if missing
+    {
+        let mut table_info = conn.prepare("PRAGMA table_info(snippets)").map_err(|e| e.to_string())?;
+        let rows = table_info.query_map([], |row| {
+            let name: String = row.get(1)?;
+            Ok(name)
+        }).map_err(|e| e.to_string())?;
+        
+        let mut columns = Vec::new();
+        for col in rows {
+            columns.push(col.map_err(|e| e.to_string())?);
+        }
+
+        if !columns.contains(&"copy_count".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN copy_count INTEGER DEFAULT 0", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"last_used_at".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN last_used_at DATETIME", []).map_err(|e| e.to_string())?;
+        }
+    }
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS snippet_versions (
@@ -76,6 +99,17 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             VALUES (new.id, new.title, new.content, new.tags);
         END;
         "
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS activity_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            snippet_id INTEGER,
+            event_type TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE SET NULL
+        )",
+        [],
     ).map_err(|e| e.to_string())?;
 
     Ok(())

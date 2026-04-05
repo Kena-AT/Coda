@@ -14,6 +14,7 @@ import { Sidebar } from '../layout/Sidebar';
 import { HardwareVisualization } from './HardwareVisualization';
 import { recordClientMetric } from '../../hooks/useTelemetry';
 import { SnippetEditor } from './SnippetEditor';
+import { AnalyticsPage } from './AnalyticsPage';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
@@ -127,13 +128,20 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const copyToClipboard = (id: number, content: string) => {
+  const copyToClipboard = async (id: number, content: string) => {
     const t0 = performance.now();
     navigator.clipboard.writeText(content);
     const duration = performance.now() - t0;
     
     incrementCopy(id);
     recordClientMetric('copy', duration);
+
+    // Record usage in DB
+    try {
+      await invoke('record_snippet_usage', { snippetId: id });
+    } catch (err) {
+      console.error('Failed to record snippet usage:', err);
+    }
 
     toast.success('Snippet copied to terminal buffer', {
       style: { background: '#19191c', color: '#fffbfe', borderLeft: '4px solid #e60000', fontSize: '12px', fontFamily: 'Space Grotesk' }
@@ -154,6 +162,8 @@ export const Dashboard: React.FC = () => {
         
         {selectedSnippetId !== null ? (
           <SnippetEditor />
+        ) : activeTab === 'analytics' ? (
+          <AnalyticsPage />
         ) : (
           <>
             {/* Top Header */}

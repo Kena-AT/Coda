@@ -3,15 +3,17 @@ import { Editor, DiffEditor } from '@monaco-editor/react';
 import { useStore, Snippet } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
+import { BoilerplateSelector } from './BoilerplateSelector';
+import { SmartRecommendations } from './SmartRecommendations';
 import { 
   X, 
   Save, 
   RotateCcw, 
   Terminal, 
   History,
-  LayoutTemplate
+  LayoutTemplate,
+  Zap
 } from 'lucide-react';
-import { BoilerplateSelector } from './BoilerplateSelector';
 
 interface Version {
   id: number;
@@ -28,6 +30,7 @@ export const SnippetEditor: React.FC = () => {
   const [isDiffMode, setIsDiffMode] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs'>('recs'); // Default to recs for new sprint
 
   // Load existing snippet
   useEffect(() => {
@@ -236,68 +239,101 @@ export const SnippetEditor: React.FC = () => {
 
       </div>
 
-      {/* Right Sidebar: Version History Container */}
+      {/* Right Sidebar */}
       <aside className="w-[320px] bg-[#0e0e0e] border-l border-[#353534]/20 flex flex-col pt-14">
         
-        <div className="p-6 border-b border-[#353534]/20 flex flex-col gap-1">
-          <h3 className="text-white text-[12px] font-main font-bold tracking-[1.5px] uppercase">
-            REVISION_LOG
-          </h3>
-          <p className="text-[#adaaad] text-[9px] font-mono">Immutable cryptographic history</p>
-        </div>
-
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-4">
-          
-          <div className="text-[10px] text-[#e60000] font-main tracking-[1px] uppercase ml-2 mb-2">Active Working Set</div>
-          
+        {/* Tab Switcher */}
+        <div className="flex border-b border-[#353534]/20">
           <button 
-             onClick={() => { setIsDiffMode(false); setSelectedVersion(null); }}
-             className={`w-full text-left p-4 bg-[#1c1b1b] border-l-2 transition-all ${!isDiffMode ? 'border-[#e60000]' : 'border-transparent hover:border-[#e60000]/50'}`}
+            onClick={() => setRightSidebarTab('recs')}
+            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'recs' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
-             <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-white uppercase font-main">CURRENT</span>
-                <span className="text-[9px] text-[#adaaad] font-mono">Unsaved changes</span>
-             </div>
+            <Zap size={14} />
+            SMART_RECS
           </button>
-
-          {versions.length > 0 && (
-             <>
-               <div className="text-[10px] text-[#adaaad] font-main tracking-[1px] uppercase ml-2 mt-4 mb-2">Commits</div>
-               {versions.map(v => (
-                 <button 
-                   key={v.id}
-                   onClick={() => { setSelectedVersion(v); setIsDiffMode(true); }}
-                   className={`w-full text-left p-4 bg-[#1c1b1b] opacity-70 border transition-all ${selectedVersion?.id === v.id ? 'border-[#e60000] opacity-100' : 'border-transparent hover:border-[#353534]'}`}
-                 >
-                    <div className="flex flex-col gap-2">
-                       <div className="flex items-center gap-2">
-                          <History className="w-3.5 h-3.5 text-[#adaaad]" />
-                          <span className="text-[10px] text-white font-mono">ID: {v.id.toString().padStart(6, '0')}</span>
-                       </div>
-                       <span className="text-[9px] text-[#e60000] font-mono">{formatDate(v.created_at)}</span>
-                    </div>
-                 </button>
-               ))}
-             </>
-          )}
-
-          {selectedSnippetId === -1 && (
-             <div className="text-[10px] text-[#adaaad] p-4 font-mono">Save initial snippet to begin version tracking.</div>
-          )}
+          <button 
+            onClick={() => setRightSidebarTab('history')}
+            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'history' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+          >
+            <History size={14} />
+            HISTORY
+          </button>
         </div>
 
-        {isDiffMode && (
-          <div className="p-6 bg-[#131313] border-t border-[#353534]/20 flex flex-col gap-4 sticky bottom-0">
-             <div className="text-[9px] text-[#adaaad] font-mono uppercase text-center mb-2">
-               Warning: Reverting destroys current unsaved changes.
-             </div>
-             <button 
-               onClick={handleRollback}
-               className="w-full bg-[#353534] hover:bg-[#e60000] text-white py-3 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1.5px] uppercase transition-colors"
-             >
-               <RotateCcw className="w-4 h-4" />
-               Rollback to this state
-             </button>
+        {rightSidebarTab === 'recs' ? (
+          <div className="flex-1 flex flex-col overflow-hidden">
+             <SmartRecommendations 
+               currentLanguage={snippet.language || 'javascript'} 
+               currentTags={snippet.tags || ''}
+               onPreview={(content) => {
+                 setSnippet({ ...snippet, content });
+                 toast.success('Sequence preview injected');
+               }}
+             />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="p-6 border-b border-[#353534]/20 flex flex-col gap-1">
+              <h3 className="text-white text-[12px] font-main font-bold tracking-[1.5px] uppercase">
+                REVISION_LOG
+              </h3>
+              <p className="text-[#adaaad] text-[9px] font-mono">Immutable cryptographic history</p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-4">
+              
+              <div className="text-[10px] text-[#e60000] font-main tracking-[1px] uppercase ml-2 mb-2">Active Working Set</div>
+              
+              <button 
+                onClick={() => { setIsDiffMode(false); setSelectedVersion(null); }}
+                className={`w-full text-left p-4 bg-[#1c1b1b] border-l-2 transition-all ${!isDiffMode ? 'border-[#e60000]' : 'border-transparent hover:border-[#e60000]/50'}`}
+              >
+                <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-white uppercase font-main">CURRENT</span>
+                    <span className="text-[9px] text-[#adaaad] font-mono">Unsaved changes</span>
+                </div>
+              </button>
+
+              {versions.length > 0 && (
+                <>
+                  <div className="text-[10px] text-[#adaaad] font-main tracking-[1px] uppercase ml-2 mt-4 mb-2">Commits</div>
+                  {versions.map(v => (
+                    <button 
+                      key={v.id}
+                      onClick={() => { setSelectedVersion(v); setIsDiffMode(true); }}
+                      className={`w-full text-left p-4 bg-[#1c1b1b] opacity-70 border transition-all ${selectedVersion?.id === v.id ? 'border-[#e60000] opacity-100' : 'border-transparent hover:border-[#353534]'}`}
+                    >
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                              <History className="w-3.5 h-3.5 text-[#adaaad]" />
+                              <span className="text-[10px] text-white font-mono">ID: {v.id.toString().padStart(6, '0')}</span>
+                          </div>
+                          <span className="text-[9px] text-[#e60000] font-mono">{formatDate(v.created_at)}</span>
+                        </div>
+                    </button>
+                  ))}
+                </>
+              )}
+
+              {selectedSnippetId === -1 && (
+                <div className="text-[10px] text-[#adaaad] p-4 font-mono">Save initial snippet to begin version tracking.</div>
+              )}
+            </div>
+
+            {isDiffMode && (
+              <div className="p-6 bg-[#131313] border-t border-[#353534]/20 flex flex-col gap-4 sticky bottom-0">
+                <div className="text-[9px] text-[#adaaad] font-mono uppercase text-center mb-2">
+                  Warning: Reverting destroys current unsaved changes.
+                </div>
+                <button 
+                  onClick={handleRollback}
+                  className="w-full bg-[#353534] hover:bg-[#e60000] text-white py-3 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1.5px] uppercase transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Rollback to this state
+                </button>
+              </div>
+            )}
           </div>
         )}
 

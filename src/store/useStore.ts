@@ -8,6 +8,8 @@ export interface Snippet {
   language: string;
   tags?: string;
   is_archived: boolean;
+  copy_count: number;
+  last_used_at?: string;
   created_at?: string;
   updated_at?: string;
 }

@@ -3,6 +3,7 @@ mod db;
 mod snippet;
 mod telemetry;
 mod templates;
+mod recommendations;
 
 use dashmap::DashMap;
 use tauri::Manager;
@@ -81,7 +82,11 @@ pub fn run() {
             telemetry::update_task_state_cmd,
             telemetry::set_diagnostics_enabled,
             templates::get_templates,
-            templates::get_smart_recommendations
+            templates::get_smart_recommendations,
+            snippet::record_snippet_usage,
+            snippet::get_analytics_summary,
+            recommendations::get_contextual_recommendations,
+            recommendations::get_recommendations_metadata
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

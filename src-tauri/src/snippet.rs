@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::db::get_db_connection;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, State, Manager};
 use crate::AppState;
 use std::time::Instant;
 
@@ -13,8 +13,27 @@ pub struct Snippet {
     pub language: String,
     pub tags: Option<String>,
     pub is_archived: bool,
+    pub copy_count: i32,
+    pub last_used_at: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActivityData {
+    pub hour: String,
+    pub count: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AnalyticsSummary {
+    pub global_copies: i32,
+    pub last_entry: String,
+    pub activity: Vec<ActivityData>,
+    pub ledger: Vec<Snippet>,
+    pub resource_usage: Option<crate::telemetry::ResourceSample>,
+    pub copy_growth: f64,
+    pub db_size_bytes: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -87,9 +106,9 @@ pub fn list_snippets(
     let conn = get_db_connection(&app_handle)?;
     
     let mut stmt = if include_archived {
-        conn.prepare("SELECT id, user_id, title, content, language, tags, is_archived, created_at, updated_at FROM snippets WHERE user_id = ? ORDER BY updated_at DESC")
+        conn.prepare("SELECT id, user_id, title, content, language, tags, is_archived, copy_count, last_used_at, created_at, updated_at FROM snippets WHERE user_id = ? ORDER BY updated_at DESC")
     } else {
-        conn.prepare("SELECT id, user_id, title, content, language, tags, is_archived, created_at, updated_at FROM snippets WHERE user_id = ? AND is_archived = 0 ORDER BY updated_at DESC")
+        conn.prepare("SELECT id, user_id, title, content, language, tags, is_archived, copy_count, last_used_at, created_at, updated_at FROM snippets WHERE user_id = ? AND is_archived = 0 ORDER BY updated_at DESC")
     }.map_err(|e| e.to_string())?;
 
     let snippet_iter = stmt.query_map([user_id], |row| {
@@ -101,8 +120,10 @@ pub fn list_snippets(
             language: row.get(4)?,
             tags: row.get(5)?,
             is_archived: row.get(6)?,
-            created_at: Some(row.get(7)?),
-            updated_at: Some(row.get(8)?),
+            copy_count: row.get(7)?,
+            last_used_at: row.get(8)?,
+            created_at: Some(row.get(9)?),
+            updated_at: Some(row.get(10)?),
         })
     }).map_err(|e| e.to_string())?;
 
@@ -326,5 +347,130 @@ pub fn rollback_snippet(
         success: true,
         message: "Rollback successful".to_string(),
         data: None,
+    })
+}
+
+#[tauri::command]
+pub fn record_snippet_usage(app_handle: AppHandle, _state: State<'_, AppState>, snippet_id: i32) -> Result<(), String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    conn.execute(
+        "UPDATE snippets SET copy_count = copy_count + 1, last_used_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [snippet_id],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "INSERT INTO activity_log (snippet_id, event_type) VALUES (?, 'COPY')",
+        [snippet_id],
+    ).map_err(|e| e.to_string())?;
+
+    // Invalidate caches if needed, but analytics might be live
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, user_id: i32) -> Result<AnalyticsSummary, String> {
+    let conn = get_db_connection(&app_handle)?;
+
+    // 1. Global Copies
+    let global_copies: i32 = conn.query_row(
+        "SELECT SUM(copy_count) FROM snippets WHERE user_id = ?",
+        [user_id],
+        |row| row.get(0)
+    ).unwrap_or(0);
+
+    // 2. Last Entry
+    let last_entry: String = conn.query_row(
+        "SELECT title FROM snippets WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+        [user_id],
+        |row| row.get(0)
+    ).unwrap_or_else(|_| "No entries".to_string());
+
+    // 3. Activity (Hourly buckets for last 24h)
+    let mut stmt = conn.prepare("
+        SELECT strftime('%H:00', timestamp) as hour, COUNT(*) as count 
+        FROM activity_log 
+        WHERE timestamp > datetime('now', '-24 hours')
+        GROUP BY hour
+        ORDER BY hour ASC
+    ").map_err(|e| e.to_string())?;
+    
+    let activity_iter = stmt.query_map([], |row| {
+        Ok(ActivityData {
+            hour: row.get(0)?,
+            count: row.get(1)?,
+        })
+    }).map_err(|e| e.to_string())?;
+
+    let mut activity = Vec::new();
+    for a in activity_iter {
+        activity.push(a.map_err(|e| e.to_string())?);
+    }
+
+    // 4. Ledger (Top 5 popular snippets)
+    let mut stmt = conn.prepare("
+        SELECT id, user_id, title, content, language, tags, is_archived, copy_count, last_used_at, created_at, updated_at 
+        FROM snippets 
+        WHERE user_id = ? 
+        ORDER BY copy_count DESC 
+        LIMIT 5
+    ").map_err(|e| e.to_string())?;
+
+    let ledger_iter = stmt.query_map([user_id], |row| {
+        Ok(Snippet {
+            id: Some(row.get(0)?),
+            user_id: row.get(1)?,
+            title: row.get(2)?,
+            content: row.get(3)?,
+            language: row.get(4)?,
+            tags: row.get(5)?,
+            is_archived: row.get(6)?,
+            copy_count: row.get(7)?,
+            last_used_at: row.get(8)?,
+            created_at: Some(row.get(9)?),
+            updated_at: Some(row.get(10)?),
+        })
+    }).map_err(|e| e.to_string())?;
+
+    let mut ledger = Vec::new();
+    for s in ledger_iter {
+        ledger.push(s.map_err(|e| e.to_string())?);
+    }
+
+    // 5. Resource Usage & Storage
+    let resource_usage = state.telemetry.lock().map(|t| t.get_snapshot().latest_resource).unwrap_or(None);
+    
+    let db_path = app_handle.path().app_data_dir().map_err(|e: tauri::Error| e.to_string())?.join("coda.db");
+    let db_size_bytes = std::fs::metadata(db_path).map(|m| m.len()).unwrap_or(0);
+
+    // 6. Copy Growth (Month-over-Month)
+    let this_month: i32 = conn.query_row(
+        "SELECT COUNT(*) FROM activity_log WHERE event_type = 'COPY' AND timestamp > datetime('now', 'start of month')",
+        [],
+        |row| row.get(0)
+    ).unwrap_or(0);
+    
+    let last_month: i32 = conn.query_row(
+        "SELECT COUNT(*) FROM activity_log WHERE event_type = 'COPY' AND timestamp BETWEEN datetime('now', 'start of month', '-1 month') AND datetime('now', 'start of month')",
+        [],
+        |row| row.get(0)
+    ).unwrap_or(0);
+
+    let copy_growth = if last_month > 0 {
+        ((this_month as f64 - last_month as f64) / last_month as f64) * 100.0
+    } else if this_month > 0 {
+        100.0
+    } else {
+        0.0
+    };
+
+    Ok(AnalyticsSummary {
+        global_copies,
+        last_entry,
+        activity,
+        ledger,
+        resource_usage,
+        copy_growth,
+        db_size_bytes,
     })
 }
