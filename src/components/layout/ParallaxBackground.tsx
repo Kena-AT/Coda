@@ -112,12 +112,12 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
     };
   }, []);
 
-  // Smooth rotation animation
+  // Smooth rotation animation with auto-rotation
   useEffect(() => {
     const animate = () => {
       setRotation(prev => ({
-        x: prev.x + (mousePos.y * 0.0005 - prev.x) * 0.05,
-        y: prev.y + (mousePos.x * 0.0005 - prev.y) * 0.05
+        x: prev.x + (mousePos.y * 0.0005 - prev.x) * 0.05 + 0.001,
+        y: prev.y + (mousePos.x * 0.0005 - prev.y) * 0.05 + 0.002
       }));
       frameRef.current = requestAnimationFrame(animate);
     };
