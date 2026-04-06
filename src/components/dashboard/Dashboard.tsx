@@ -27,7 +27,7 @@ import { ProjectVault } from './ProjectVault';
 import { MaintenanceSettingsModal } from './MaintenanceSettingsModal';
 
 export const Dashboard: React.FC = () => {
-  const { user, setUser, snippets, setSnippets, projects, loading, setLoading, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
+  const { user, setUser, snippets, setSnippets, projects, setProjects, loading, setLoading, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
   const [activeTab, setActiveTab] = useState('library');
   const [searchQuery, setSearchQuery] = useState('');
   const [languageFilter, setLanguageFilter] = useState('all');
@@ -88,6 +88,20 @@ export const Dashboard: React.FC = () => {
       }
     };
     checkArchivable();
+
+    // Fetch projects
+    const fetchProjects = async () => {
+      if (!user) return;
+      try {
+        const response: any = await invoke('get_projects', { userId: user.id });
+        if (response.success) {
+          setProjects(response.data || []);
+        }
+      } catch (e) {
+        console.error('Failed to fetch projects', e);
+      }
+    };
+    fetchProjects();
   }, [user, activeTab]);
 
   // When selected tab changes, clear snippet editor

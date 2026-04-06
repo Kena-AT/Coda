@@ -23,7 +23,7 @@ interface ProjectLinkingPanelProps {
 }
 
 export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippetId }) => {
-  const { user } = useStore();
+  const { user, setSelectedSnippetId } = useStore();
   const [related, setRelated] = useState<RelatedSnippet[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -136,7 +136,10 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
                       NODE_ID: CP-{link.id.toString().padStart(4, '0')}
                     </span>
                   </div>
-                  <button className="p-1 hover:text-red-400 text-slate-600 transition-colors">
+                  <button 
+                    onClick={() => setSelectedSnippetId(link.id)}
+                    className="p-1 hover:text-red-400 text-slate-600 transition-colors"
+                  >
                     <ExternalLink className="w-3.5 h-3.5" />
                   </button>
                 </div>

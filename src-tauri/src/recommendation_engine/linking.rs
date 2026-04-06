@@ -127,14 +127,14 @@ pub fn recompute_snippet_links(
         }
 
         // D. Project Proximity (+10 bonus)
-        if cproj == target_proj && target_proj.is_some() {
+        if cproj == target_proj {
             strength += 10;
         }
 
         // E. Session Co-usage (10%) - Simplified: if both in top 100 recent
         // (Placeholder for complex session logic, using simple recency correlation)
         
-        if strength >= 25 {
+        if strength >= 15 {
             relations.push((snippet_id, cid, strength.min(100), link_type));
         }
     }
