@@ -16,8 +16,9 @@ export const HardwareVisualization: React.FC = () => {
   const searchLatency = snapshot?.search_ms?.toFixed(0) || '0';
   const dbQueryTime = snapshot?.db_query_ms?.toFixed(0) || '0';
 
-  const backupTask = snapshot?.tasks.find(t => t.name === 'backup');
-  const importTask = snapshot?.tasks.find(t => t.name === 'import_processing');
+
+  const analyticsTask = snapshot?.tasks.find(t => t.name === 'analytics');
+  const maintenanceTask = snapshot?.tasks.find(t => t.name === 'maintenance');
 
   // Pulse animation speed based on CPU
   const pulseDuration = useMemo(() => {
@@ -117,17 +118,15 @@ export const HardwareVisualization: React.FC = () => {
              </div>
           </div>
           
-          <div className="flex flex-col gap-1 z-10">
-             <span className="text-[8px] text-[#adaaad] uppercase font-bold">Search latency (ms)</span>
-             <span className="text-[8px] text-[#adaaad] uppercase">Import processing</span>
+          <div className="flex flex-col gap-1 z-10 bg-[#111111]/80 p-1">
+             <span className="text-[8px] text-[#adaaad] uppercase font-bold">Query Operations</span>
              
-             <div className="flex flex-col mt-2 gap-0.5">
+             <div className="flex flex-col mt-2 gap-1">
                 <div className="flex justify-between items-center pr-2">
-                   <span className="text-[8px] text-white">SER_LAT: {searchLatency}ms</span>
+                   <span className="text-[8px] text-white">SEARCH: {searchLatency}ms</span>
                 </div>
                 <div className="flex justify-between items-center pr-2">
-                   <span className="text-[8px] text-white">SER_LAT: {searchLatency}ms</span>
-                   <span className="text-[8px] text-white">IMP_PROC: {importTask?.state.toUpperCase() || 'IDLE'}</span>
+                   <span className="text-[8px] text-white">ANALYTICS: <span className={analyticsTask?.state === 'running' ? 'text-[#3b82f6]' : ''}>{analyticsTask?.state.toUpperCase() || 'IDLE'}</span></span>
                 </div>
              </div>
           </div>
@@ -138,25 +137,24 @@ export const HardwareVisualization: React.FC = () => {
           <div className="flex gap-3 items-center">
              <div className="relative w-6 h-6 flex items-center justify-center">
                 <div className={`w-4 h-4 rounded-full blur-[4px]  ${
-                  backupTask?.state === 'running' ? 'bg-[#3b82f6] shadow-[0_0_10px_#3b82f6]' :
-                  backupTask?.state === 'failed' ? 'bg-[#ff0000] shadow-[0_0_10px_#ff0000]' :
+                  maintenanceTask?.state === 'running' ? 'bg-[#3b82f6] shadow-[0_0_10px_#3b82f6]' :
+                  maintenanceTask?.state === 'failed' ? 'bg-[#ff0000] shadow-[0_0_10px_#ff0000]' :
                   'bg-[#adaaad]'
-                } ${backupTask?.state === 'running' ? 'animate-pulse' : ''}`} />
+                } ${maintenanceTask?.state === 'running' ? 'animate-pulse' : ''}`} />
                 <div className={`absolute w-2 h-2 rounded-full ${
-                  backupTask?.state === 'running' ? 'bg-[#fff]' :
-                  backupTask?.state === 'failed' ? 'bg-[#ff0000]' :
+                  maintenanceTask?.state === 'running' ? 'bg-[#fff]' :
+                  maintenanceTask?.state === 'failed' ? 'bg-[#ff0000]' :
                   'bg-[#000]'
                 }`} />
              </div>
              <div className="flex flex-col">
-                <span className="text-[8px] text-[#adaaad] uppercase font-bold">Backup jobs:</span>
-                <span className="text-[8px] text-[#adaaad] uppercase leading-tight">Backup jobs:</span>
+                <span className="text-[8px] text-[#adaaad] uppercase font-bold">Vault Maintenance</span>
                 <span className={`text-[9px] font-bold ${
-                  backupTask?.state === 'running' ? 'text-[#3b82f6]' :
-                  backupTask?.state === 'failed' ? 'text-[#ff0000]' :
+                  maintenanceTask?.state === 'running' ? 'text-[#3b82f6]' :
+                  maintenanceTask?.state === 'failed' ? 'text-[#ff0000]' :
                   'text-[#adaaad]'
                 }`}>
-                  {backupTask?.state.toUpperCase() || 'IDLE'}
+                  {maintenanceTask?.state.toUpperCase() || 'IDLE'}
                 </span>
              </div>
           </div>

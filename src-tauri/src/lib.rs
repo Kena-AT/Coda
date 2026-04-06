@@ -103,7 +103,9 @@ pub fn run() {
             project::get_project_stats,
             archiver::get_archive_candidates,
             archiver::archive_snippets,
-            archiver::snooze_archive
+            archiver::snooze_archive,
+            archiver::update_maintenance_settings,
+            telemetry::get_system_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

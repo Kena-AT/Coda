@@ -1,6 +1,8 @@
-use tauri::AppHandle;
+use tauri::{AppHandle, State};
 use serde::{Deserialize, Serialize};
 use crate::db::get_db_connection;
+use crate::AppState;
+use crate::telemetry::TaskState;
 // Snippet not used in this file
 use rusqlite::OptionalExtension;
 
@@ -25,8 +27,16 @@ pub struct ArchiverSettings {
 #[tauri::command]
 pub fn get_archive_candidates(
     app_handle: AppHandle,
+    state: State<'_, AppState>,
     user_id: i32
 ) -> Result<Vec<ArchiveCandidate>, String> {
+    // 0. Instrument Task Start
+    {
+        if let Ok(mut store) = state.telemetry.lock() {
+            store.update_task_state("maintenance", TaskState::Running, None);
+        }
+    }
+
     let conn = get_db_connection(&app_handle)?;
     
     // 1. Get User Settings
@@ -133,6 +143,13 @@ pub fn get_archive_candidates(
     // Sort by score DESC
     candidates.sort_by(|a, b| b.archive_score.cmp(&a.archive_score));
 
+    // Instrument Task End
+    {
+        if let Ok(mut store) = state.telemetry.lock() {
+            store.update_task_state("maintenance", TaskState::Idle, None);
+        }
+    }
+
     Ok(candidates)
 }
 
@@ -172,6 +189,24 @@ pub fn snooze_archive(
             rusqlite::params![snooze_until, id, user_id]
         ).map_err(|e| e.to_string())?;
     }
+    
+    Ok(())
+}
+
+#[tauri::command]
+pub fn update_maintenance_settings(
+    app_handle: AppHandle,
+    user_id: i32,
+    auto_archive_days: i32,
+    exclude_favorites: bool,
+    min_copy_threshold: i32,
+) -> Result<(), String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    conn.execute(
+        "INSERT OR REPLACE INTO user_settings (user_id, auto_archive_days, exclude_favorites, min_copy_threshold) VALUES (?, ?, ?, ?)",
+        rusqlite::params![user_id, auto_archive_days, exclude_favorites, min_copy_threshold]
+    ).map_err(|e| e.to_string())?;
     
     Ok(())
 }

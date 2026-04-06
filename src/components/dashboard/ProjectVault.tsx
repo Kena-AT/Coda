@@ -1,0 +1,101 @@
+import React, { useEffect, useState } from 'react';
+import { useStore } from '../../store/useStore';
+import { invoke } from '@tauri-apps/api/core';
+import { FolderGit2, Activity, PieChart, Code2, AlertTriangle, ChevronRight } from 'lucide-react';
+
+export const ProjectVault: React.FC = () => {
+  const { user, projects } = useStore();
+  const [stats, setStats] = useState<Record<number, any>>({});
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+      setLoadingStats(true);
+      const newStats: Record<number, any> = {};
+      
+      for (const p of projects) {
+        try {
+          const s = await invoke('get_project_stats', { projectId: p.id, userId: user.id });
+          newStats[p.id!] = s;
+        } catch (e) {
+          console.error(`Failed to fetch stats for project ${p.id}:`, e);
+        }
+      }
+      setStats(newStats);
+      setLoadingStats(false);
+    };
+    
+    fetchStats();
+  }, [projects, user]);
+
+  return (
+    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#111111]">
+      <div className="mb-10 flex flex-col gap-2">
+        <h1 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase">Project Vault</h1>
+        <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">Repository Health & Activity Tracking</p>
+      </div>
+      
+      {loadingStats ? (
+        <div className="h-64 flex items-center justify-center text-[#adaaad] font-mono text-[11px] uppercase">
+          <div className="w-4 h-4 border-2 border-[#e60000] border-t-transparent rounded-full animate-spin mr-3" />
+          ANALYZING VAULT REGISTRY...
+        </div>
+      ) : projects.length === 0 ? (
+        <div className="h-64 flex items-center justify-center border-2 border-dashed border-[#222226] text-[#adaaad] font-mono text-[11px] uppercase">
+          No projects configured
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          {projects.map(p => {
+            const s = stats[p.id!];
+            return (
+              <div key={p.id} className="bg-[#151515] border border-[#222226] p-6 hover:border-[#e60000]/50 transition-colors group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#e60000]/10 text-[#e60000] border border-[#e60000]/30 transition-colors group-hover:bg-[#e60000] group-hover:text-white">
+                      <FolderGit2 className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <h3 className="font-main font-bold text-white tracking-[0.5px] uppercase">{p.name}</h3>
+                      <p className="text-[10px] text-[#adaaad] font-mono truncate max-w-[200px]">{p.description || 'No description'}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[#adaaad] group-hover:text-[#e60000] transition-colors" />
+                </div>
+                
+                {s ? (
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pb-4 border-b border-[#222226]">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] text-[#adaaad] font-bold uppercase tracking-[1px] flex items-center gap-1"><PieChart className="w-3 h-3"/> Active</span>
+                      <span className="font-mono text-white text-lg">{s.active_snippets}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] text-[#adaaad] font-bold uppercase tracking-[1px] flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-[#e60000]"/> Stale</span>
+                      <span className="font-mono text-[#adaaad] text-lg">{s.stale_snippets}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] text-[#adaaad] font-bold uppercase tracking-[1px] flex items-center gap-1"><Activity className="w-3 h-3 text-[#3b82f6]"/> Usage</span>
+                      <span className="font-mono text-white text-lg">{s.total_copies} <span className="text-[9px] text-[#adaaad] font-main uppercase">copies</span></span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] text-[#adaaad] font-bold uppercase tracking-[1px] flex items-center gap-1"><Code2 className="w-3 h-3 text-[#facc15]"/> Primary</span>
+                      <span className="font-mono text-white text-[12px] mt-1">{s.main_language || 'Mixed'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-[73px] animate-pulse bg-[#19191c] mb-4" />
+                )}
+                
+                <div className="pt-4 flex justify-between items-center text-[10px] font-mono">
+                  <span className="text-[#adaaad]">Created: {new Date(p.created_at!).toLocaleDateString()}</span>
+                  <span className="text-[#e60000] uppercase font-bold tracking-[1px]">ID: {p.id}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};

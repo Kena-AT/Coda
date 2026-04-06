@@ -1,7 +1,9 @@
-use tauri::AppHandle;
+use tauri::{AppHandle, State};
 use rusqlite::params;
 use crate::db::get_db_connection;
 use serde::{Deserialize, Serialize};
+use crate::AppState;
+use crate::telemetry::TaskState;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RelatedSnippet {
@@ -52,9 +54,17 @@ pub fn get_related_snippets(
 #[tauri::command]
 pub fn recompute_snippet_links(
     app_handle: AppHandle,
+    state: State<'_, AppState>,
     snippet_id: i32,
     user_id: i32
 ) -> Result<(), String> {
+    // 0. Instrument Task Start
+    {
+        if let Ok(mut store) = state.telemetry.lock() {
+            store.update_task_state("analytics", TaskState::Running, None);
+        }
+    }
+
     let conn = get_db_connection(&app_handle)?;
     
     // 1. Get target snippet details
@@ -144,6 +154,13 @@ pub fn recompute_snippet_links(
     }
     
     tx.commit().map_err(|e| e.to_string())?;
+
+    // Instrument Task End
+    {
+        if let Ok(mut store) = state.telemetry.lock() {
+            store.update_task_state("analytics", TaskState::Idle, None);
+        }
+    }
 
     Ok(())
 }

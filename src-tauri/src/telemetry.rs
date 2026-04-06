@@ -247,6 +247,30 @@ pub fn new_shared() -> SharedTelemetry {
 use tauri::State;
 use crate::AppState;
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SystemStatus {
+    pub db_healthy: bool,
+    pub telemetry_active: bool,
+    pub session_valid: bool,
+}
+
+#[tauri::command]
+pub fn get_system_status(app_handle: tauri::AppHandle, state: State<'_, AppState>) -> Result<SystemStatus, String> {
+    let db_healthy = crate::db::get_db_connection(&app_handle).is_ok();
+    let telemetry_active = {
+        let store = state.telemetry.lock().map_err(|e| e.to_string())?;
+        store.diagnostics_enabled
+    };
+    // For now, if we have a user in store it's valid
+    let session_valid = true; 
+
+    Ok(SystemStatus {
+        db_healthy,
+        telemetry_active,
+        session_valid,
+    })
+}
+
 #[tauri::command]
 pub fn get_telemetry_snapshot(state: State<'_, AppState>) -> Result<TelemetrySnapshot, String> {
     let store = state.telemetry.lock().map_err(|e| e.to_string())?;

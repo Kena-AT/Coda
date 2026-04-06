@@ -7,9 +7,7 @@ import {
   Unlink, 
   Network,
   Zap,
-  Tag,
-  History,
-  Folder
+  Tag
 } from 'lucide-react';
 
 interface RelatedSnippet {

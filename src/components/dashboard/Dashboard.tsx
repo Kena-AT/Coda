@@ -7,7 +7,10 @@ import {
   Plus,
   Trash2,
   Copy,
-  Edit3
+  Edit3,
+  Shield,
+  Activity,
+  Database
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Sidebar } from '../layout/Sidebar';
@@ -20,9 +23,11 @@ import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
 import { HighlightText } from './HighlightText';
 import { ArchiveModal } from './ArchiveModal';
+import { ProjectVault } from './ProjectVault';
+import { MaintenanceSettingsModal } from './MaintenanceSettingsModal';
 
 export const Dashboard: React.FC = () => {
-  const { user, setUser, snippets, setSnippets, projects, loading, setLoading, sessionCopies, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
+  const { user, setUser, snippets, setSnippets, projects, loading, setLoading, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
   const [activeTab, setActiveTab] = useState('library');
   const [searchQuery, setSearchQuery] = useState('');
   const [languageFilter, setLanguageFilter] = useState('all');
@@ -30,6 +35,22 @@ export const Dashboard: React.FC = () => {
   const [sortBy, setSortBy] = useState<'modified_desc' | 'modified_asc' | 'alpha'>('modified_desc');
   const [projectFilter, setProjectFilter] = useState<number | 'all'>('all');
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
+  const [systemStatus, setSystemStatus] = useState<any>(null);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const status = await invoke('get_system_status');
+        setSystemStatus(status);
+      } catch (e) {
+        console.error('System status check failed:', e);
+      }
+    };
+    checkStatus();
+    const interval = setInterval(checkStatus, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchSnippets = async () => {
     if (!user) return;
@@ -185,6 +206,8 @@ export const Dashboard: React.FC = () => {
           <SnippetEditor />
         ) : activeTab === 'analytics' ? (
           <AnalyticsPage />
+        ) : activeTab === 'projects' ? (
+          <ProjectVault />
         ) : (
           <>
             {/* Top Header */}
@@ -206,16 +229,33 @@ export const Dashboard: React.FC = () => {
               </div>
               
               <div className="flex items-center gap-8">
-                <div className="flex gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full border border-[#adaaad]" />
-                  <div className="w-2.5 h-2.5 rounded-full border border-[#adaaad]" />
-                  <div className="w-2.5 h-2.5 rounded-full border border-[#adaaad]" />
+                <div className="flex gap-4">
+                  {/* Database Status */}
+                  <div className={`flex items-center justify-center p-1.5 rounded-md border ${
+                    systemStatus?.db_healthy ? 'bg-[#15ff00]/10 border-[#15ff00]/30 text-[#15ff00]' : 'bg-[#e60000]/10 border-[#e60000]/30 text-[#e60000]'
+                  }`}>
+                    <Database className="w-3.5 h-3.5" />
+                  </div>
+                  
+                  {/* Telemetry Status */}
+                  <div className={`flex items-center justify-center p-1.5 rounded-md border ${
+                    systemStatus?.telemetry_active ? 'bg-[#3b82f6]/10 border-[#3b82f6]/30 text-[#3b82f6]' : 'bg-[#adaaad]/10 border-[#adaaad]/30 text-[#adaaad]'
+                  }`}>
+                    <Activity className={`w-3.5 h-3.5 ${systemStatus?.telemetry_active ? 'animate-pulse' : ''}`} />
+                  </div>
+                  
+                  {/* Auth Session */}
+                  <div className={`flex items-center justify-center p-1.5 rounded-md border ${
+                    systemStatus?.session_valid ? 'bg-[#facc15]/10 border-[#facc15]/30 text-[#facc15]' : 'bg-[#adaaad]/10 border-[#adaaad]/30 text-[#adaaad]'
+                  }`}>
+                    <Shield className="w-3.5 h-3.5" />
+                  </div>
                 </div>
                 <div className="flex items-center gap-6 border-l border-[#222226] pl-8">
                   <button className="text-[#adaaad] hover:text-[#e60000] transition-colors">
                     <TerminalSquare className="w-5 h-5" />
                   </button>
-                  <button className="text-[#adaaad] hover:text-[#e60000] transition-colors">
+                  <button onClick={() => setIsMaintenanceModalOpen(true)} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
                     <Settings className="w-5 h-5" />
                   </button>
                   <button onClick={() => setUser(null)} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
@@ -416,7 +456,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div className="space-y-6">
                       {processedSnippets.slice(0, 3).map((snippet, idx) => {
-                        const copies = sessionCopies[snippet.id!] || 0;
+                        const copies = snippet.copy_count || 0;
                         const visualWidth = Math.min(100, Math.max(15, (copies * 10) + (snippet.content.length % 20)));
                         return (
                           <div key={idx} className="flex flex-col gap-2">
@@ -451,13 +491,19 @@ export const Dashboard: React.FC = () => {
                       <div className="absolute top-0 left-0 w-1 h-full bg-[#e60000]" />
                       <div className="grid grid-cols-[100px_1fr] gap-x-2">
                         <span className="uppercase tracking-[1px] opacity-70">ENCRYPTION:</span>
-                        <span className="text-white">AES_256_ACTIVE</span>
+                        <span className={systemStatus?.session_valid ? "text-[#15ff00]" : "text-[#e60000]"}>
+                          {systemStatus?.session_valid ? 'SECURE_ACTIVE' : 'DEGRADED_STATE'}
+                        </span>
                         
                         <span className="uppercase tracking-[1px] opacity-70">SYNC:</span>
-                        <span className="text-white">SYNCHRONIZED</span>
+                        <span className={systemStatus?.telemetry_active ? "text-[#3b82f6]" : "text-[#adaaad]"}>
+                          {systemStatus?.telemetry_active ? 'SYNCHRONIZING' : 'IDLE'}
+                        </span>
                         
-                        <span className="uppercase tracking-[1px] opacity-70">UPLINK:</span>
-                        <span className="text-white">842.1 MB/S</span>
+                        <span className="uppercase tracking-[1px] opacity-70">DATABASE:</span>
+                        <span className={systemStatus?.db_healthy ? "text-white" : "text-[#e60000]"}>
+                          {systemStatus?.db_healthy ? 'SQLite V3_OK' : 'CONNECTION_ERR'}
+                        </span>
                       </div>
                     </div>
                 </div>
@@ -493,6 +539,11 @@ export const Dashboard: React.FC = () => {
         )}
 
       </main>
+
+      <MaintenanceSettingsModal 
+        isOpen={isMaintenanceModalOpen}
+        onClose={() => setIsMaintenanceModalOpen(false)}
+      />
     </div>
   );
-};;
+};

@@ -8,23 +8,52 @@ interface ParallaxBackgroundProps {
 export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ className = '', glow = true }) => {
   const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Generate a fixed grid of dots
+  // Generate dots based on container dimensions
+  const generateDots = (width: number, height: number) => {
     const spacing = 40;
     const padding = 100;
     const newDots = [];
-    const width = window.innerWidth;
-    const height = 1000;
 
     for (let x = -padding; x < width + padding; x += spacing) {
       for (let y = -padding; y < height + padding; y += spacing) {
         newDots.push({ x, y });
       }
     }
-    setDots(newDots);
+    return newDots;
+  };
 
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: rect.height });
+        setDots(generateDots(rect.width, rect.height));
+      }
+    };
+
+    // Initial measurement
+    updateDimensions();
+
+    // Handle window resize
+    window.addEventListener('resize', updateDimensions);
+    
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, []);
+
+  // Regenerate dots when dimensions change
+  useEffect(() => {
+    if (dimensions.width > 0 && dimensions.height > 0) {
+      setDots(generateDots(dimensions.width, dimensions.height));
+    }
+  }, [dimensions.width, dimensions.height]);
+
+  // Mouse tracking
+  useEffect(() => {
     let animationFrameId: number;
 
     const handleMouseMove = (e: MouseEvent) => {
