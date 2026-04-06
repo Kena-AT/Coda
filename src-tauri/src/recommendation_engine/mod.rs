@@ -6,6 +6,7 @@ pub mod scoring;
 pub mod workflow;
 pub mod candidates;
 pub mod metrics;
+pub mod linking;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Recommendation {

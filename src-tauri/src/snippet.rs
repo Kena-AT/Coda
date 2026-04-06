@@ -8,6 +8,7 @@ use std::time::Instant;
 pub struct Snippet {
     pub id: Option<i32>,
     pub user_id: i32,
+    pub project_id: Option<i32>,
     pub title: String,
     pub content: String,
     pub language: String,
@@ -19,6 +20,7 @@ pub struct Snippet {
     pub impressions: i32,
     pub clicks: i32,
     pub last_used_at: Option<String>,
+    pub archive_snoozed_until: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
 }
@@ -63,15 +65,16 @@ pub fn create_snippet(
     title: String,
     content: String,
     language: String,
-    tags: Option<String>
+    tags: Option<String>,
+    project_id: Option<i32>
 ) -> Result<SnippetResponse, String> {
     let conn = get_db_connection(&app_handle)?;
     
     let detected_patterns = crate::patterns::get_pattern_tags_json(&content);
     
     match conn.execute(
-        "INSERT INTO snippets (user_id, title, content, language, tags, detected_patterns) VALUES (?, ?, ?, ?, ?, ?)",
-        rusqlite::params![user_id, title, content, language, tags, detected_patterns],
+        "INSERT INTO snippets (user_id, title, content, language, tags, detected_patterns, project_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params![user_id, title, content, language, tags, detected_patterns, project_id],
     ) {
         Ok(_) => {
             // Invalidate cache on write
@@ -112,28 +115,30 @@ pub fn list_snippets(
     let conn = get_db_connection(&app_handle)?;
     
     let mut stmt = if include_archived {
-        conn.prepare("SELECT id, user_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, created_at, updated_at FROM snippets WHERE user_id = ? ORDER BY updated_at DESC")
+        conn.prepare("SELECT id, user_id, project_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ? ORDER BY updated_at DESC")
     } else {
-        conn.prepare("SELECT id, user_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, created_at, updated_at FROM snippets WHERE user_id = ? AND is_archived = 0 ORDER BY updated_at DESC")
+        conn.prepare("SELECT id, user_id, project_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ? AND is_archived = 0 ORDER BY updated_at DESC")
     }.map_err(|e| e.to_string())?;
 
     let snippet_iter = stmt.query_map([user_id], |row| {
         Ok(Snippet {
             id: Some(row.get(0)?),
             user_id: row.get(1)?,
-            title: row.get(2)?,
-            content: row.get(3)?,
-            language: row.get(4)?,
-            tags: row.get(5)?,
-            is_archived: row.get(6)?,
-            copy_count: row.get(7)?,
-            edit_count: row.get(8)?,
-            detected_patterns: row.get(9)?,
-            impressions: row.get(10)?,
-            clicks: row.get(11)?,
-            last_used_at: row.get(12)?,
-            created_at: Some(row.get(13)?),
-            updated_at: Some(row.get(14)?),
+            project_id: row.get(2)?,
+            title: row.get(3)?,
+            content: row.get(4)?,
+            language: row.get(5)?,
+            tags: row.get(6)?,
+            is_archived: row.get(7)?,
+            copy_count: row.get(8)?,
+            edit_count: row.get(9)?,
+            detected_patterns: row.get(10)?,
+            impressions: row.get(11)?,
+            clicks: row.get(12)?,
+            last_used_at: row.get(13)?,
+            archive_snoozed_until: row.get(14)?,
+            created_at: Some(row.get(15)?),
+            updated_at: Some(row.get(16)?),
         })
     }).map_err(|e| e.to_string())?;
 
@@ -169,7 +174,8 @@ pub fn update_snippet(
     title: String,
     content: String,
     language: String,
-    tags: Option<String>
+    tags: Option<String>,
+    project_id: Option<i32>
 ) -> Result<SnippetResponse, String> {
     let t0 = Instant::now();
     let mut conn = get_db_connection(&app_handle)?;
@@ -200,8 +206,8 @@ pub fn update_snippet(
     let detected_patterns = crate::patterns::get_pattern_tags_json(&content);
     
     tx.execute(
-        "UPDATE snippets SET title = ?, content = ?, language = ?, tags = ?, updated_at = CURRENT_TIMESTAMP, edit_count = edit_count + 1, detected_patterns = ? WHERE id = ? AND user_id = ?",
-        rusqlite::params![title, content, language, tags, detected_patterns, id, user_id]
+        "UPDATE snippets SET title = ?, content = ?, language = ?, tags = ?, updated_at = CURRENT_TIMESTAMP, edit_count = edit_count + 1, detected_patterns = ?, project_id = ? WHERE id = ? AND user_id = ?",
+        rusqlite::params![title, content, language, tags, detected_patterns, project_id, id, user_id]
     ).map_err(|e| e.to_string())?;
 
     if let Err(e) = tx.commit() {
@@ -449,7 +455,7 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
 
     // 4. Ledger (Top 5 popular snippets)
     let mut stmt = conn.prepare("
-        SELECT id, user_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, created_at, updated_at 
+        SELECT id, user_id, project_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at 
         FROM snippets 
         WHERE user_id = ? 
         ORDER BY copy_count DESC 
@@ -460,19 +466,21 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
         Ok(Snippet {
             id: Some(row.get(0)?),
             user_id: row.get(1)?,
-            title: row.get(2)?,
-            content: row.get(3)?,
-            language: row.get(4)?,
-            tags: row.get(5)?,
-            is_archived: row.get(6)?,
-            copy_count: row.get(7)?,
-            edit_count: row.get(8)?,
-            detected_patterns: row.get(9)?,
-            impressions: row.get(10)?,
-            clicks: row.get(11)?,
-            last_used_at: row.get(12)?,
-            created_at: Some(row.get(13)?),
-            updated_at: Some(row.get(14)?),
+            project_id: row.get(2)?,
+            title: row.get(3)?,
+            content: row.get(4)?,
+            language: row.get(5)?,
+            tags: row.get(6)?,
+            is_archived: row.get(7)?,
+            copy_count: row.get(8)?,
+            edit_count: row.get(9)?,
+            detected_patterns: row.get(10)?,
+            impressions: row.get(11)?,
+            clicks: row.get(12)?,
+            last_used_at: row.get(13)?,
+            archive_snoozed_until: row.get(14)?,
+            created_at: Some(row.get(15)?),
+            updated_at: Some(row.get(16)?),
         })
     }).map_err(|e| e.to_string())?;
 

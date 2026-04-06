@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export interface Snippet {
   id?: number;
   user_id: number;
-  project_id?: number;
+  project_id?: number | null;
   title: string;
   content: string;
   language: string;
@@ -15,8 +15,24 @@ export interface Snippet {
   impressions: number;
   clicks: number;
   last_used_at: string | null;
+  archive_snoozed_until: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Project {
+  id: number;
+  user_id: number;
+  name: string;
+  description: string | null;
+  color: string | null;
+  created_at: string;
+}
+
+export interface UserSettings {
+  auto_archive_days: number;
+  exclude_favorites: boolean;
+  min_copy_threshold: number;
 }
 
 interface AppState {
@@ -37,6 +53,12 @@ interface AppState {
 
   selectedSnippetId: number | null;
   setSelectedSnippetId: (id: number | null) => void;
+
+  projects: Project[];
+  setProjects: (projects: Project[]) => void;
+  
+  settings: UserSettings | null;
+  setSettings: (settings: UserSettings) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -58,6 +80,12 @@ export const useStore = create<AppState>((set) => ({
   })),
 
   setSelectedSnippetId: (id) => set({ selectedSnippetId: id }),
+
+  projects: [],
+  setProjects: (projects) => set({ projects }),
+
+  settings: null,
+  setSettings: (settings) => set({ settings }),
 
   sessionCopies: {},
   incrementCopy: (id) => set((state) => ({

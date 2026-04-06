@@ -15,6 +15,7 @@ import {
   Zap
 } from 'lucide-react';
 import { RollbackConfirmModal } from './RollbackConfirmModal';
+import { ProjectLinkingPanel } from './ProjectLinkingPanel';
 
 interface Version {
   id: number;
@@ -24,7 +25,7 @@ interface Version {
 }
 
 export const SnippetEditor: React.FC = () => {
-  const { user, snippets, selectedSnippetId, setSelectedSnippetId, updateSnippetInStore } = useStore();
+  const { user, snippets, projects, setProjects, selectedSnippetId, setSelectedSnippetId, updateSnippetInStore } = useStore();
   const [snippet, setSnippet] = useState<Partial<Snippet>>({ title: '', content: '', language: 'javascript' });
   const [versions, setVersions] = useState<Version[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
@@ -43,10 +44,26 @@ export const SnippetEditor: React.FC = () => {
         loadVersions(existing.id!);
       }
     } else {
-      setSnippet({ title: '', content: '', language: 'javascript' });
+      setSnippet({ title: '', content: '', language: 'javascript', project_id: null });
       setVersions([]);
     }
   }, [selectedSnippetId, snippets]);
+
+  // Load projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!user) return;
+      try {
+        const response: any = await invoke('list_projects', { userId: user.id });
+        if (response.success) {
+          setProjects(response.data || []);
+        }
+      } catch (err) {
+        console.error('Failed to load projects:', err);
+      }
+    };
+    fetchProjects();
+  }, [user]);
 
   const loadVersions = async (id: number) => {
     try {
@@ -73,7 +90,8 @@ export const SnippetEditor: React.FC = () => {
           title: snippet.title,
           content: snippet.content,
           language: snippet.language,
-          tags: snippet.tags || ''
+          tags: snippet.tags || '',
+          projectId: snippet.project_id || null
         });
         if (response.success) {
           toast.success('System buffer recorded');
@@ -90,7 +108,8 @@ export const SnippetEditor: React.FC = () => {
           title: snippet.title,
           content: snippet.content,
           language: snippet.language,
-          tags: snippet.tags || ''
+          tags: snippet.tags || '',
+          projectId: snippet.project_id || null
         });
         if (response.success) {
           toast.success('Matrix updated and versioned');
@@ -191,6 +210,20 @@ export const SnippetEditor: React.FC = () => {
                placeholder="SYS_ENTRY_TITLE..."
              />
              <div className="flex flex-col gap-1 w-48">
+               <span className="text-[9px] font-mono text-[#adaaad] uppercase">Project</span>
+               <select 
+                 value={snippet.project_id || ''}
+                 onChange={e => setSnippet({...snippet, project_id: e.target.value ? parseInt(e.target.value) : null})}
+                 className="bg-[#1c1b1b] border border-[#353534]/50 text-white text-[10px] font-mono p-2 outline-none"
+               >
+                 <option value="">NONE / ROOT</option>
+                 {projects.map(p => (
+                   <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
+                 ))}
+               </select>
+             </div>
+
+             <div className="flex flex-col gap-1 w-48">
                <span className="text-[9px] font-mono text-[#adaaad] uppercase">Language</span>
                <select 
                  value={snippet.language}
@@ -210,7 +243,8 @@ export const SnippetEditor: React.FC = () => {
         </div>
 
         {/* The Monaco Editor */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative flex flex-col">
+           <div className="flex-1 relative">
            {isDiffMode && selectedVersion ? (
              <DiffEditor
                height="100%"
@@ -243,6 +277,11 @@ export const SnippetEditor: React.FC = () => {
              />
            )}
         </div>
+        </div>
+
+        {selectedSnippetId !== -1 && (
+          <ProjectLinkingPanel snippetId={selectedSnippetId!} />
+        )}
 
       </div>
 

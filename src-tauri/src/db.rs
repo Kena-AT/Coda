@@ -93,6 +93,9 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         if !columns.contains(&"clicks".to_string()) {
             conn.execute("ALTER TABLE snippets ADD COLUMN clicks INTEGER DEFAULT 0", []).map_err(|e| e.to_string())?;
         }
+        if !columns.contains(&"archive_snoozed_until".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN archive_snoozed_until DATETIME", []).map_err(|e| e.to_string())?;
+        }
     }
 
     conn.execute(
@@ -153,6 +156,31 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             FOREIGN KEY (user_id) REFERENCES users(id),
             FOREIGN KEY (from_id) REFERENCES snippets(id) ON DELETE CASCADE,
             FOREIGN KEY (to_id) REFERENCES snippets(id) ON DELETE CASCADE
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS snippet_relations (
+            snippet_id INTEGER NOT NULL,
+            related_id INTEGER NOT NULL,
+            strength INTEGER DEFAULT 0,
+            link_type TEXT NOT NULL,
+            last_calculated DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (snippet_id, related_id),
+            FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE CASCADE,
+            FOREIGN KEY (related_id) REFERENCES snippets(id) ON DELETE CASCADE
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS user_settings (
+            user_id INTEGER PRIMARY KEY,
+            auto_archive_days INTEGER DEFAULT 30,
+            exclude_favorites BOOLEAN DEFAULT 1,
+            min_copy_threshold INTEGER DEFAULT 10,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )",
         [],
     ).map_err(|e| e.to_string())?;

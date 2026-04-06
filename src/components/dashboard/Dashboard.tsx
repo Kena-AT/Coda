@@ -19,14 +19,17 @@ import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
 import { HighlightText } from './HighlightText';
+import { ArchiveModal } from './ArchiveModal';
 
 export const Dashboard: React.FC = () => {
-  const { user, setUser, snippets, setSnippets, loading, setLoading, sessionCopies, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
+  const { user, setUser, snippets, setSnippets, projects, loading, setLoading, sessionCopies, incrementCopy, selectedSnippetId, setSelectedSnippetId } = useStore();
   const [activeTab, setActiveTab] = useState('library');
   const [searchQuery, setSearchQuery] = useState('');
   const [languageFilter, setLanguageFilter] = useState('all');
   const [tagFilter, setTagFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'modified_desc' | 'modified_asc' | 'alpha'>('modified_desc');
+  const [projectFilter, setProjectFilter] = useState<number | 'all'>('all');
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
   const fetchSnippets = async () => {
     if (!user) return;
@@ -51,6 +54,19 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchSnippets();
+    // Check for archive candidates on mount
+    const checkArchivable = async () => {
+      if (!user) return;
+      try {
+        const candidates = await invoke<any[]>('get_archive_candidates', { userId: user.id });
+        if (candidates.length > 0) {
+          setIsArchiveModalOpen(true);
+        }
+      } catch (e) {
+        console.error('Archiver check failed:', e);
+      }
+    };
+    checkArchivable();
   }, [user, activeTab]);
 
   // When selected tab changes, clear snippet editor
@@ -95,7 +111,12 @@ export const Dashboard: React.FC = () => {
       });
     }
 
-    // 4. Sorting
+    // 4. Project Filter
+    if (projectFilter !== 'all') {
+      result = result.filter(s => s.project_id === projectFilter);
+    }
+
+    // 5. Sorting
     result = [...result].sort((a, b) => {
       if (sortBy === 'modified_desc') {
         return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
@@ -219,6 +240,26 @@ export const Dashboard: React.FC = () => {
                       ROOT_VAULT
                     </h1>
                   </div>
+                  <button 
+                    onClick={async () => {
+                      const name = window.prompt('Enter Project Name:');
+                      if (name && user) {
+                        try {
+                          await invoke('create_project', { userId: user.id, name });
+                          const response: any = await invoke('list_projects', { userId: user.id });
+                          if (response.success) {
+                            useStore.getState().setProjects(response.data || []);
+                            toast.success('Project sector initialized');
+                          }
+                        } catch (e) {
+                          toast.error('Failed to create project');
+                        }
+                      }
+                    }}
+                    className="mt-6 px-6 py-2 border border-[#353534]/50 text-[#adaaad] hover:text-[#e60000] hover:border-[#e60000] text-[10px] font-main font-bold tracking-[2px] uppercase transition-all"
+                  >
+                    CREATE_PROJECT
+                  </button>
                 </div>
 
                 {/* Filters & View Toggles */}
@@ -271,6 +312,23 @@ export const Dashboard: React.FC = () => {
                               placeholder="NO_FILTER"
                               className="w-[90px] bg-transparent text-[10px] font-main font-bold text-white outline-none uppercase tracking-[1px] placeholder:text-[#adaaad]/40"
                             />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#adaaad] text-[10px] uppercase tracking-[1px]">Project</span>
+                        <div className="flex items-center bg-[#0e0e0e] border border-[#222226] pl-2 h-[26px]">
+                            <div className="w-0.5 h-4 bg-[#e60000] mr-2" />
+                            <select 
+                              value={projectFilter === 'all' ? '' : projectFilter}
+                              onChange={(e) => setProjectFilter(e.target.value ? parseInt(e.target.value) : 'all')}
+                              className="bg-[#0e0e0e] text-[10px] font-main font-bold text-white outline-none uppercase tracking-[1px] appearance-none pr-3 cursor-pointer"
+                              style={{ colorScheme: 'dark' }}
+                            >
+                              <option value="all">ALL_PRJ</option>
+                              {projects.map(p => (
+                                <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
+                              ))}
+                            </select>
                         </div>
                       </div>
                   </div>
@@ -425,6 +483,12 @@ export const Dashboard: React.FC = () => {
             >
               <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
             </button>
+
+            <ArchiveModal 
+              isOpen={isArchiveModalOpen} 
+              onClose={() => setIsArchiveModalOpen(false)} 
+              onRefresh={fetchSnippets} 
+            />
           </>
         )}
 

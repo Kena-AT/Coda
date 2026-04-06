@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onNew
           onClick={onNewSnippet}
           className="w-full bg-[#e60000] text-white flex items-center justify-center gap-2 py-4 font-main font-bold text-[11px] tracking-[2px] uppercase hover:bg-[#ff0000] transition-colors"
         >
-          <span>NEW_Project</span>
+          <span>NEW_SNIPPET</span>
         </button>
       </div>
 

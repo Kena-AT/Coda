@@ -5,6 +5,8 @@ mod telemetry;
 mod templates;
 mod recommendation_engine;
 mod patterns;
+mod project;
+mod archiver;
 
 use dashmap::DashMap;
 use tauri::Manager;
@@ -92,7 +94,16 @@ pub fn run() {
             recommendation_engine::get_recommendations_metadata,
             recommendation_engine::get_stale_snippets,
             recommendation_engine::get_popular_snippets,
-            recommendation_engine::record_recommendation_click
+            recommendation_engine::record_recommendation_click,
+            recommendation_engine::linking::get_related_snippets,
+            recommendation_engine::linking::recompute_snippet_links,
+            project::create_project,
+            project::list_projects,
+            project::delete_project,
+            project::get_project_stats,
+            archiver::get_archive_candidates,
+            archiver::archive_snippets,
+            archiver::snooze_archive
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
