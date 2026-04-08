@@ -99,6 +99,7 @@ pub fn run() {
             recommendation_engine::linking::recompute_snippet_links,
             project::create_project,
             project::list_projects,
+            project::update_project,
             project::delete_project,
             project::get_project_stats,
             archiver::get_archive_candidates,

@@ -54,6 +54,9 @@ interface AppState {
   selectedSnippetId: number | null;
   setSelectedSnippetId: (id: number | null) => void;
 
+  selectedProjectId: number | null;
+  setSelectedProjectId: (id: number | null) => void;
+
   projects: Project[];
   setProjects: (projects: Project[]) => void;
   
@@ -80,6 +83,8 @@ export const useStore = create<AppState>((set) => ({
   })),
 
   setSelectedSnippetId: (id) => set({ selectedSnippetId: id }),
+  selectedProjectId: null,
+  setSelectedProjectId: (id) => set({ selectedProjectId: id }),
 
   projects: [],
   setProjects: (projects) => set({ projects }),

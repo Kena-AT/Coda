@@ -25,7 +25,16 @@ interface Version {
 }
 
 export const SnippetEditor: React.FC = () => {
-  const { user, snippets, projects, setProjects, selectedSnippetId, setSelectedSnippetId, updateSnippetInStore } = useStore();
+  const { 
+    user, 
+    snippets, 
+    projects, 
+    setProjects, 
+    selectedSnippetId, 
+    setSelectedSnippetId, 
+    selectedProjectId,
+    updateSnippetInStore 
+  } = useStore();
   const [snippet, setSnippet] = useState<Partial<Snippet>>({ title: '', content: '', language: 'javascript' });
   const [versions, setVersions] = useState<Version[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
@@ -44,7 +53,9 @@ export const SnippetEditor: React.FC = () => {
         loadVersions(existing.id!);
       }
     } else {
-      setSnippet({ title: '', content: '', language: 'javascript', project_id: null });
+      // Set default project from store if we're in a project view
+      const defaultProjectId = selectedProjectId && selectedProjectId !== -1 ? selectedProjectId : null;
+      setSnippet({ title: '', content: '', language: 'javascript', project_id: defaultProjectId });
       setVersions([]);
     }
   }, [selectedSnippetId, snippets]);
@@ -210,13 +221,13 @@ export const SnippetEditor: React.FC = () => {
                placeholder="SYS_ENTRY_TITLE..."
              />
              <div className="flex flex-col gap-1 w-48">
-               <span className="text-[9px] font-mono text-[#adaaad] uppercase">Project</span>
+               <span className="text-[9px] font-mono text-[#adaaad] uppercase">PROJECT_REPOSITORY</span>
                <select 
                  value={snippet.project_id || ''}
                  onChange={e => setSnippet({...snippet, project_id: e.target.value ? parseInt(e.target.value) : null})}
-                 className="bg-[#1c1b1b] border border-[#353534]/50 text-white text-[10px] font-mono p-2 outline-none"
+                 className="bg-[#1c1b1b] border border-[#353534]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[#e60000] transition-colors cursor-pointer"
                >
-                 <option value="">NONE / ROOT</option>
+                 <option value="">INBOX / UNSORTED</option>
                  {projects.map(p => (
                    <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
                  ))}

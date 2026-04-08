@@ -98,6 +98,40 @@ pub fn list_projects(
 }
 
 #[tauri::command]
+pub fn update_project(
+    app_handle: AppHandle,
+    id: i32,
+    user_id: i32,
+    name: String,
+    description: Option<String>,
+    color: Option<String>,
+) -> Result<ProjectResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    match conn.execute(
+        "UPDATE projects SET name = ?, description = ?, color = ? WHERE id = ? AND user_id = ?",
+        rusqlite::params![name, description, color, id, user_id],
+    ) {
+        Ok(_) => {
+            let project = Project {
+                id: Some(id),
+                user_id,
+                name,
+                description,
+                color,
+                created_at: None, // We don't necessarily need to return it here
+            };
+            Ok(ProjectResponse {
+                success: true,
+                message: "Project updated successfully".to_string(),
+                data: Some(vec![project]),
+            })
+        },
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
 pub fn delete_project(
     app_handle: AppHandle,
     id: i32,
