@@ -11,14 +11,19 @@ interface HighlightTextProps {
  * Used to surface fuzzy-search hits inside snippet list rows.
  */
 export const HighlightText: React.FC<HighlightTextProps> = ({ text, query, className }) => {
-  if (!query.trim()) {
+  // Only highlight keyword terms, not filters (lang:, tag:, etc)
+  const escapedTerms = query.split(/\s+/)
+    .filter(t => !t.includes(':'))
+    .filter(t => t.trim().length > 0)
+    .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+  if (escapedTerms.length === 0) {
     return <span className={className}>{text}</span>;
   }
 
-  // Escape special regex characters in the query
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const regex = new RegExp(`(${escaped})`, 'gi');
-  const parts = text.split(regex);
+  const regex = new RegExp(`(${escapedTerms.join('|')})`, 'gi');
+  const safeText = text || '';
+  const parts = safeText.split(regex);
 
   return (
     <span className={className}>

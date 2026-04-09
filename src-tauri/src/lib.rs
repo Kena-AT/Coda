@@ -15,6 +15,7 @@ pub struct AppState {
     pub snippet_cache: DashMap<i32, Vec<snippet::Snippet>>,
     pub last_accessed_map: DashMap<i32, i32>, // user_id -> snippet_id
     pub telemetry: telemetry::SharedTelemetry,
+    pub session_store: auth::SessionStore,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -25,6 +26,7 @@ pub fn run() {
         snippet_cache: DashMap::new(),
         last_accessed_map: DashMap::new(),
         telemetry: telemetry.clone(),
+        session_store: auth::SessionStore::new(),
     };
 
     // Clone handle for background sampling thread
@@ -75,6 +77,9 @@ pub fn run() {
             auth::signup,
             auth::login,
             auth::check_auth,
+            auth::refresh_access_token,
+            auth::logout,
+            auth::validate_token,
             snippet::create_snippet,
             snippet::list_snippets,
             snippet::update_snippet,

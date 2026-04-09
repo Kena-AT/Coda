@@ -62,6 +62,9 @@ interface AppState {
   
   settings: UserSettings | null;
   setSettings: (settings: UserSettings) => void;
+
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -91,6 +94,9 @@ export const useStore = create<AppState>((set) => ({
 
   settings: null,
   setSettings: (settings) => set({ settings }),
+
+  searchQuery: '',
+  setSearchQuery: (query) => set({ searchQuery: query }),
 
   sessionCopies: {},
   incrementCopy: (id) => set((state) => ({

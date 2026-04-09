@@ -33,24 +33,24 @@ export const IntelligenceDashboard: React.FC = () => {
   };
 
   const sections = useMemo(() => {
-    const unarchived = snippets.filter(s => !s.is_archived);
+    const unarchived = snippets.filter(s => s && !s.is_archived);
     
     // Top Snippets (by copies)
     const topSnippets = [...unarchived]
-      .sort((a, b) => b.copy_count - a.copy_count)
+      .sort((a, b) => (b.copy_count || 0) - (a.copy_count || 0))
       .slice(0, 4);
 
     // Continue Working (by updated_at)
     const continueWorking = [...unarchived]
       .filter(s => s.updated_at)
-      .sort((a, b) => new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime())
+      .sort((a, b) => new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime())
       .slice(0, 4);
 
     // active project mapping
-    const projScores = projects.map(p => {
+    const projScores = (projects || []).map(p => {
        const pSnips = unarchived.filter(s => s.project_id === p.id);
        const activeBase = pSnips.length * 5;
-       const copiesBase = pSnips.reduce((acc, curr) => acc + curr.copy_count, 0) * 2;
+       const copiesBase = pSnips.reduce((acc, curr) => acc + (curr.copy_count || 0), 0) * 2;
        return { ...p, score: activeBase + copiesBase, snippetCount: pSnips.length };
     }).sort((a, b) => b.score - a.score).slice(0, 4);
 
@@ -58,7 +58,9 @@ export const IntelligenceDashboard: React.FC = () => {
     const stale = [...unarchived]
       .filter(s => {
          if (!s.last_used_at) return true;
-         return (new Date().getTime() - new Date(s.last_used_at).getTime()) > 30 * 24 * 60 * 60 * 1000;
+         try {
+           return (new Date().getTime() - new Date(s.last_used_at).getTime()) > 30 * 24 * 60 * 60 * 1000;
+         } catch(e) { return true; }
       })
       .slice(0, 4);
 
@@ -77,7 +79,7 @@ export const IntelligenceDashboard: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {list.map(s => (
+          {list.map(s => s && (
             <div key={s.id} className="h-[200px]">
               <SnippetCard 
                 snippet={s} 
@@ -105,13 +107,13 @@ export const IntelligenceDashboard: React.FC = () => {
           <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Active Projects</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {sections.projScores.map(p => (
+          {sections.projScores.map(p => p && (
             <div key={p.id} className="bg-[#151515] border border-[#222226] p-5 hover:border-[#e60000]/50 transition-colors cursor-pointer group">
               <div className="flex justify-between items-start mb-4">
                 <Folder className="w-5 h-5 text-[#e60000]" />
                 <span className="text-[#adaaad] text-[9px] font-mono tracking-widest">{p.snippetCount} ITEMS</span>
               </div>
-              <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[#e60000] transition-colors">{p.name}</h3>
+              <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[#e60000] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
               <p className="text-[10px] text-[#adaaad] font-mono mt-2">ACTIVITY SCORE: {p.score}</p>
             </div>
           ))}

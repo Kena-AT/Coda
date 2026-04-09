@@ -59,6 +59,24 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         [],
     ).map_err(|e| e.to_string())?;
 
+    // Migration logic: Add columns to existing users table if missing
+    {
+        let mut table_info = conn.prepare("PRAGMA table_info(users)").map_err(|e| e.to_string())?;
+        let rows = table_info.query_map([], |row| {
+            let name: String = row.get(1)?;
+            Ok(name)
+        }).map_err(|e| e.to_string())?;
+        
+        let mut columns = Vec::new();
+        for col in rows {
+            columns.push(col.map_err(|e| e.to_string())?);
+        }
+
+        if !columns.contains(&"last_logout_at".to_string()) {
+            conn.execute("ALTER TABLE users ADD COLUMN last_logout_at DATETIME", []).map_err(|e| e.to_string())?;
+        }
+    }
+
     // Migration logic: Add columns to existing snippets table if missing
     {
         let mut table_info = conn.prepare("PRAGMA table_info(snippets)").map_err(|e| e.to_string())?;

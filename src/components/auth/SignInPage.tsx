@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/core';
+import { Eye, EyeOff, Check } from 'lucide-react';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
+import { authApi, sessionManager, type AuthResponse } from '../../store/authStore';
 
 interface SignInPageProps {
   onBack: () => void;
   onSignUp: () => void;
-  onSuccess: (id: number, username: string) => void;
+  onSuccess: (id: number, username: string, accessToken: string) => void;
 }
 
 export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,9 +23,22 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
     setError('');
 
     try {
-      const response: any = await invoke('login', { username, password });
-      if (response.success) {
-        onSuccess(response.user_id, username);
+      const response: AuthResponse = await authApi.login(username, password, rememberMe);
+      if (response.success && response.token && response.user_id && response.refresh_token) {
+        // Store tokens based on remember me preference
+        sessionManager.setSession(
+          {
+            accessToken: response.token,
+            refreshToken: response.refresh_token,
+            userId: response.user_id,
+            username: response.username || username,
+            accessExpiresAt: response.access_expires_at || Math.floor(Date.now() / 1000) + 24 * 60 * 60,
+            refreshExpiresAt: response.refresh_expires_at || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
+            rememberMe,
+          },
+          rememberMe
+        );
+        onSuccess(response.user_id, response.username || username, response.token);
       } else {
         setError(response.message);
       }
@@ -138,11 +152,29 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
               </button>
             </div>
 
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setRememberMe(!rememberMe)}
+                className={`w-5 h-5 rounded flex items-center justify-center transition-all ${
+                  rememberMe
+                    ? 'bg-[#e60000] border-2 border-[#e60000] shadow-[0_0_10px_rgba(230,0,0,0.4)]'
+                    : 'bg-[#222226] border-2 border-[#e60000]/60 hover:border-[#e60000] hover:bg-[#2a2a2e]'
+                }`}
+              >
+                {rememberMe && <Check className="w-3.5 h-3.5 text-white" />}
+              </button>
+              <span className="text-[#adaaad] font-main text-[11px] tracking-[0.55px]">
+                Remember me on this device
+              </span>
+            </div>
+
             {error && !error.includes('locked') && (
               <p className="text-[#e60000] text-[12px] font-bold tracking-tight">{error}</p>
             )}
 
-            <div className="pt-4 flex flex-col gap-6">
+            <div className="pt-2 flex flex-col gap-6">
               <button 
                 type="submit" 
                 disabled={loading}

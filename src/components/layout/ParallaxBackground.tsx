@@ -20,11 +20,12 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
+  const mouseRef = useRef({ x: 0, y: 0 });
 
   // Generate spherical orbital points
   const generateOrbitalPoints = (centerX: number, centerY: number): OrbitalPoint[] => {
-    const rings = 8;
-    const pointsPerRing = 24;
+    const rings = 12;
+    const pointsPerRing = 36;
     const maxRadius = Math.min(centerX, centerY) * 1.3; // INCREASED from 0.85 to 1.3
     const newPoints: OrbitalPoint[] = [];
 
@@ -66,8 +67,8 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
     }
 
     // Add spiral arms (galactic effect)
-    const spiralArms = 3;
-    const spiralPoints = 60;
+    const spiralArms = 4;
+    const spiralPoints = 80;
     for (let arm = 0; arm < spiralArms; arm++) {
       const armOffset = (arm / spiralArms) * Math.PI * 2;
       for (let i = 0; i < spiralPoints; i++) {
@@ -116,40 +117,33 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
   useEffect(() => {
     const animate = () => {
       setRotation(prev => ({
-        x: prev.x + (mousePos.y * 0.0005 - prev.x) * 0.05 + 0.001,
-        y: prev.y + (mousePos.x * 0.0005 - prev.y) * 0.05 + 0.002
+        x: prev.x + (mouseRef.current.y * 0.0005 - prev.x) * 0.05 + 0.005,
+        y: prev.y + (mouseRef.current.x * 0.0005 - prev.y) * 0.05 + 0.008
       }));
       frameRef.current = requestAnimationFrame(animate);
     };
 
     frameRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [mousePos]);
+  }, []);
 
   // Mouse tracking
   useEffect(() => {
-    let animationFrameId: number;
-
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const x = e.clientX - rect.left - centerX;
-        const y = e.clientY - rect.top - centerY;
-        
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        animationFrameId = requestAnimationFrame(() => {
-          setMousePos({ x, y });
-        });
+        mouseRef.current = {
+          x: e.clientX - rect.left - centerX,
+          y: e.clientY - rect.top - centerY
+        };
+        setMousePos(mouseRef.current);
       }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    };
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   // Transform points based on rotation and cursor repulsion

@@ -20,12 +20,9 @@ import {
 } from 'lucide-react';
 import { SnippetCard } from './SnippetCard';
 import toast from 'react-hot-toast';
+import { filterSnippets } from '../../utils/searchEngine';
 
-interface ProjectVaultProps {
-  searchQuery: string;
-}
-
-export const ProjectVault: React.FC<ProjectVaultProps> = ({ searchQuery: globalSearch }) => {
+export const ProjectVault: React.FC = () => {
   const { 
     user, 
     projects, 
@@ -34,7 +31,8 @@ export const ProjectVault: React.FC<ProjectVaultProps> = ({ searchQuery: globalS
     setSnippets,
     setSelectedSnippetId, 
     selectedProjectId,
-    setSelectedProjectId
+    setSelectedProjectId,
+    searchQuery
   } = useStore();
 
   const [stats, setStats] = useState<Record<number, any>>({});
@@ -192,20 +190,19 @@ export const ProjectVault: React.FC<ProjectVaultProps> = ({ searchQuery: globalS
       return s.project_id === selectedProjectId;
     });
 
-    const searchArr = [localSearch, globalSearch].filter(Boolean);
-    if (searchArr.length > 0) {
-      result = result.filter(s => 
-        searchArr.some(q => {
-          const lq = q.toLowerCase();
-          return s.title.toLowerCase().includes(lq) || 
-                 s.content.toLowerCase().includes(lq) ||
-                 (s.tags && s.tags.toLowerCase().includes(lq));
-        })
-      );
+    // If searching, show archived snippets in results
+    if (!searchQuery && !localSearch) {
+      result = result.filter(s => !s.is_archived);
     }
 
-    return result.filter(s => !s.is_archived);
-  }, [snippets, selectedProjectId, localSearch, globalSearch]);
+    if (searchQuery || localSearch) {
+      const combinedQuery = `${searchQuery} ${localSearch}`.trim();
+      const filtered = filterSnippets(result, projects, combinedQuery);
+      return filtered.map(r => r.snippet);
+    }
+
+    return result;
+  }, [snippets, selectedProjectId, localSearch, searchQuery, projects]);
 
   const calculateHealth = (stat: any) => {
     if (!stat || stat.active_snippets === 0) return { label: 'EMPTY', color: 'text-slate-500' };
@@ -298,7 +295,7 @@ export const ProjectVault: React.FC<ProjectVaultProps> = ({ searchQuery: globalS
         <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
           {scopedSnippets.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center border border-dashed border-[#222226] rounded-xl text-[#adaaad] uppercase font-mono text-[11px]">
-              {localSearch || globalSearch ? 'NO_MATCHING_CODE_ENTRIES' : 'PROJECT_VAULT_EMPTY'}
+              {localSearch || searchQuery ? 'NO_MATCHING_CODE_ENTRIES' : 'PROJECT_VAULT_EMPTY'}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">

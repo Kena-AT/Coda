@@ -19,6 +19,9 @@ import { ArchiveModal } from './ArchiveModal';
 import { ProjectVault } from './ProjectVault';
 import { MaintenanceSettingsModal } from './MaintenanceSettingsModal';
 import { IntelligenceDashboard } from './IntelligenceDashboard';
+import { GlobalSearchResults } from './GlobalSearchResults';
+import { sessionManager, authApi } from '../../store/authStore';
+import { useAuthSession } from '../../hooks/useAuthSession';
 
 export const Dashboard: React.FC = () => {
   const { 
@@ -28,11 +31,39 @@ export const Dashboard: React.FC = () => {
     setSnippets, 
     setLoading, 
     selectedSnippetId, 
-    setSelectedSnippetId 
+    setSelectedSnippetId,
+    searchQuery,
+    setSearchQuery,
+    setProjects
   } = useStore();
 
+  // Enable automatic token expiry tracking and refresh
+  useAuthSession();
+
+  const handleLogout = async () => {
+    if (!user) return;
+    
+    try {
+      const session = sessionManager.getSession();
+      if (session) {
+        // Call backend to invalidate session
+        await authApi.logout(
+          session.accessToken,
+          session.refreshToken,
+          user.id
+        );
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Always clear local session regardless of backend response
+      sessionManager.clearSession();
+      setUser(null);
+      toast.success('Logged out successfully');
+    }
+  };
+
   const [activeTab, setActiveTab] = useState('library');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
@@ -55,7 +86,7 @@ export const Dashboard: React.FC = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const includeArchived = activeTab === 'archive';
+      const includeArchived = activeTab === 'archive' || !!searchQuery;
       const response: any = await invoke('list_snippets', {
         userId: user.id,
         includeArchived
@@ -100,7 +131,7 @@ export const Dashboard: React.FC = () => {
       }
     };
     checkArchivable();
-  }, [user, activeTab]);
+  }, [user, activeTab, !!searchQuery]);
 
   // When selected tab changes, clear snippet editor
   useEffect(() => {
@@ -121,12 +152,12 @@ export const Dashboard: React.FC = () => {
     <div className="flex min-h-screen bg-[#111111] text-white">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onNewSnippet={() => setSelectedSnippetId(-1)} />
 
-      <main className="flex-1 ml-[256px] flex flex-col relative overflow-hidden">
+      <main className="flex-1 ml-[0px] lg:ml-[256px] flex flex-col relative overflow-hidden">
         
         {/* Global Navbar Header */}
         <header className="h-[64px] bg-[#111111] border-b border-[#222226] px-8 flex items-center justify-between z-40 shrink-0">
           <div className="flex items-center gap-8">
-            <h2 className="text-lg font-main font-bold text-[#e60000] tracking-[-1px] uppercase">
+            <h2 className="text-lg font-main font-bold text-[#e60000] tracking-[-1px] uppercase cursor-pointer" onClick={() => setSearchQuery('')}>
               CODA
             </h2>
             <div className="relative w-[300px] flex items-center">
@@ -138,6 +169,14 @@ export const Dashboard: React.FC = () => {
                 placeholder="GLOBAL_SEARCH_CMD..."
                 className="w-full bg-[#0e0e0e] border border-[#222226] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[#e60000] transition-colors font-main text-[11px] tracking-[1px]"
               />
+              {searchQuery && (
+                 <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 text-[#adaaad] hover:text-white font-mono text-[9px]"
+                 >
+                   [ESC]
+                 </button>
+              )}
             </div>
           </div>
           
@@ -166,7 +205,7 @@ export const Dashboard: React.FC = () => {
               <button onClick={() => setIsMaintenanceModalOpen(true)} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
                 <Settings className="w-5 h-5" />
               </button>
-              <button onClick={() => setUser(null)} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
+              <button onClick={handleLogout} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
                 <Power className="w-5 h-5" />
               </button>
             </div>
@@ -176,13 +215,16 @@ export const Dashboard: React.FC = () => {
         <div className="flex-1 flex overflow-hidden">
           {selectedSnippetId !== null ? (
             <SnippetEditor />
+          ) : searchQuery ? (
+            <GlobalSearchResults />
           ) : activeTab === 'analytics' ? (
             <AnalyticsPage />
           ) : activeTab === 'projects' ? (
-            <ProjectVault searchQuery={searchQuery} />
+            <ProjectVault />
           ) : (
             <>
               <IntelligenceDashboard />
+
               {/* Right Panel: Assets & Hardware Intelligence */}
               <aside className="w-[360px] bg-[#111111] border-l border-[#222226] p-8 flex-col gap-12 hidden xl:flex overflow-y-auto custom-scrollbar relative">
                 
@@ -195,9 +237,10 @@ export const Dashboard: React.FC = () => {
                       </h3>
                     </div>
                     <div className="space-y-6">
-                      {snippets.slice(0, 3).sort((a,b) => b.copy_count - a.copy_count).map((snippet, idx) => {
+                      {snippets.slice(0, 3).sort((a,b) => (b.copy_count || 0) - (a.copy_count || 0)).map((snippet, idx) => {
                         const copies = snippet.copy_count || 0;
-                        const visualWidth = Math.min(100, Math.max(15, (copies * 10) + (snippet.content.length % 20)));
+                        const contentLen = snippet.content?.length || 0;
+                        const visualWidth = Math.min(100, Math.max(15, (copies * 10) + (contentLen % 20)));
                         return (
                           <div key={idx} className="flex flex-col gap-2">
                               <div className="flex justify-between items-center text-[10px] font-mono">
