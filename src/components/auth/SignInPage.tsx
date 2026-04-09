@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff, Check, Copy, CheckCircle2 } from 'lucide-react';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
 import { authApi, sessionManager, type AuthResponse } from '../../store/authStore';
 
@@ -16,6 +16,20 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+
+  const localNodeAddress = '127.0.0.1:443';
+
+  const handleCopyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(localNodeAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +112,22 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
             </div>
             <div className="text-right">
               <span className="text-[#adaaad] font-main text-[10px] block mb-1">Local Node:</span>
-              <span className="text-[#e60000] font-main text-[12px]">127.0.0.1:443</span>
+              <button
+                onClick={handleCopyAddress}
+                className="group flex items-center gap-2 text-[#e60000] font-main text-[12px] hover:text-[#ff3333] transition-colors"
+                title={copied ? 'Copied!' : 'Click to copy address'}
+              >
+                <span className={copied ? 'text-[#f3ffca]' : ''}>
+                  {copied ? localNodeAddress : localNodeAddress}
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  {copied ? <CheckCircle2 size={12} className="text-[#f3ffca]" /> : <Copy size={12} />}
+                </span>
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#f3ffca] animate-pulse' : 'bg-[#ff716c]'}`}
+                  title={isConnected ? 'Connected' : 'Disconnected'}
+                />
+              </button>
             </div>
           </div>
 

@@ -7,6 +7,7 @@ mod recommendation_engine;
 mod patterns;
 mod project;
 mod archiver;
+mod vault_maintenance;
 
 use dashmap::DashMap;
 use tauri::Manager;
@@ -38,6 +39,15 @@ pub fn run() {
         .setup(move |app| {
             // Initialize database
             db::init_db(app.handle())?;
+
+            // Start vault maintenance scheduler
+            let app_handle_maintenance = app.handle().clone();
+            std::thread::spawn(move || {
+                // Wait a bit for DB to be ready
+                std::thread::sleep(std::time::Duration::from_secs(5));
+                let service = vault_maintenance::VaultMaintenanceService::new(app_handle_maintenance);
+                service.start_scheduler();
+            });
 
             // Spawn background telemetry sampling thread
             let app_handle = app.handle().clone();
@@ -111,7 +121,13 @@ pub fn run() {
             archiver::archive_snippets,
             archiver::snooze_archive,
             archiver::update_maintenance_settings,
-            telemetry::get_system_status
+            telemetry::get_system_status,
+            vault_maintenance::get_vault_status,
+            vault_maintenance::get_vault_history,
+            vault_maintenance::run_vault_maintenance,
+            vault_maintenance::get_vault_config,
+            vault_maintenance::update_vault_config,
+            vault_maintenance::add_vault_monitor
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

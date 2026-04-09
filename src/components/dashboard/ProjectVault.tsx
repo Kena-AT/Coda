@@ -41,10 +41,15 @@ export const ProjectVault: React.FC = () => {
   const [localSearch, setLocalSearch] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   
-  // Edit State
+  // Edit State for detail view
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editDesc, setEditDesc] = useState('');
+
+  // Inline edit state for overview grid
+  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+  const [inlineEditName, setInlineEditName] = useState('');
+  const [inlineEditDesc, setInlineEditDesc] = useState('');
 
   // Virtual Project: Inbox (ID: -1)
   const inboxProject: Project = {
@@ -163,6 +168,43 @@ export const ProjectVault: React.FC = () => {
       if (resp.success) {
         toast.success('Metadata updated');
         setIsEditing(false);
+        await fetchProjects();
+      }
+    } catch (err) {
+      toast.error('Update failed');
+    }
+  };
+
+  const startInlineEdit = (p: Project) => {
+    setEditingProjectId(p.id!);
+    setInlineEditName(p.name);
+    setInlineEditDesc(p.description || '');
+  };
+
+  const cancelInlineEdit = () => {
+    setEditingProjectId(null);
+    setInlineEditName('');
+    setInlineEditDesc('');
+  };
+
+  const saveInlineEdit = async (projectId: number) => {
+    if (!user || projectId === -1) return;
+    
+    try {
+      const p = allProjects.find(proj => proj.id === projectId);
+      if (!p) return;
+
+      const resp = await invoke<any>('update_project', {
+        id: projectId,
+        userId: user.id,
+        name: inlineEditName,
+        description: inlineEditDesc,
+        color: p.color
+      });
+      
+      if (resp.success) {
+        toast.success('Project updated');
+        setEditingProjectId(null);
         await fetchProjects();
       }
     } catch (err) {
@@ -363,31 +405,76 @@ export const ProjectVault: React.FC = () => {
                 onClick={() => setSelectedProjectId(p.id)}
               >
                 <div className="flex justify-between items-start mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#e60000]/10 text-[#e60000] border border-[#e60000]/20 group-hover:bg-[#e60000] group-hover:text-white transition-all">
-                      {p.id === -1 ? <Inbox className="w-5 h-5" /> : <FolderGit2 className="w-5 h-5" />}
-                    </div>
-                    <div className="flex flex-col">
-                      <h3 className="font-main font-bold text-white tracking-[0.5px] uppercase">{p.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-[9px] font-black uppercase font-mono tracking-widest ${health.color}`}>
-                          {health.label}
-                        </span>
+                  {editingProjectId === p.id ? (
+                    <div className="flex flex-col gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="text"
+                        value={inlineEditName}
+                        onChange={(e) => setInlineEditName(e.target.value)}
+                        className="font-main font-bold text-white bg-[#0e0e0e] border border-[#222226] px-2 py-1 text-sm outline-none focus:border-[#e60000] uppercase tracking-[0.5px] w-full"
+                        placeholder="PROJECT_NAME..."
+                        autoFocus
+                      />
+                      <input
+                        type="text"
+                        value={inlineEditDesc}
+                        onChange={(e) => setInlineEditDesc(e.target.value)}
+                        className="text-[#adaaad] font-mono text-[9px] bg-[#0e0e0e] border border-[#222226] px-2 py-1 outline-none focus:border-[#e60000] w-full"
+                        placeholder="Description..."
+                      />
+                      <div className="flex gap-2 mt-1">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); saveInlineEdit(p.id!); }}
+                          className="px-2 py-1 bg-[#e60000] text-white text-[9px] font-bold uppercase"
+                        >
+                          <Check size={12} />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); cancelInlineEdit(); }}
+                          className="px-2 py-1 border border-[#222226] text-[#adaaad] text-[9px] font-bold uppercase"
+                        >
+                          <X size={12} />
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {p.id !== -1 && (
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); handleDeleteProject(p.id!); }}
-                        className="p-1.5 text-[#adaaad] hover:text-[#e60000] opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Purge"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    )}
-                    <ChevronRight className="w-4 h-4 text-[#adaaad] group-hover:text-[#e60000] transform transition-transform group-hover:translate-x-1" />
-                  </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#e60000]/10 text-[#e60000] border border-[#e60000]/20 group-hover:bg-[#e60000] group-hover:text-white transition-all">
+                          {p.id === -1 ? <Inbox className="w-5 h-5" /> : <FolderGit2 className="w-5 h-5" />}
+                        </div>
+                        <div className="flex flex-col">
+                          <h3 className="font-main font-bold text-white tracking-[0.5px] uppercase">{p.name}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-[9px] font-black uppercase font-mono tracking-widest ${health.color}`}>
+                              {health.label}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {p.id !== -1 && (
+                          <>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); startInlineEdit(p); }}
+                              className="p-1.5 text-[#adaaad] hover:text-[#e60000] opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Edit"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDeleteProject(p.id!); }}
+                              className="p-1.5 text-[#adaaad] hover:text-[#e60000] opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Purge"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                        <ChevronRight className="w-4 h-4 text-[#adaaad] group-hover:text-[#e60000] transform transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </>
+                  )}
                 </div>
                 
                 {s ? (
@@ -434,6 +521,23 @@ export const ProjectVault: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Floating Action Button for Creating Projects */}
+      <button
+        onClick={() => {
+          const name = prompt('Enter new project name:');
+          if (name?.trim()) {
+            setNewProjectName(name.trim());
+            setTimeout(() => {
+              handleCreateProject({ preventDefault: () => {} } as React.FormEvent);
+            }, 0);
+          }
+        }}
+        className="fixed bottom-8 right-8 w-14 h-14 bg-[#e60000] flex items-center justify-center hover:bg-[#ff0000] hover:scale-105 transition-all shadow-[0_0_20px_rgba(230,0,0,0.3)] z-50"
+        title="Create New Project"
+      >
+        <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+      </button>
     </div>
   );
 };

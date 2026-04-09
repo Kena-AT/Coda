@@ -203,6 +203,56 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         [],
     ).map_err(|e| e.to_string())?;
 
+    // Monitor config and logs for Vault Maintenance
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS monitor_config (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            check_interval INTEGER DEFAULT 300,
+            enabled BOOLEAN DEFAULT 1,
+            db_limit_mb INTEGER DEFAULT 100,
+            cache_limit_mb INTEGER DEFAULT 20,
+            stale_snippet_threshold INTEGER DEFAULT 100,
+            auto_vacuum BOOLEAN DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS monitor_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            monitor_name TEXT NOT NULL,
+            status TEXT NOT NULL,
+            last_run DATETIME DEFAULT CURRENT_TIMESTAMP,
+            duration_ms INTEGER,
+            db_size_mb REAL,
+            cache_size_mb REAL,
+            issues_found INTEGER DEFAULT 0,
+            actions_taken TEXT,
+            details TEXT
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS app_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key TEXT UNIQUE NOT NULL,
+            value TEXT,
+            expires_at DATETIME,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    // Insert default monitor config if not exists
+    conn.execute(
+        "INSERT OR IGNORE INTO monitor_config (name, check_interval, enabled) 
+         VALUES ('Vault Maintenance', 300, 1)",
+        [],
+    ).map_err(|e| e.to_string())?;
+
     Ok(())
 }
 

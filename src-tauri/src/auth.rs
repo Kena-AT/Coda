@@ -5,9 +5,8 @@ use argon2::{
 use jsonwebtoken::{encode, decode, Header, EncodingKey, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use crate::db::get_db_connection;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager};
 use chrono::Utc;
-use std::sync::Mutex;
 use dashmap::DashMap;
 
 const SECRET_KEY: &[u8] = b"coda_secret_key_change_this_for_production";
@@ -24,7 +23,7 @@ pub struct SessionStore {
 pub struct SessionData {
     pub user_id: i32,
     pub username: String,
-    pub created_at: i64,
+    pub _created_at: i64,
 }
 
 impl SessionStore {
@@ -38,7 +37,7 @@ impl SessionStore {
         self.sessions.insert(token, SessionData {
             user_id,
             username,
-            created_at: Utc::now().timestamp(),
+            _created_at: Utc::now().timestamp(),
         });
     }
 
@@ -100,7 +99,7 @@ pub struct RefreshResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct StoredTokens {
+pub struct _StoredTokens {
     pub refresh_token: String,
     pub user_id: i32,
     pub username: String,

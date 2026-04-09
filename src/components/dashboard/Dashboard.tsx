@@ -3,7 +3,6 @@ import {
   Search, 
   Settings,
   Power,
-  Plus,
   Shield,
   Activity,
   Database
@@ -306,13 +305,6 @@ export const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Global Floating Action Button for Snippets */}
-        <button 
-          onClick={() => setSelectedSnippetId(-1)}
-          className="absolute bottom-8 right-8 w-14 h-14 bg-[#e60000] flex items-center justify-center hover:bg-[#ff0000] hover:scale-105 transition-all shadow-[0_0_20px_rgba(230,0,0,0.3)] z-50"
-        >
-          <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-        </button>
       </main>
 
       <ArchiveModal 

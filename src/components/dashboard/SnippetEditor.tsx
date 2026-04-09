@@ -12,7 +12,8 @@ import {
   Terminal, 
   History,
   LayoutTemplate,
-  Zap
+  Zap,
+  Plus
 } from 'lucide-react';
 import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
@@ -43,6 +44,30 @@ export const SnippetEditor: React.FC = () => {
   const [showTemplates, setShowTemplates] = useState(false);
   const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs'>('recs'); // Default to recs for new sprint
   const [showRollbackModal, setShowRollbackModal] = useState(false);
+
+  // Handle creating new project from dropdown
+  const handleCreateProjectFromDropdown = async () => {
+    const name = prompt('Enter new project name:');
+    if (!name?.trim() || !user) return;
+    
+    try {
+      const response: any = await invoke('create_project', {
+        userId: user.id,
+        name: name.trim(),
+        description: null
+      });
+      if (response.success) {
+        const newProject = response.data;
+        setProjects([...projects, newProject]);
+        setSnippet({ ...snippet, project_id: newProject.id });
+        toast.success(`Project "${name}" created`);
+      } else {
+        toast.error(response.message || 'Failed to create project');
+      }
+    } catch (err: any) {
+      toast.error(err.toString());
+    }
+  };
 
   // Load existing snippet
   useEffect(() => {
@@ -224,13 +249,21 @@ export const SnippetEditor: React.FC = () => {
                <span className="text-[9px] font-mono text-[#adaaad] uppercase">PROJECT_REPOSITORY</span>
                <select 
                  value={snippet.project_id || ''}
-                 onChange={e => setSnippet({...snippet, project_id: e.target.value ? parseInt(e.target.value) : null})}
+                 onChange={e => {
+                   const value = e.target.value;
+                   if (value === 'create_new') {
+                     handleCreateProjectFromDropdown();
+                   } else {
+                     setSnippet({...snippet, project_id: value ? parseInt(value) : null});
+                   }
+                 }}
                  className="bg-[#1c1b1b] border border-[#353534]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[#e60000] transition-colors cursor-pointer"
                >
                  <option value="">INBOX / UNSORTED</option>
                  {projects.map(p => (
                    <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
                  ))}
+                 <option value="create_new" className="text-[#e60000]">+ CREATE NEW PROJECT</option>
                </select>
              </div>
 

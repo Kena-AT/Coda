@@ -1,15 +1,76 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useTelemetry } from '../../hooks/useTelemetry';
+import { invoke } from '@tauri-apps/api/core';
+import toast from 'react-hot-toast';
+
+interface VaultState {
+  name: string;
+  status: string;
+  last_run: string | null;
+  duration_ms: number;
+  db_size_mb: number;
+  cache_size_mb: number;
+  issues_found: number;
+  actions_taken: string[];
+}
 
 export const HardwareVisualization: React.FC = () => {
   const { snapshot, loading } = useTelemetry(2000); // Faster polling for viz
+  const [vaultState, setVaultState] = useState<VaultState | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const fetchVaultStatus = useCallback(async () => {
+    try {
+      const status = await invoke<VaultState>('get_vault_status');
+      setVaultState(status);
+    } catch (e) {
+      console.error('Failed to fetch vault status:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVaultStatus();
+    const interval = setInterval(fetchVaultStatus, 5000);
+    return () => clearInterval(interval);
+  }, [fetchVaultStatus]);
+
+  const handleRunMaintenance = async () => {
+    if (isRunning) return;
+    setIsRunning(true);
+    try {
+      const result = await invoke<VaultState>('run_vault_maintenance');
+      setVaultState(result);
+      toast.success(`Maintenance complete: ${result.issues_found} issues found`);
+    } catch (e: any) {
+      toast.error(`Maintenance failed: ${e.toString()}`);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const handleAddMonitor = async () => {
+    try {
+      await invoke('add_vault_monitor', { name: 'Health Check', interval: 300 });
+      toast.success('Monitor added successfully');
+    } catch (e: any) {
+      toast.error(`Failed to add monitor: ${e.toString()}`);
+    }
+  };
 
   const res = snapshot?.latest_resource;
   
   // Normalize values for visualization
   const cpuVal = res?.cpu_percent || 0;
   const ramVal = res?.ram_mb || 0;
-  const dbSizeStr = res ? (res.db_size_bytes / (1024 * 1024)).toFixed(1) + 'MB' : '0MB';
+  
+  // Use real vault state for DB size if available
+  const realDbSize = vaultState?.db_size_mb || 0;
+  const dbSizeStr = realDbSize > 0 ? realDbSize.toFixed(1) + 'MB' : (res ? (res.db_size_bytes / (1024 * 1024)).toFixed(1) + 'MB' : '0MB');
+  
+  // Determine vault status display
+  const vaultStatus = vaultState?.status || 'IDLE';
+  const isVaultRunning = vaultStatus === 'RUNNING' || isRunning;
+  const hasIssues = (vaultState?.issues_found || 0) > 0;
   
   const snippetLoadTime = snapshot?.snippet_load_ms?.toFixed(0) || '0';
   const copyExecTime = snapshot?.copy_ms?.toFixed(0) || '0';
@@ -137,35 +198,57 @@ export const HardwareVisualization: React.FC = () => {
           <div className="flex gap-3 items-center">
              <div className="relative w-6 h-6 flex items-center justify-center">
                 <div className={`w-4 h-4 rounded-full blur-[4px]  ${
-                  maintenanceTask?.state === 'running' ? 'bg-[#3b82f6] shadow-[0_0_10px_#3b82f6]' :
-                  maintenanceTask?.state === 'failed' ? 'bg-[#ff0000] shadow-[0_0_10px_#ff0000]' :
+                  isVaultRunning ? 'bg-[#3b82f6] shadow-[0_0_10px_#3b82f6]' :
+                  hasIssues ? 'bg-[#ff0000] shadow-[0_0_10px_#ff0000]' :
                   'bg-[#adaaad]'
-                } ${maintenanceTask?.state === 'running' ? 'animate-pulse' : ''}`} />
+                } ${isVaultRunning ? 'animate-pulse' : ''}`} />
                 <div className={`absolute w-2 h-2 rounded-full ${
-                  maintenanceTask?.state === 'running' ? 'bg-[#fff]' :
-                  maintenanceTask?.state === 'failed' ? 'bg-[#ff0000]' :
+                  isVaultRunning ? 'bg-[#fff]' :
+                  hasIssues ? 'bg-[#ff0000]' :
                   'bg-[#000]'
                 }`} />
              </div>
              <div className="flex flex-col">
                 <span className="text-[8px] text-[#adaaad] uppercase font-bold">Vault Maintenance</span>
                 <span className={`text-[9px] font-bold ${
-                  maintenanceTask?.state === 'running' ? 'text-[#3b82f6]' :
-                  maintenanceTask?.state === 'failed' ? 'text-[#ff0000]' :
+                  isVaultRunning ? 'text-[#3b82f6]' :
+                  hasIssues ? 'text-[#ff0000]' :
                   'text-[#adaaad]'
                 }`}>
-                  {maintenanceTask?.state.toUpperCase() || 'IDLE'}
+                  {isVaultRunning ? 'RUNNING' : vaultStatus}
                 </span>
+                {vaultState?.last_run && (
+                  <span className="text-[7px] text-[#adaaad] opacity-60">
+                    Last: {new Date(vaultState.last_run).toLocaleTimeString()}
+                  </span>
+                )}
              </div>
           </div>
 
           <div className="mt-auto flex flex-col items-end">
              <span className="text-[10px] text-white font-mono">DB_FSIZE: {dbSizeStr}</span>
-             <button className="mt-2 bg-[#e60000] text-white px-3 py-1 flex items-center gap-1 group overflow-hidden relative">
-                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-                <span className="text-[8px] font-bold">+</span>
-                <span className="text-[8px] font-bold uppercase tracking-tighter">Add Monitor</span>
-             </button>
+             {vaultState?.issues_found > 0 && (
+               <span className="text-[8px] text-[#ff0000] font-mono">
+                 {vaultState.issues_found} ISSUES
+               </span>
+             )}
+             <div className="flex gap-2 mt-2">
+               <button 
+                 onClick={handleRunMaintenance}
+                 disabled={isRunning}
+                 className="bg-[#e60000] text-white px-3 py-1 flex items-center gap-1 group overflow-hidden relative disabled:opacity-50"
+               >
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                  <span className="text-[8px] font-bold">{isRunning ? '...' : 'RUN'}</span>
+               </button>
+               <button 
+                 onClick={handleAddMonitor}
+                 className="bg-[#222226] border border-[#e60000] text-[#e60000] px-3 py-1 flex items-center gap-1 group overflow-hidden relative hover:bg-[#e60000] hover:text-white transition-colors"
+               >
+                  <span className="text-[8px] font-bold">+</span>
+                  <span className="text-[8px] font-bold uppercase tracking-tighter">Add Monitor</span>
+               </button>
+             </div>
           </div>
         </div>
       </div>
