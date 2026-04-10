@@ -87,8 +87,8 @@ export const Dashboard: React.FC = () => {
     try {
       const includeArchived = activeTab === 'archive' || !!searchQuery;
       const response: any = await invoke('list_snippets', {
-        userId: user.id,
-        includeArchived
+        user_id: user.id,
+        include_archived: includeArchived
       });
       if (response.success) {
         setSnippets(response.data || []);
@@ -105,7 +105,7 @@ export const Dashboard: React.FC = () => {
   const fetchProjects = async () => {
     if (!user) return;
     try {
-      const response: any = await invoke('get_projects', { userId: user.id });
+      const response: any = await invoke('get_projects', { user_id: user.id });
       if (response.success) {
         setProjects(response.data || []);
       }
@@ -121,7 +121,7 @@ export const Dashboard: React.FC = () => {
     const checkArchivable = async () => {
       if (!user) return;
       try {
-        const candidates = await invoke<any[]>('get_archive_candidates', { userId: user.id });
+        const candidates = await invoke<any[]>('get_archive_candidates', { user_id: user.id });
         if (candidates.length > 0) {
           setIsArchiveModalOpen(true);
         }

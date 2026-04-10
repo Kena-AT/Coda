@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useStore, Snippet, Project } from '../../store/useStore';
+import { useStore, Project } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
 import { 
   FolderGit2, 
@@ -10,12 +10,10 @@ import {
   ChevronRight, 
   Plus, 
   Search, 
-  ArrowLeft,
-  Settings2,
   Inbox,
-  Trash2,
-  Edit2,
-  Check,
+  Trash2, 
+  Edit2, 
+  Check, 
   X
 } from 'lucide-react';
 import { SnippetCard } from './SnippetCard';
@@ -68,7 +66,7 @@ export const ProjectVault: React.FC = () => {
   const fetchProjects = async () => {
     if (!user) return;
     try {
-      const response: any = await invoke('get_projects', { userId: user.id });
+      const response: any = await invoke('list_projects', { user_id: user.id });
       if (response.success) setProjects(response.data || []);
     } catch (e) {
       console.error('Failed to fetch projects', e);
@@ -78,7 +76,7 @@ export const ProjectVault: React.FC = () => {
   const fetchSnippets = async () => {
     if (!user) return;
     try {
-      const response: any = await invoke('list_snippets', { userId: user.id, includeArchived: false });
+      const response: any = await invoke('list_snippets', { user_id: user.id, include_archived: false });
       if (response.success) setSnippets(response.data || []);
     } catch (e) {
       console.error('Failed to fetch snippets', e);
@@ -102,7 +100,7 @@ export const ProjectVault: React.FC = () => {
               main_language: 'Varies'
             };
           } else {
-            const s = await invoke('get_project_stats', { projectId: p.id, userId: user.id });
+            const s = await invoke('get_project_stats', { project_id: p.id, user_id: user.id });
             newStats[p.id!] = s;
           }
         } catch (e) {
@@ -130,7 +128,9 @@ export const ProjectVault: React.FC = () => {
       if (resp.success) {
         await fetchProjects();
         setNewProjectName('');
-        toast.success('Project sector initialized');
+        setNewProjectDesc('');
+        setShowCreateModal(false);
+        toast.success('Sector initialized and indexed');
       }
     } catch(err) {
       toast.error('Failed to create project');
@@ -143,7 +143,7 @@ export const ProjectVault: React.FC = () => {
     if (projectId === -1) return;
     if (!confirm('Destroy this project sector? Snippets will be moved to INBOX.')) return;
     try {
-      const resp = await invoke<any>('delete_project', { id: projectId, user_id: user?.id });
+      const resp = await invoke<any>('delete_project', { project_id: projectId, user_id: user?.id });
       if (resp.success) {
         toast.success('Project sector purged');
         if (selectedProjectId === projectId) setSelectedProjectId(null);
@@ -350,10 +350,10 @@ export const ProjectVault: React.FC = () => {
                       snippet={snippet}
                       onEdit={() => setSelectedSnippetId(snippet.id!)}
                       onDelete={() => {
-                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, userId: user?.id }).then(() => fetchSnippets());
+                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, user_id: user?.id }).then(() => fetchSnippets());
                       }}
                       onArchive={() => {
-                        invoke('archive_snippet', { id: snippet.id, userId: user?.id }).then(() => fetchSnippets());
+                        invoke('archive_snippet', { id: snippet.id, user_id: user?.id }).then(() => fetchSnippets());
                       }}
                    />
                 </div>
@@ -457,7 +457,7 @@ export const ProjectVault: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {p.id !== -1 && (
-                          <>
+                          <div className="flex items-center gap-2 mr-2">
                             <button
                               onClick={(e) => { e.stopPropagation(); startInlineEdit(p); }}
                               className="p-2 bg-[#1a1a1a] border border-[#333] text-[#adaaad] hover:text-[#e60000] hover:border-[#e60000] hover:bg-[#e60000]/10 transition-all"
@@ -472,7 +472,7 @@ export const ProjectVault: React.FC = () => {
                             >
                               <Trash2 size={16} />
                             </button>
-                          </>
+                          </div>
                         )}
                         <ChevronRight className="w-5 h-5 text-[#adaaad] group-hover:text-[#e60000] transform transition-transform group-hover:translate-x-1" />
                       </div>

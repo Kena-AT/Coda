@@ -77,6 +77,23 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         }
     }
 
+    // Migration logic: Add columns to existing projects table if missing
+    {
+        let mut table_info = conn.prepare("PRAGMA table_info(projects)").map_err(|e| e.to_string())?;
+        let rows = table_info.query_map([], |row| {
+            let name: String = row.get(1)?;
+            Ok(name)
+        }).map_err(|e| e.to_string())?;
+        
+        let mut columns = Vec::new();
+        for col in rows {
+            columns.push(col.map_err(|e| e.to_string())?);
+        }
+        if !columns.contains(&"color".to_string()) {
+            conn.execute("ALTER TABLE projects ADD COLUMN color TEXT", []).map_err(|e| e.to_string())?;
+        }
+    }
+
     // Migration logic: Add columns to existing snippets table if missing
     {
         let mut table_info = conn.prepare("PRAGMA table_info(snippets)").map_err(|e| e.to_string())?;

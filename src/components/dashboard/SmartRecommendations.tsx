@@ -47,20 +47,20 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
     try {
       if (activeSubTab === 'smart') {
         const recs = await invoke<Recommendation[]>('get_contextual_recommendations', {
-          userId: user.id,
-          currentLanguage,
-          currentTags,
-          currentSnippetId: selectedSnippetId
+          user_id: user.id,
+          current_language: currentLanguage,
+          current_tags: currentTags,
+          current_snippet_id: selectedSnippetId
         });
         setRecommendations(recs);
       } else {
         const recs = await invoke<Recommendation[]>('get_stale_snippets', {
-          userId: user.id
+          user_id: user.id
         });
         setRecommendations(recs);
       }
 
-      const meta = await invoke<RecommendationMetadata>('get_recommendations_metadata', { userId: user.id });
+      const meta = await invoke<RecommendationMetadata>('get_recommendations_metadata', { user_id: user.id });
       setMetadata(meta);
     } catch (err) {
       console.error(err);
@@ -127,7 +127,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                     onClick={async () => {
                       onPreview(rec.content);
                       try {
-                        await invoke('record_recommendation_click', { snippetId: rec.id });
+                        await invoke('record_recommendation_click', { snippet_id: rec.id });
                       } catch (err) {
                         console.error("CTR tracking failed:", err);
                       }

@@ -39,7 +39,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
 
     try {
       const response: any = await invoke('create_snippet', {
-        userId: user.id,
+        user_id: user.id,
         title,
         content,
         language,

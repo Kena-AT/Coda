@@ -47,7 +47,7 @@ export const GlobalSearchResults: React.FC = () => {
 
   const handleArchive = async (id: number) => {
     try {
-      const resp: any = await invoke('archive_snippet', { id, userId: user?.id });
+      const resp: any = await invoke('archive_snippet', { id, user_id: user?.id });
       if (resp.success) {
         setSnippets(snippets.map(s => s.id === id ? { ...s, is_archived: !s.is_archived } : s));
         toast.success(snippets.find(s => s.id === id)?.is_archived ? 'Restored' : 'Archived');
@@ -60,7 +60,7 @@ export const GlobalSearchResults: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!confirm('Destroy item?')) return;
     try {
-      const resp: any = await invoke('delete_snippet', { id, userId: user?.id });
+      const resp: any = await invoke('delete_snippet', { id, user_id: user?.id });
       if (resp.success) {
         setSnippets(snippets.filter(s => s.id !== id));
         toast.success('Purged from vault');

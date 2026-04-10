@@ -12,8 +12,7 @@ import {
   Terminal, 
   History,
   LayoutTemplate,
-  Zap,
-  Plus
+  Zap
 } from 'lucide-react';
 import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
@@ -47,22 +46,26 @@ export const SnippetEditor: React.FC = () => {
 
   // Handle creating new project from dropdown
   const handleCreateProjectFromDropdown = async () => {
-    const name = prompt('Enter new project name:');
+    // We'll replace the prompt with a triggered flag that ProjectVault can handle or a local modal
+    const name = prompt('Enter new project designation:');
     if (!name?.trim() || !user) return;
     
     try {
       const response: any = await invoke('create_project', {
-        userId: user.id,
+        user_id: user.id,
         name: name.trim(),
-        description: null
+        description: null,
+        color: null
       });
       if (response.success) {
-        const newProject = response.data;
-        setProjects([...projects, newProject]);
-        setSnippet({ ...snippet, project_id: newProject.id });
-        toast.success(`Project "${name}" created`);
+        const newProject = response.data?.[0];
+        if (newProject) {
+          setProjects([...projects, newProject]);
+          setSnippet({ ...snippet, project_id: newProject.id });
+          toast.success(`Project Sector "${name}" Initialized`);
+        }
       } else {
-        toast.error(response.message || 'Failed to create project');
+        toast.error(response.message || 'Failed to initialize sector');
       }
     } catch (err: any) {
       toast.error(err.toString());
@@ -90,7 +93,7 @@ export const SnippetEditor: React.FC = () => {
     const fetchProjects = async () => {
       if (!user) return;
       try {
-        const response: any = await invoke('list_projects', { userId: user.id });
+        const response: any = await invoke('list_projects', { user_id: user.id });
         if (response.success) {
           setProjects(response.data || []);
         }
@@ -103,7 +106,7 @@ export const SnippetEditor: React.FC = () => {
 
   const loadVersions = async (id: number) => {
     try {
-      const response: any = await invoke('get_snippet_versions', { snippetId: id });
+      const response: any = await invoke('get_snippet_versions', { snippet_id: id });
       if (response.success && response.data) {
         setVersions(response.data);
       }
@@ -122,12 +125,12 @@ export const SnippetEditor: React.FC = () => {
       if (selectedSnippetId === -1) {
         // Create new
         const response: any = await invoke('create_snippet', {
-          userId: user?.id,
+          user_id: user?.id,
           title: snippet.title,
           content: snippet.content,
           language: snippet.language,
           tags: snippet.tags || '',
-          projectId: snippet.project_id || null
+          project_id: snippet.project_id || null
         });
         if (response.success) {
           toast.success('System buffer recorded');
@@ -139,13 +142,13 @@ export const SnippetEditor: React.FC = () => {
       } else {
         // Update
         const response: any = await invoke('update_snippet', {
-          userId: user?.id,
+          user_id: user?.id,
           id: selectedSnippetId,
           title: snippet.title,
           content: snippet.content,
           language: snippet.language,
           tags: snippet.tags || '',
-          projectId: snippet.project_id || null
+          project_id: snippet.project_id || null
         });
         if (response.success) {
           toast.success('Matrix updated and versioned');
@@ -172,9 +175,9 @@ export const SnippetEditor: React.FC = () => {
     
     try {
       const response: any = await invoke('rollback_snippet', {
-        userId: user?.id,
-        snippetId: selectedSnippetId,
-        versionId: selectedVersion.id
+        user_id: user?.id,
+        snippet_id: selectedSnippetId,
+        version_id: selectedVersion.id
       });
       
       if (response.success) {

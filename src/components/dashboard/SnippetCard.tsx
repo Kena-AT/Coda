@@ -31,7 +31,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
     try {
       await navigator.clipboard.writeText(snippet.content);
       if (snippet.id) {
-        await invoke('record_snippet_usage', { snippetId: snippet.id });
+        await invoke('record_snippet_usage', { snippet_id: snippet.id });
       }
       toast.success('Snippet copied to terminal buffer', {
         style: {
@@ -51,9 +51,9 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
     if (!user || !snippet.id) return;
     try {
       const response: any = await invoke('update_snippet', {
-        userId: user.id,
+        user_id: user.id,
         id: snippet.id,
-        projectId: tempProjectId,
+        project_id: tempProjectId,
         title: snippet.title,
         content: snippet.content,
         language: snippet.language,

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { useStore, Snippet, Project } from '../../store/useStore';
+import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
-import { Flame, Clock, Archive, Activity, ChevronRight, Folder } from 'lucide-react';
+import { Flame, Clock, Archive, Activity, Folder } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 
@@ -10,7 +10,7 @@ export const IntelligenceDashboard: React.FC = () => {
 
   const handleArchive = async (id: number) => {
     try {
-      const response: any = await invoke('archive_snippet', { id, userId: user?.id });
+      const response: any = await invoke('archive_snippet', { id, user_id: user?.id });
       if (response.success) {
         setSnippets(snippets.map(s => s.id === id ? { ...s, is_archived: true } : s));
         toast.success('Snippet archived');
@@ -23,7 +23,7 @@ export const IntelligenceDashboard: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!confirm('Permanent deletion?')) return;
     try {
-      const response: any = await invoke('delete_snippet', { id, userId: user?.id });
+      const response: any = await invoke('delete_snippet', { id, user_id: user?.id });
       if (response.success) {
         setSnippets(snippets.filter(s => s.id !== id));
       }
