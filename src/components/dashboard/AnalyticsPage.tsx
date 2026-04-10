@@ -48,10 +48,10 @@ export const AnalyticsPage: React.FC = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const data = await invoke<AnalyticsSummary>('get_analytics_summary', { user_id: user.id });
+      const data = await invoke<AnalyticsSummary>('get_analytics_summary', { userId: user.id });
       setSummary(data);
       
-      const popularRecs: any[] = await invoke('get_popular_snippets', { user_id: user.id });
+      const popularRecs: any[] = await invoke('get_popular_snippets', { userId: user.id });
       setPopularSnippets(popularRecs.map(r => ({
         id: r.id,
         title: r.title,

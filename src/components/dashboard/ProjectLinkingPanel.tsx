@@ -33,12 +33,12 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
       setLoading(true);
       try {
         // Trigger background recomputation first (in real prod, this might be debounced or partial)
-        await invoke('recompute_snippet_links', { snippet_id: snippetId, user_id: user.id });
+        await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user.id });
         
         // Fetch the precomputed links
         const data = await invoke<RelatedSnippet[]>('get_related_snippets', { 
-          snippet_id: snippetId, 
-          user_id: user.id 
+          snippetId: snippetId, 
+          userId: user.id 
         });
         setRelated(data);
       } catch (error) {

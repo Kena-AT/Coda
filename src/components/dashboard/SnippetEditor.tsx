@@ -52,7 +52,7 @@ export const SnippetEditor: React.FC = () => {
     
     try {
       const response: any = await invoke('create_project', {
-        user_id: user.id,
+        userId: user.id,
         name: name.trim(),
         description: null,
         color: null
@@ -65,10 +65,10 @@ export const SnippetEditor: React.FC = () => {
           toast.success(`Project Sector "${name}" Initialized`);
         }
       } else {
-        toast.error(response.message || 'Failed to initialize sector');
+        toast.error(response.message || 'Sector initialization protocol failed');
       }
     } catch (err: any) {
-      toast.error(err.toString());
+      toast.error(`Infrastructure Error: ${err.toString()}`);
     }
   };
 
@@ -93,7 +93,7 @@ export const SnippetEditor: React.FC = () => {
     const fetchProjects = async () => {
       if (!user) return;
       try {
-        const response: any = await invoke('list_projects', { user_id: user.id });
+        const response: any = await invoke('list_projects', { userId: user.id });
         if (response.success) {
           setProjects(response.data || []);
         }
@@ -106,7 +106,7 @@ export const SnippetEditor: React.FC = () => {
 
   const loadVersions = async (id: number) => {
     try {
-      const response: any = await invoke('get_snippet_versions', { snippet_id: id });
+      const response: any = await invoke('get_snippet_versions', { snippetId: id });
       if (response.success && response.data) {
         setVersions(response.data);
       }
@@ -125,12 +125,12 @@ export const SnippetEditor: React.FC = () => {
       if (selectedSnippetId === -1) {
         // Create new
         const response: any = await invoke('create_snippet', {
-          user_id: user?.id,
+          userId: user?.id,
           title: snippet.title,
           content: snippet.content,
           language: snippet.language,
           tags: snippet.tags || '',
-          project_id: snippet.project_id || null
+          projectId: snippet.project_id || null
         });
         if (response.success) {
           toast.success('System buffer recorded');
@@ -142,13 +142,13 @@ export const SnippetEditor: React.FC = () => {
       } else {
         // Update
         const response: any = await invoke('update_snippet', {
-          user_id: user?.id,
+          userId: user?.id,
           id: selectedSnippetId,
           title: snippet.title,
           content: snippet.content,
           language: snippet.language,
           tags: snippet.tags || '',
-          project_id: snippet.project_id || null
+          projectId: snippet.project_id || null
         });
         if (response.success) {
           toast.success('Matrix updated and versioned');
@@ -175,9 +175,9 @@ export const SnippetEditor: React.FC = () => {
     
     try {
       const response: any = await invoke('rollback_snippet', {
-        user_id: user?.id,
-        snippet_id: selectedSnippetId,
-        version_id: selectedVersion.id
+        userId: user?.id,
+        snippetId: selectedSnippetId,
+        versionId: selectedVersion.id
       });
       
       if (response.success) {

@@ -66,7 +66,7 @@ export const ProjectVault: React.FC = () => {
   const fetchProjects = async () => {
     if (!user) return;
     try {
-      const response: any = await invoke('list_projects', { user_id: user.id });
+      const response: any = await invoke('list_projects', { userId: user.id });
       if (response.success) setProjects(response.data || []);
     } catch (e) {
       console.error('Failed to fetch projects', e);
@@ -76,7 +76,7 @@ export const ProjectVault: React.FC = () => {
   const fetchSnippets = async () => {
     if (!user) return;
     try {
-      const response: any = await invoke('list_snippets', { user_id: user.id, include_archived: false });
+      const response: any = await invoke('list_snippets', { userId: user.id, includeArchived: false });
       if (response.success) setSnippets(response.data || []);
     } catch (e) {
       console.error('Failed to fetch snippets', e);
@@ -100,7 +100,7 @@ export const ProjectVault: React.FC = () => {
               main_language: 'Varies'
             };
           } else {
-            const s = await invoke('get_project_stats', { project_id: p.id, user_id: user.id });
+            const s = await invoke('get_project_stats', { projectId: p.id, userId: user.id });
             newStats[p.id!] = s;
           }
         } catch (e) {
@@ -120,7 +120,7 @@ export const ProjectVault: React.FC = () => {
     setIsCreating(true);
     try {
       const resp = await invoke<any>('create_project', { 
-        user_id: user.id, 
+        userId: user.id, 
         name: newProjectName,
         description: newProjectDesc || null,
         color: null
@@ -131,9 +131,11 @@ export const ProjectVault: React.FC = () => {
         setNewProjectDesc('');
         setShowCreateModal(false);
         toast.success('Sector initialized and indexed');
+      } else {
+        toast.error(resp.message || 'Initialization protocol failed');
       }
-    } catch(err) {
-      toast.error('Failed to create project');
+    } catch(err: any) {
+      toast.error(`Infrastructure Error: ${err.toString()}`);
     } finally {
       setIsCreating(false);
     }
@@ -143,7 +145,7 @@ export const ProjectVault: React.FC = () => {
     if (projectId === -1) return;
     if (!confirm('Destroy this project sector? Snippets will be moved to INBOX.')) return;
     try {
-      const resp = await invoke<any>('delete_project', { project_id: projectId, user_id: user?.id });
+      const resp = await invoke<any>('delete_project', { projectId: projectId, userId: user?.id });
       if (resp.success) {
         toast.success('Project sector purged');
         if (selectedProjectId === projectId) setSelectedProjectId(null);
@@ -162,7 +164,7 @@ export const ProjectVault: React.FC = () => {
     try {
       const resp = await invoke<any>('update_project', {
         id: p.id,
-        user_id: user.id,
+        userId: user.id,
         name: editName,
         description: editDesc,
         color: p.color
@@ -199,7 +201,7 @@ export const ProjectVault: React.FC = () => {
 
       const resp = await invoke<any>('update_project', {
         id: projectId,
-        user_id: user.id,
+        userId: user.id,
         name: inlineEditName,
         description: inlineEditDesc,
         color: p.color
@@ -350,10 +352,10 @@ export const ProjectVault: React.FC = () => {
                       snippet={snippet}
                       onEdit={() => setSelectedSnippetId(snippet.id!)}
                       onDelete={() => {
-                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, user_id: user?.id }).then(() => fetchSnippets());
+                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, userId: user?.id }).then(() => fetchSnippets());
                       }}
                       onArchive={() => {
-                        invoke('archive_snippet', { id: snippet.id, user_id: user?.id }).then(() => fetchSnippets());
+                        invoke('archive_snippet', { id: snippet.id, userId: user?.id }).then(() => fetchSnippets());
                       }}
                    />
                 </div>

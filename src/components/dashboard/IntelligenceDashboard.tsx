@@ -10,7 +10,7 @@ export const IntelligenceDashboard: React.FC = () => {
 
   const handleArchive = async (id: number) => {
     try {
-      const response: any = await invoke('archive_snippet', { id, user_id: user?.id });
+      const response: any = await invoke('archive_snippet', { id, userId: user?.id });
       if (response.success) {
         setSnippets(snippets.map(s => s.id === id ? { ...s, is_archived: true } : s));
         toast.success('Snippet archived');
@@ -23,7 +23,7 @@ export const IntelligenceDashboard: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!confirm('Permanent deletion?')) return;
     try {
-      const response: any = await invoke('delete_snippet', { id, user_id: user?.id });
+      const response: any = await invoke('delete_snippet', { id, userId: user?.id });
       if (response.success) {
         setSnippets(snippets.filter(s => s.id !== id));
       }

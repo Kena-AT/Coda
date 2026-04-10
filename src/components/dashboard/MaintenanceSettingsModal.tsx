@@ -27,10 +27,10 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
     setIsSaving(true);
     try {
       await invoke('update_maintenance_settings', {
-        user_id: user.id,
-        auto_archive_days: parseInt(autoArchiveDays.toString(), 10),
-        exclude_favorites: excludeFavorites,
-        min_copy_threshold: parseInt(minCopyThreshold.toString(), 10)
+        userId: user.id,
+        autoArchiveDays: autoArchiveDays,
+        excludeFavorites: excludeFavorites,
+        minCopyThreshold: minCopyThreshold
       });
       toast.success('Maintenance settings updated', {
         style: { background: '#19191c', color: '#fffbfe', borderLeft: '4px solid #15ff00', fontSize: '12px', fontFamily: 'Space Grotesk' }

@@ -43,7 +43,7 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, onClose, onR
     if (!user) return;
     setLoading(true);
     try {
-      const data = await invoke<ArchiveCandidate[]>('get_archive_candidates', { user_id: user.id });
+      const data = await invoke<ArchiveCandidate[]>('get_archive_candidates', { userId: user.id });
       setCandidates(data);
       setSelectedIds(new Set(data.map(c => c.snippet_id))); // Select all by default
     } catch (error) {
@@ -65,8 +65,8 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, onClose, onR
     setLoading(true);
     try {
       await invoke('archive_snippets', { 
-        snippet_ids: Array.from(selectedIds), 
-        user_id: user.id 
+        snippetIds: Array.from(selectedIds), 
+        userId: user.id 
       });
       onRefresh();
       onClose();
@@ -82,8 +82,8 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, onClose, onR
     setLoading(true);
     try {
       await invoke('snooze_archive', { 
-        snippet_ids: Array.from(selectedIds), 
-        user_id: user.id,
+        snippetIds: Array.from(selectedIds), 
+        userId: user.id,
         days: 7
       });
       fetchCandidates();
