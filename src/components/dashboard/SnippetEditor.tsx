@@ -12,7 +12,8 @@ import {
   Terminal, 
   History,
   LayoutTemplate,
-  Zap
+  Zap,
+  ArrowLeft
 } from 'lucide-react';
 import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
@@ -211,10 +212,19 @@ export const SnippetEditor: React.FC = () => {
         {/* Editor Settings Header */}
         <div className="h-auto bg-[#131313]/80 backdrop-blur-md border-b border-[#353534]/20 p-8 flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-[14px] font-main font-bold text-white tracking-[2px] uppercase flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-[#e60000]" />
-              {selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}
-            </h2>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setSelectedSnippetId(null)}
+                className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
+                title="Back to Dashboard"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <h2 className="text-[14px] font-main font-bold text-white tracking-[2px] uppercase flex items-center gap-2">
+                <Terminal className="w-5 h-5 text-[#e60000]" />
+                {selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}
+              </h2>
+            </div>
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setShowTemplates(true)}

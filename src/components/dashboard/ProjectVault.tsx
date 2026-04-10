@@ -14,7 +14,8 @@ import {
   Trash2, 
   Edit2, 
   Check, 
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
 import { SnippetCard } from './SnippetCard';
 import toast from 'react-hot-toast';
@@ -316,12 +317,23 @@ export const ProjectVault: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <h1 className="text-4xl font-main font-bold text-white tracking-[-2px] uppercase">
-                    {activeProject.name}
-                  </h1>
-                  <p className="text-[#adaaad] font-mono text-[11px] uppercase max-w-xl">
-                     {activeProject.description || 'REPOSITORY_VIEW__MODAL_ACTIVE'}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setSelectedProjectId(null)}
+                      className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
+                      title="Back to Projects"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </button>
+                    <div>
+                      <h1 className="text-4xl font-main font-bold text-white tracking-[-2px] uppercase">
+                        {activeProject.name}
+                      </h1>
+                      <p className="text-[#adaaad] font-mono text-[11px] uppercase max-w-xl">
+                        {activeProject.description || 'REPOSITORY_VIEW__MODAL_ACTIVE'}
+                      </p>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
@@ -539,11 +551,20 @@ export const ProjectVault: React.FC = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]">
           <div className="bg-[#111111] border border-[#e60000]/30 p-8 w-full max-w-md shadow-2xl">
-            <div className="flex items-center gap-3 mb-6 border-b border-[#e60000]/20 pb-4">
-              <div className="w-2 h-2 bg-[#e60000] animate-pulse" />
-              <h2 className="text-lg font-main font-bold text-[#e60000] tracking-[1px] uppercase">
-                PURGE_CONFIRMATION
-              </h2>
+            <div className="flex items-center justify-between mb-6 border-b border-[#e60000]/20 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-[#e60000] animate-pulse" />
+                <h2 className="text-lg font-main font-bold text-[#e60000] tracking-[1px] uppercase">
+                  PURGE_CONFIRMATION
+                </h2>
+              </div>
+              <button
+                onClick={closeDeleteModal}
+                className="p-1.5 text-[#adaaad] hover:text-white hover:bg-[#e60000]/10 transition-colors"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
             
             <div className="flex flex-col gap-4">
@@ -586,11 +607,20 @@ export const ProjectVault: React.FC = () => {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]">
           <div className="bg-[#111111] border border-[#222226] p-8 w-full max-w-md shadow-2xl">
-            <div className="flex items-center gap-3 mb-6 border-b border-[#222226] pb-4">
-              <div className="w-2 h-2 bg-[#e60000]" />
-              <h2 className="text-lg font-main font-bold text-white tracking-[1px] uppercase">
-                INITIALIZE_NEW_SECTOR
-              </h2>
+            <div className="flex items-center justify-between mb-6 border-b border-[#222226] pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-[#e60000]" />
+                <h2 className="text-lg font-main font-bold text-white tracking-[1px] uppercase">
+                  INITIALIZE_NEW_SECTOR
+                </h2>
+              </div>
+              <button
+                onClick={() => { setShowCreateModal(false); setNewProjectName(''); setNewProjectDesc(''); }}
+                className="p-1.5 text-[#adaaad] hover:text-white hover:bg-[#e60000]/10 transition-colors"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
             
             <form onSubmit={handleCreateProject} className="flex flex-col gap-4">

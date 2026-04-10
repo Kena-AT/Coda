@@ -105,7 +105,7 @@ export const Dashboard: React.FC = () => {
   const fetchProjects = async () => {
     if (!user) return;
     try {
-      const response: any = await invoke('get_projects', { userId: user.id });
+      const response: any = await invoke('list_projects', { userId: user.id });
       if (response.success) {
         setProjects(response.data || []);
       }
