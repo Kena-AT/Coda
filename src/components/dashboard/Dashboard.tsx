@@ -5,7 +5,9 @@ import {
   Power,
   Shield,
   Activity,
-  Database
+  Database,
+  Upload,
+  Download
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Sidebar } from '../layout/Sidebar';
@@ -19,6 +21,8 @@ import { ProjectVault } from './ProjectVault';
 import { MaintenanceSettingsModal } from './MaintenanceSettingsModal';
 import { IntelligenceDashboard } from './IntelligenceDashboard';
 import { GlobalSearchResults } from './GlobalSearchResults';
+import { ExportModal } from './ExportModal';
+import { ImportModal } from './ImportModal';
 import { sessionManager, authApi } from '../../store/authStore';
 import { useAuthSession } from '../../hooks/useAuthSession';
 
@@ -65,6 +69,8 @@ export const Dashboard: React.FC = () => {
 
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
 
   useEffect(() => {
@@ -201,10 +207,24 @@ export const Dashboard: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-6 border-l border-[#222226] pl-8">
-              <button onClick={() => setIsMaintenanceModalOpen(true)} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
+              <button 
+                onClick={() => setIsImportModalOpen(true)} 
+                className="text-[#adaaad] hover:text-white transition-colors"
+                title="Import Intelligence"
+              >
+                <Download className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => setIsExportModalOpen(true)} 
+                className="text-[#adaaad] hover:text-white transition-colors"
+                title="Export Protocol"
+              >
+                <Upload className="w-5 h-5" />
+              </button>
+              <button onClick={() => setIsMaintenanceModalOpen(true)} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Settings">
                 <Settings className="w-5 h-5" />
               </button>
-              <button onClick={handleLogout} className="text-[#adaaad] hover:text-[#e60000] transition-colors">
+              <button onClick={handleLogout} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Logout">
                 <Power className="w-5 h-5" />
               </button>
             </div>
@@ -315,6 +335,15 @@ export const Dashboard: React.FC = () => {
       <MaintenanceSettingsModal 
         isOpen={isMaintenanceModalOpen}
         onClose={() => setIsMaintenanceModalOpen(false)}
+      />
+      <ExportModal 
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+      />
+      <ImportModal 
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={fetchSnippets}
       />
     </div>
   );
