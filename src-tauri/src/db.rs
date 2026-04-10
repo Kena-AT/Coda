@@ -31,6 +31,7 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
+            color TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )",
@@ -267,6 +268,12 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
     conn.execute(
         "INSERT OR IGNORE INTO monitor_config (name, check_interval, enabled) 
          VALUES ('Vault Maintenance', 300, 1)",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    // Cleanup legacy INBOX projects if they were manually created
+    conn.execute(
+        "DELETE FROM projects WHERE name = 'INBOX' OR name = 'UNSORTED' OR name = 'INBOX / UNSORTED'",
         [],
     ).map_err(|e| e.to_string())?;
 

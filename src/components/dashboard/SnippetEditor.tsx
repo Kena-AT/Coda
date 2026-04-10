@@ -33,6 +33,7 @@ export const SnippetEditor: React.FC = () => {
     selectedSnippetId, 
     setSelectedSnippetId, 
     selectedProjectId,
+    setPreSelectedProjectId,
     updateSnippetInStore 
   } = useStore();
   const [snippet, setSnippet] = useState<Partial<Snippet>>({ title: '', content: '', language: 'javascript' });
@@ -136,6 +137,7 @@ export const SnippetEditor: React.FC = () => {
           toast.success('System buffer recorded');
           // For a real app we'd fetch the created snippet string, but we'll just go back to library
           setSelectedSnippetId(null);
+          setPreSelectedProjectId(null);
         } else {
           toast.error(response.message);
         }
@@ -231,7 +233,10 @@ export const SnippetEditor: React.FC = () => {
                 {saving ? 'COMMITTING...' : 'SAVE REVISION'}
               </button>
               <button 
-                onClick={() => setSelectedSnippetId(null)}
+                onClick={() => {
+                  setSelectedSnippetId(null);
+                  setPreSelectedProjectId(null);
+                }}
                 className="p-2 border border-[#353534]/50 text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
                 title="Close Editor"
               >

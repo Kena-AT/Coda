@@ -39,6 +39,8 @@ interface AppState {
   user: { id: number; username: string } | null;
   snippets: Snippet[];
   loading: boolean;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
   
   setUser: (user: { id: number; username: string } | null) => void;
   setSnippets: (snippets: Snippet[]) => void;
@@ -65,12 +67,17 @@ interface AppState {
 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+
+  preSelectedProjectId: number | null;
+  setPreSelectedProjectId: (id: number | null) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
   user: null,
   snippets: [],
   loading: false,
+  activeTab: 'library',
+  setActiveTab: (activeTab) => set({ activeTab }),
   selectedSnippetId: null,
 
   setUser: (user) => set({ user }),
@@ -97,6 +104,9 @@ export const useStore = create<AppState>((set) => ({
 
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
+
+  preSelectedProjectId: null,
+  setPreSelectedProjectId: (id) => set({ preSelectedProjectId: id }),
 
   sessionCopies: {},
   incrementCopy: (id) => set((state) => ({

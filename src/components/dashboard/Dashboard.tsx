@@ -33,7 +33,8 @@ export const Dashboard: React.FC = () => {
     setSelectedSnippetId,
     searchQuery,
     setSearchQuery,
-    setProjects
+    setProjects,
+    activeTab
   } = useStore();
 
   // Enable automatic token expiry tracking and refresh
@@ -62,7 +63,6 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const [activeTab, setActiveTab] = useState('library');
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
@@ -149,7 +149,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-[#111111] text-white">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onNewSnippet={() => setSelectedSnippetId(-1)} />
+      <Sidebar onNewSnippet={() => setSelectedSnippetId(-1)} />
 
       <main className="flex-1 ml-[0px] lg:ml-[256px] flex flex-col relative overflow-hidden">
         

@@ -9,18 +9,18 @@ import {
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useStore } from '../../store/useStore';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 interface SidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   onNewSnippet: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onNewSnippet }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
+  const { activeTab, setActiveTab } = useStore();
   const navItems = [
     { id: 'library', label: 'Library', icon: Folder },
     { id: 'projects', label: 'Projects', icon: FolderGit2 },

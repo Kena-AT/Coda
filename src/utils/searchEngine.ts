@@ -125,3 +125,47 @@ export const filterSnippets = (
     .filter((res): res is SearchResult => res !== null)
     .sort((a, b) => b.score - a.score);
 };
+
+export interface ProjectSearchResult {
+  project: Project;
+  score: number;
+}
+
+export const filterProjects = (
+  projects: Project[],
+  query: string
+): ProjectSearchResult[] => {
+  if (!query.trim()) return [];
+
+  const { terms, filters } = parseSearchQuery(query);
+  
+  // If specific code-only filters are used, exclude projects unless explicitly searching for them
+  if (filters.lang || filters.tag || filters.isArchived) return [];
+
+  return projects
+    .map(project => {
+      let score = 0;
+
+      if (terms.length === 0) return null;
+
+      terms.forEach(term => {
+        const name = project.name.toLowerCase();
+        const desc = project.description?.toLowerCase() || '';
+
+        if (name === term) {
+          score += 200; // Exact match bonus
+        } else if (name.includes(term)) {
+          score += 100;
+        }
+
+        if (desc.includes(term)) {
+          score += 30;
+        }
+      });
+
+      if (score === 0) return null;
+      return { project, score };
+    })
+    .filter((res): res is ProjectSearchResult => res !== null)
+    .sort((a, b) => b.score - a.score);
+};

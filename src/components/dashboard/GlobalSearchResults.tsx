@@ -1,8 +1,8 @@
 import React, { useMemo, Component, ErrorInfo, ReactNode } from 'react';
 import { useStore } from '../../store/useStore';
-import { filterSnippets } from '../../utils/searchEngine';
+import { filterSnippets, filterProjects } from '../../utils/searchEngine';
 import { SnippetCard } from './SnippetCard';
-import { Search, Info, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Search, Info, AlertTriangle, RefreshCcw, FolderGit2, ChevronRight, Activity } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 
@@ -32,16 +32,31 @@ class SearchErrorBoundary extends Component<{ children: ReactNode }, { hasError:
 }
 
 export const GlobalSearchResults: React.FC = () => {
-  const { snippets, projects, searchQuery, setSelectedSnippetId, setSnippets, user } = useStore();
+  const { 
+    snippets, 
+    projects, 
+    searchQuery, 
+    setSelectedSnippetId, 
+    setSelectedProjectId,
+    setActiveTab,
+    setSearchQuery,
+    setSnippets, 
+    user 
+  } = useStore();
 
-  const results = useMemo(() => {
+  const { snippetResults, projectResults } = useMemo(() => {
     try {
-      if (!searchQuery) return [];
-      const res = filterSnippets(snippets || [], projects || [], searchQuery);
-      return res.filter(r => r && r.snippet); // Double defensive filter
+      if (!searchQuery) return { snippetResults: [], projectResults: [] };
+      const snips = filterSnippets(snippets || [], projects || [], searchQuery);
+      const projs = filterProjects(projects || [], searchQuery);
+      
+      return {
+        snippetResults: snips.filter(r => r && r.snippet),
+        projectResults: projs
+      };
     } catch (err) {
       console.error('Search logic crash:', err);
-      return [];
+      return { snippetResults: [], projectResults: [] };
     }
   }, [snippets, projects, searchQuery]);
 
@@ -70,7 +85,7 @@ export const GlobalSearchResults: React.FC = () => {
     }
   };
 
-  if (results.length === 0 && searchQuery) {
+  if (snippetResults.length === 0 && projectResults.length === 0 && searchQuery) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="w-20 h-20 bg-[#222226] flex items-center justify-center rounded-full mb-8">
@@ -93,7 +108,7 @@ export const GlobalSearchResults: React.FC = () => {
               Search Results
             </h1>
             <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">
-              Found {results.length} matches across total vault
+              Found {projectResults.length + snippetResults.length} matches across total vault
             </p>
           </div>
           
@@ -105,20 +120,65 @@ export const GlobalSearchResults: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-          {results.map(({ snippet }) => (
-            <div key={snippet?.id || Math.random()} className="h-[200px]">
-              {snippet && (
-                <SnippetCard 
-                  snippet={snippet}
-                  onEdit={() => setSelectedSnippetId(snippet.id!)}
-                  onDelete={() => handleDelete(snippet.id!)}
-                  onArchive={() => handleArchive(snippet.id!)}
-                />
-              )}
+        {/* Project Results Section */}
+        {projectResults.length > 0 && (
+          <div className="mb-16">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="p-2 bg-[#e60000]/10 rounded text-[#e60000]">
+                <FolderGit2 size={18} />
+              </div>
+              <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Project Sectors</h2>
             </div>
-          ))}
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {projectResults.map(({ project }) => (
+                <div 
+                  key={project.id}
+                  onClick={() => {
+                    setSelectedProjectId(project.id);
+                    setActiveTab('projects');
+                    setSearchQuery('');
+                  }}
+                  className="bg-[#151515] border border-[#222226] p-6 hover:border-[#e60000] transition-all cursor-pointer group animate-in zoom-in-95 duration-300"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="p-2 bg-[#222226] text-[#adaaad] group-hover:text-[#e60000] transition-colors">
+                      <FolderGit2 size={16} />
+                    </div>
+                    <ChevronRight size={14} className="text-[#333] group-hover:text-[#e60000] transition-all transform group-hover:translate-x-1" />
+                  </div>
+                  <h3 className="text-sm font-bold font-main text-white uppercase mb-2 group-hover:text-[#e60000] transition-colors">{project.name}</h3>
+                  <p className="text-[10px] text-[#adaaad] font-mono uppercase line-clamp-1">{project.description || 'NO_DESCRIPTION_PROVIDED'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Snippet Results Section */}
+        {snippetResults.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <div className="p-2 bg-[#222226]/50 rounded text-[#adaaad]">
+                <Activity size={18} />
+              </div>
+              <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Snippet Fragments</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+              {snippetResults.map(({ snippet }) => (
+                <div key={snippet?.id || Math.random()} className="h-[200px]">
+                  {snippet && (
+                    <SnippetCard 
+                      snippet={snippet}
+                      onEdit={() => setSelectedSnippetId(snippet.id!)}
+                      onDelete={() => handleDelete(snippet.id!)}
+                      onArchive={() => handleArchive(snippet.id!)}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </SearchErrorBoundary>
   );

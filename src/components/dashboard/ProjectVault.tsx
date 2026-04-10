@@ -30,7 +30,8 @@ export const ProjectVault: React.FC = () => {
     setSelectedSnippetId, 
     selectedProjectId,
     setSelectedProjectId,
-    searchQuery
+    searchQuery,
+    setPreSelectedProjectId
   } = useStore();
 
   const [stats, setStats] = useState<Record<number, any>>({});
@@ -51,17 +52,12 @@ export const ProjectVault: React.FC = () => {
   const [inlineEditName, setInlineEditName] = useState('');
   const [inlineEditDesc, setInlineEditDesc] = useState('');
 
-  // Virtual Project: Inbox (ID: -1)
-  const inboxProject: Project = {
-    id: -1,
-    user_id: user?.id || 0,
-    name: 'INBOX / UNSORTED',
-    description: 'Snippets not yet assigned to a project',
-    color: '#8b5cf6',
-    created_at: new Date().toISOString()
-  };
+  // Delete confirmation modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
+  const [projectToDeleteName, setProjectToDeleteName] = useState('');
 
-  const allProjects = [inboxProject, ...projects];
+  const allProjects = projects;
 
   const fetchProjects = async () => {
     if (!user) return;
@@ -141,19 +137,36 @@ export const ProjectVault: React.FC = () => {
     }
   };
 
-  const handleDeleteProject = async (projectId: number) => {
+  const openDeleteModal = (projectId: number) => {
     if (projectId === -1) return;
-    if (!confirm('Destroy this project sector? Snippets will be moved to INBOX.')) return;
+    const p = allProjects.find(proj => proj.id === projectId);
+    if (p) {
+      setProjectToDelete(projectId);
+      setProjectToDeleteName(p.name);
+      setShowDeleteModal(true);
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setProjectToDelete(null);
+    setProjectToDeleteName('');
+  };
+
+  const confirmDeleteProject = async () => {
+    if (!projectToDelete || !user) return;
     try {
-      const resp = await invoke<any>('delete_project', { projectId: projectId, userId: user?.id });
+      const resp = await invoke<any>('delete_project', { id: projectToDelete, userId: user.id });
       if (resp.success) {
         toast.success('Project sector purged');
-        if (selectedProjectId === projectId) setSelectedProjectId(null);
+        if (selectedProjectId === projectToDelete) setSelectedProjectId(null);
         await fetchProjects();
         await fetchSnippets();
       }
     } catch (err) {
       toast.error('Purge failed');
+    } finally {
+      closeDeleteModal();
     }
   };
 
@@ -314,6 +327,17 @@ export const ProjectVault: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-4">
+              {!isEditing && (
+                <button 
+                  onClick={() => {
+                    setPreSelectedProjectId(activeProject.id);
+                    setSelectedSnippetId(-1);
+                  }}
+                  className="flex items-center gap-2 px-6 py-2 bg-[#e60000] text-white text-[10px] font-bold uppercase hover:bg-[#ff0000] hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
+                >
+                  <Plus size={14} /> INITIALISE_SNIPPET
+                </button>
+              )}
               <div className="relative w-64 group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#adaaad] group-focus-within:text-[#e60000] transition-colors" />
                 <input 
@@ -329,7 +353,7 @@ export const ProjectVault: React.FC = () => {
                    <button onClick={() => setIsEditing(true)} className="p-2 border border-[#222226] text-[#adaaad] hover:text-white transition-colors" title="Edit Metadata">
                     <Edit2 size={16} />
                   </button>
-                  <button onClick={() => handleDeleteProject(activeProject.id!)} className="p-2 border border-[#222226] text-[#adaaad] hover:text-[#e60000] transition-colors" title="Purge Project">
+                  <button onClick={() => openDeleteModal(activeProject.id!)} className="p-2 border border-[#222226] text-[#adaaad] hover:text-[#e60000] transition-colors" title="Purge Project">
                     <Trash2 size={16} />
                   </button>
                 </>
@@ -375,22 +399,6 @@ export const ProjectVault: React.FC = () => {
           <h1 className="text-3xl font-main font-bold text-white tracking-[-1.5px] uppercase">Project Vault</h1>
           <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">Organizational & Contextual Scoping Layer</p>
         </div>
-        <form onSubmit={handleCreateProject} className="flex items-center gap-2">
-          <input 
-            type="text"
-            value={newProjectName}
-            onChange={(e) => setNewProjectName(e.target.value)}
-            placeholder="GENERATE_PROJECT_SECTOR..."
-            className="bg-[#0e0e0e] border border-[#222226] text-white text-[10px] font-mono px-4 py-2 uppercase tracking-[1px] outline-none focus:border-[#e60000] w-64"
-          />
-          <button 
-            type="submit"
-            disabled={isCreating || !newProjectName.trim()}
-            className="bg-[#e60000] text-white p-2 hover:bg-[#ff0000] disabled:opacity-50 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </form>
       </div>
       
       {loadingStats ? (
@@ -468,7 +476,7 @@ export const ProjectVault: React.FC = () => {
                               <Edit2 size={16} />
                             </button>
                             <button
-                              onClick={(e) => { e.stopPropagation(); handleDeleteProject(p.id!); }}
+                              onClick={(e) => { e.stopPropagation(); openDeleteModal(p.id!); }}
                               className="p-2 bg-[#1a1a1a] border border-[#333] text-[#adaaad] hover:text-[#e60000] hover:border-[#e60000] hover:bg-[#e60000]/10 transition-all"
                               title="Purge"
                             >
@@ -524,6 +532,44 @@ export const ProjectVault: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]">
+          <div className="bg-[#111111] border border-[#e60000]/30 p-8 w-full max-w-md shadow-2xl">
+            <div className="flex items-center gap-3 mb-6 border-b border-[#e60000]/20 pb-4">
+              <div className="w-2 h-2 bg-[#e60000] animate-pulse" />
+              <h2 className="text-lg font-main font-bold text-[#e60000] tracking-[1px] uppercase">
+                PURGE_CONFIRMATION
+              </h2>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <p className="text-white font-mono text-sm">
+                DESTROY PROJECT SECTOR: <span className="text-[#e60000] font-bold">{projectToDeleteName}</span>?
+              </p>
+              <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[0.5px]">
+                WARNING: All snippets within this sector will be relocated to INBOX.
+              </p>
+              
+              <div className="flex gap-3 mt-4 pt-4 border-t border-[#222226]">
+                <button
+                  onClick={confirmDeleteProject}
+                  className="flex-1 bg-[#e60000] text-white py-3 text-[11px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors"
+                >
+                  CONFIRM_PURGE
+                </button>
+                <button
+                  onClick={closeDeleteModal}
+                  className="px-6 py-3 border border-[#222226] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors"
+                >
+                  ABORT
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

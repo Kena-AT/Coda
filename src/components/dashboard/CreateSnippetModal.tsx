@@ -7,7 +7,8 @@ import {
   Hash,
   Terminal,
   Save,
-  AlertCircle
+  AlertCircle,
+  FolderGit2
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
@@ -20,11 +21,12 @@ interface CreateSnippetModalProps {
 }
 
 export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, onClose, onSnippetCreated }) => {
-  const { user } = useStore();
+  const { user, projects, preSelectedProjectId, setPreSelectedProjectId } = useStore();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [tags, setTags] = useState('');
+  const [projectId, setProjectId] = useState<number | null>(preSelectedProjectId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -44,7 +46,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
         content,
         language,
         tags: tags || null,
-        projectId: null
+        projectId: projectId && projectId !== -1 ? projectId : null
       });
 
       if (response.success) {
@@ -64,6 +66,8 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
         setContent('');
         setLanguage('javascript');
         setTags('');
+        setProjectId(null);
+        setPreSelectedProjectId(null);
       } else {
         setError(response.message);
       }
@@ -143,19 +147,41 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
             </div>
           </div>
 
-          {/* Tags */}
-          <div className="relative">
-            <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
-              <Tags className="w-3 h-3 text-[#e60000]" />
-              <span>Tags (comma-separated)</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Tags */}
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
+                <Tags className="w-3 h-3 text-[#e60000]" />
+                <span>Tags (comma-separated)</span>
+              </div>
+              <input 
+                type="text" 
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="API, Utility, Auth..."
+                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm"
+              />
             </div>
-            <input 
-              type="text" 
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="API, Utility, Auth..."
-              className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm"
-            />
+
+            {/* Project Selection */}
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
+                <FolderGit2 className="w-3 h-3 text-[#e60000]" />
+                <span>Target Project (Sector)</span>
+              </div>
+              <select 
+                value={projectId || ''}
+                onChange={(e) => setProjectId(e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm appearance-none"
+              >
+                <option value="">NO_PROJECT_ASSIGNED (INBOX)</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Content */}
