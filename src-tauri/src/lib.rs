@@ -9,6 +9,8 @@ mod project;
 mod archiver;
 mod vault_maintenance;
 mod backup;
+mod notifications;
+mod settings;
 
 use dashmap::DashMap;
 use tauri::Manager;
@@ -135,7 +137,11 @@ pub fn run() {
             vault_maintenance::add_vault_monitor,
             snippet::validate_snippet_title,
             backup::create_backup,
-            backup::restore_backup
+            backup::restore_backup,
+            notifications::update_notification_settings,
+            notifications::get_notification_settings,
+            settings::get_user_preferences,
+            settings::update_user_preferences
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

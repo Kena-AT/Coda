@@ -42,7 +42,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
             System_About_Manifest
           </div>
           <div className="flex justify-between items-end">
-            <h1 className="text-8xl font-main font-black text-white tracking-[-6px] uppercase leading-none">VERSION_INFO</h1>
+            <h1 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">VERSION_INFO</h1>
             <div className="text-right space-y-1 mb-2">
                <p className="text-[9px] font-mono text-[#737373] uppercase">Last Kernel Update: 2023.10.12_0400</p>
                <p className="text-[10px] font-main text-green-500 font-bold uppercase tracking-[1px]">Status: Fully_Operational</p>
@@ -56,7 +56,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1">
           <div className="bg-[#131313] p-8 border border-[#353534]/30 space-y-6">
             <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[#353534]/50 pb-2">App Version</p>
-            <h2 className="text-4xl font-main font-bold text-white uppercase tracking-[-1px]">V.2.0.4-STABLE</h2>
+            <h2 className="text-xl font-main font-bold text-white uppercase tracking-[-1px]">V.2.0.4-STABLE</h2>
             <div className="flex items-center gap-2 text-[#737373]">
                <ShieldCheck size={14} className="text-[#e60000]" />
                <span className="text-[9px] font-mono uppercase">Encrypted_Sig_Valid</span>
@@ -75,7 +75,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                </div>
             </div>
             <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[#353534]/50 pb-2">Build Identifier</p>
-            <h2 className="text-5xl font-main font-bold text-white uppercase tracking-[-2px]">882-QX-ALPHA</h2>
+            <h2 className="text-2xl font-main font-bold text-white uppercase tracking-[-1px]">882-QX-ALPHA</h2>
           </div>
 
           <div className="bg-[#131313] p-8 border border-[#353534]/30 space-y-8">
@@ -103,7 +103,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
           
           {/* Changelog */}
           <div className="lg:col-span-2 space-y-8">
-            <h3 className="text-2xl font-main font-bold text-white uppercase flex items-center gap-3">
+            <h3 className="text-xl font-main font-bold text-white uppercase tracking-tight">
               <History className="w-6 h-6 text-[#e60000]" />
               COMMIT_CHANGELOG_HISTORY
             </h3>
@@ -180,7 +180,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
               <div className="space-y-8 relative z-10">
                  <div className="flex flex-col items-center gap-4">
                     <Terminal className="w-12 h-12 text-red-600" />
-                    <h2 className="text-5xl font-main font-black text-white tracking-[-3px] uppercase">
+                    <h2 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase">
                        {rebooting ? "REBOOTING..." : "EXECUTE_REBOOT_SIMULATION"}
                     </h2>
                  </div>
@@ -188,7 +188,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                  <button 
                    onClick={handleReboot}
                    disabled={rebooting}
-                   className="px-12 py-5 bg-[#e60000] hover:bg-white hover:text-red-600 transition-all font-main font-black uppercase text-[16px] tracking-[1px] disabled:opacity-50"
+                   className="px-12 py-5 bg-[#e60000] hover:bg-white hover:text-red-600 transition-all font-main font-bold uppercase text-[13px] tracking-[1px] disabled:opacity-50"
                  >
                    {rebooting ? <RefreshCcw className="w-6 h-6 animate-spin mx-auto" /> : "INIT_REBOOT_SEQUENCE"}
                  </button>

@@ -62,7 +62,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-7xl font-main font-black text-white tracking-[-4px] uppercase">
+          <h2 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase">
             TERMINATE_SESSION?
           </h2>
           <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#e60000]/50 to-transparent" />
@@ -80,7 +80,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
                 <Monitor className="w-5 h-5 text-white" />
             </div>
             <div className="space-y-1">
-              <span className="text-[16px] font-main font-black text-white uppercase block leading-tight">Logout // End_session</span>
+              <span className="text-[14px] font-main font-bold text-white uppercase block leading-tight">Logout // End_session</span>
               <span className="text-[9px] font-mono text-white/70 uppercase">Execute_sig_quit</span>
             </div>
           </button>
@@ -93,7 +93,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
                 <ShieldAlert className="w-5 h-5 text-[#adaaad]" />
             </div>
             <div className="space-y-1">
-              <span className="text-[16px] font-main font-black text-white uppercase block leading-tight">Stay_active // Abort</span>
+              <span className="text-[14px] font-main font-bold text-white uppercase block leading-tight">Stay_active // Abort</span>
               <span className="text-[9px] font-mono text-[#737373] uppercase leading-tight">Return_to_root</span>
             </div>
           </button>

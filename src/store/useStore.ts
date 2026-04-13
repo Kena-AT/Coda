@@ -129,7 +129,7 @@ export const useStore = create<AppState>((set) => ({
     pushAlerts: true,
     soundEffects: false,
     theme: 'crimson',
-    fontSize: 125,
+    fontSize: 100,
     shortcuts: {
       copy: 'C',
       newSnippet: 'N',

@@ -93,7 +93,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                   </div>
                </div>
                <div className="p-8 bg-[#131313] border-t border-[#353534] space-y-4">
-                 <h4 className="text-xl font-main font-black text-white uppercase">Vault Access</h4>
+                 <h4 className="text-lg font-main font-bold text-white uppercase">Vault Access</h4>
                  <p className="text-[9px] font-mono text-[#737373] leading-relaxed uppercase">
                    CRITICAL: Re-keying the vault requires full synchronization. Failure to maintain key integrity may result in permanent data redaction.
                  </p>
@@ -115,7 +115,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
           <div className="flex-1 space-y-12 pb-12">
             <div className="space-y-2">
               <span className="text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">Identity Management</span>
-              <h1 className="text-7xl font-main font-black text-white tracking-[-4px] uppercase leading-none">
+              <h1 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">
                 Change Master<br />Key
               </h1>
             </div>
@@ -207,14 +207,14 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                 <button 
                   onClick={handleUpdate}
                   disabled={loading}
-                  className="px-10 py-5 bg-[#e60000] hover:bg-[#ff0000] text-white font-main font-black uppercase text-[15px] tracking-[1px] flex items-center gap-3 transition-all disabled:opacity-50"
+                  className="px-10 py-5 bg-[#e60000] hover:bg-[#ff0000] text-white font-main font-bold uppercase text-[13px] tracking-[1px] flex items-center gap-3 transition-all disabled:opacity-50"
                 >
                    {loading ? <RefreshCcw className="w-5 h-5 animate-spin" /> : <Lock className="w-5 h-5" />}
                    RE-KEY VAULT
                 </button>
                 <button 
                   onClick={onBack}
-                  className="px-10 py-5 bg-[#1f1f22] border border-[#353534] hover:bg-[#252529] text-[#adaaad] font-main font-black uppercase text-[15px] tracking-[1px] transition-all"
+                  className="px-10 py-5 bg-[#1f1f22] border border-[#353534] hover:bg-[#252529] text-[#adaaad] font-main font-bold uppercase text-[13px] tracking-[1px] transition-all"
                 >
                    CANCEL
                 </button>

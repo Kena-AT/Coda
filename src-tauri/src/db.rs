@@ -216,10 +216,41 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             auto_archive_days INTEGER DEFAULT 30,
             exclude_favorites BOOLEAN DEFAULT 1,
             min_copy_threshold INTEGER DEFAULT 10,
+            push_alerts BOOLEAN DEFAULT 1,
+            sound_effects BOOLEAN DEFAULT 1,
+            lockout_threshold INTEGER DEFAULT 3,
+            lockout_duration_mins INTEGER DEFAULT 20,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )",
         [],
     ).map_err(|e| e.to_string())?;
+
+    // Migration logic: Add columns to existing user_settings table if missing
+    {
+        let mut table_info = conn.prepare("PRAGMA table_info(user_settings)").map_err(|e| e.to_string())?;
+        let rows = table_info.query_map([], |row| {
+            let name: String = row.get(1)?;
+            Ok(name)
+        }).map_err(|e| e.to_string())?;
+        
+        let mut columns = Vec::new();
+        for col in rows {
+            columns.push(col.map_err(|e| e.to_string())?);
+        }
+
+        if !columns.contains(&"push_alerts".to_string()) {
+            conn.execute("ALTER TABLE user_settings ADD COLUMN push_alerts BOOLEAN DEFAULT 1", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"sound_effects".to_string()) {
+            conn.execute("ALTER TABLE user_settings ADD COLUMN sound_effects BOOLEAN DEFAULT 1", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"lockout_threshold".to_string()) {
+            conn.execute("ALTER TABLE user_settings ADD COLUMN lockout_threshold INTEGER DEFAULT 3", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"lockout_duration_mins".to_string()) {
+            conn.execute("ALTER TABLE user_settings ADD COLUMN lockout_duration_mins INTEGER DEFAULT 20", []).map_err(|e| e.to_string())?;
+        }
+    }
 
     // Monitor config and logs for Vault Maintenance
     conn.execute(

@@ -124,7 +124,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
             <div className="w-2 h-2 bg-[#e60000]" />
             Secure Storage Protocols
           </div>
-          <h1 className="text-6xl font-main font-black text-white tracking-[-3px] uppercase">LOCAL_BACKUP_RESTORE</h1>
+          <h1 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase">LOCAL_BACKUP_RESTORE</h1>
           <p className="text-[#737373] font-main text-sm max-w-2xl">
             Manage the integrity of your code vault. Execute cryptographic snapshots or restore existing data frames from local storage.
           </p>
@@ -137,7 +137,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
             <div className="p-8 space-y-12 flex-1">
               <div className="flex justify-between items-start">
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-main font-bold text-white uppercase">Create Full Backup</h3>
+                  <h3 className="text-xl font-main font-bold text-white uppercase">Create Full Backup</h3>
                   <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">Protocol: Snapshot_v4_Encrypted</p>
                 </div>
                 <Save className="w-8 h-8 text-[#e60000]" />
@@ -146,7 +146,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
               <div className="space-y-6">
                 <div className="bg-[#1f1f22]/30 border border-[#353534]/50 p-6 rounded-sm">
                    <p className="text-[9px] font-mono text-[#737373] uppercase mb-4">Last backup point</p>
-                   <p className="text-2xl font-main font-bold text-white">{lastBackup}</p>
+                   <p className="text-xl font-main font-bold text-white">{lastBackup}</p>
                 </div>
 
                 <button 
@@ -172,7 +172,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <p className="text-[10px] font-mono text-[#737373] uppercase">Current Size</p>
-                    <p className="text-3xl font-main font-bold text-white">{vaultSize} <span className="text-sm font-light">MB</span></p>
+                    <p className="text-2xl font-main font-bold text-white">{vaultSize} <span className="text-sm font-light">MB</span></p>
                   </div>
                   <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
                     <div className="h-full bg-[#e60000] w-2/3" />
@@ -181,7 +181,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
 
                <div className="space-y-1">
                   <p className="text-[10px] font-mono text-[#737373] uppercase">Snippet Count</p>
-                  <p className="text-3xl font-main font-bold text-white">{snippets.length} <span className="text-sm font-light uppercase text-[#737373]">Entries</span></p>
+                  <p className="text-2xl font-main font-bold text-white">{snippets.length} <span className="text-sm font-light uppercase text-[#737373]">Entries</span></p>
                </div>
             </div>
 
@@ -194,7 +194,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           {/* Restore */}
           <div className="lg:col-span-3 bg-[#131313] border border-[#353534] rounded-sm overflow-hidden p-8 flex flex-col md:flex-row gap-12">
             <div className="flex-1 space-y-8">
-               <h3 className="text-3xl font-main font-bold text-white uppercase">Restore from File</h3>
+               <h3 className="text-xl font-main font-bold text-white uppercase">Restore from File</h3>
                <p className="text-[13px] font-main text-[#737373] leading-relaxed">
                   Load a previously exported <span className="text-white px-1 font-mono text-[11px] bg-[#1f1f22]">.code_vault</span> package. This operation will reconstruct the entire database state based on the provided manifest.
                </p>

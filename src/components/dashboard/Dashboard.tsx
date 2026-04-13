@@ -28,9 +28,9 @@ import { BackupRestorePage } from './BackupRestorePage';
 import { ChangePasswordPage } from './ChangePasswordPage';
 import { VersionInfoPage } from './VersionInfoPage';
 import { LogoutConfirmationPage } from './LogoutConfirmationPage';
-import { sendNotification } from '@tauri-apps/plugin-notification';
 import { sessionManager, authApi } from '../../store/authStore';
 import { useAuthSession } from '../../hooks/useAuthSession';
+import { listen } from '@tauri-apps/api/event';
 
 export const Dashboard: React.FC = () => {
   const { 
@@ -58,6 +58,44 @@ export const Dashboard: React.FC = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
+
+  // Apply Font Scaling
+  useEffect(() => {
+    const scale = settings.fontSize / 100;
+    document.documentElement.style.setProperty('--font-scale', scale.toString());
+  }, [settings.fontSize]);
+
+  useEffect(() => {
+    // Auditory feedback loop
+    const unlisten = listen('play-fx', () => {
+      if (!settings.pushAlerts && !settings.soundEffects) return; // Respect global quiet mode
+      if (!settings.soundEffects) return;
+      
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const playBeep = (freq: number, startTime: number, duration: number) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0.05, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      // Cyberpunk double-beep
+      playBeep(1200, audioCtx.currentTime, 0.08);
+      playBeep(1800, audioCtx.currentTime + 0.12, 0.04);
+    });
+
+    return () => {
+      unlisten.then(f => f());
+    };
+  }, [settings.soundEffects, settings.pushAlerts]);
 
   useEffect(() => {
     const checkStatus = async () => {
