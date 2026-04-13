@@ -268,6 +268,11 @@ pub fn toggle_archive(app_handle: AppHandle, state: State<'_, AppState>, user_id
     }
 }
 
+#[tauri::command]
+pub fn archive_snippet(app_handle: AppHandle, state: State<'_, AppState>, user_id: i32, id: i32) -> Result<SnippetResponse, String> {
+    toggle_archive(app_handle, state, user_id, id, true)
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VersionResponse {
     pub success: bool,

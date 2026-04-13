@@ -1,8 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, UploadCloud, CheckCircle2, Code2, Cpu } from 'lucide-react';
 import { Editor } from '@monaco-editor/react';
 import { useStore } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-dialog';
+import { readTextFile } from '@tauri-apps/plugin-fs';
 import toast from 'react-hot-toast';
 import { metadataEngine } from '../../utils/metadataEngine';
 
@@ -23,8 +25,6 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
   const [predictedTags, setPredictedTags] = useState<string[]>([]);
   const [predictedTitle, setPredictedTitle] = useState('');
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
     if (isOpen) {
@@ -82,54 +82,128 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
     }
   };
 
-  const processFile = (file: File) => {
-    setIsProcessing(true);
-    const reader = new FileReader();
+  const handleNativeOpen = async () => {
+    try {
+      const selected = await open({
+        multiple: true,
+        filters: [
+          { name: 'Source Files', extensions: ['js', 'ts', 'jsx', 'tsx', 'rs', 'py', 'go', 'java', 'json', 'md', 'txt'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      });
 
-    reader.onload = async (e) => {
-      try {
-        const content = e.target?.result as string;
-        
-        // Check if it's our JSON format
-        if (file.name.endsWith('.json')) {
-          try {
-             const data = JSON.parse(content);
-             if (Array.isArray(data)) {
-                let successCount = 0;
-                for (const snip of data) {
-                   await invoke('create_snippet', {
-                     userId: user?.id,
-                     title: snip.title || 'Imported_Snippet',
-                     content: snip.content || '',
-                     language: snip.language || 'plaintext',
-                     tags: snip.tags || null,
-                     projectId: snip.project_id || null
-                   });
-                   successCount++;
-                }
-                toast.success(`Imported ${successCount} clusters successfully`);
-                onSuccess();
-                onClose();
-                return;
-             }
-          } catch(err) { /* Not a JSON array, fall through */ }
+      if (!selected) return;
+
+      const filePaths = Array.isArray(selected) ? selected : [selected];
+      
+      // If single file, load it for review
+      if (filePaths.length === 1) {
+        setIsProcessing(true);
+        try {
+          const path = filePaths[0];
+          const content = await readTextFile(path);
+          const fileName = path.split(/[/\\]/).pop() || 'Untitled';
+
+          // Optimization: If it's a JSON array, just bulk import it immediately
+          if (fileName.endsWith('.json')) {
+            try {
+              const data = JSON.parse(content);
+              if (Array.isArray(data)) {
+                 await processBulkArray(data);
+                 return;
+              }
+            } catch(e) {}
+          }
+
+          const lang = metadataEngine.guessLanguage(content, fileName);
+          const tags = metadataEngine.predictTags(content);
+          const title = metadataEngine.extractTitle(content) || fileName.split('.')[0];
+
+          setPastedCode(content);
+          setPredictedLang(lang);
+          setPredictedTags(tags);
+          setPredictedTitle(title);
+          setActiveTab('PASTE_CODE');
+          toast.success(`Module ${fileName} loaded for review`);
+        } catch(err: any) {
+          toast.error('Load failed: ' + err.toString());
+        } finally {
+          setIsProcessing(false);
         }
-
-        // Treat as a module/code file
-        const lang = metadataEngine.guessLanguage(content, file.name);
-        setPastedCode(content);
-        setPredictedLang(lang);
-        setPredictedTitle(file.name.split('.')[0]);
-        setActiveTab('PASTE_CODE');
-        toast.success(`Module ${file.name} loaded for review`);
-
-      } catch (e: any) {
-        toast.error('Ingestion failure: ' + e.toString());
-      } finally {
-        setIsProcessing(false);
+        return;
       }
-    };
-    reader.readAsText(file);
+
+      // Multi-file bulk import
+      setIsProcessing(true);
+      let successCount = 0;
+      for (const path of filePaths) {
+        try {
+          const content = await readTextFile(path);
+          const fileName = path.split(/[/\\]/).pop() || 'Untitled';
+          
+          if (fileName.endsWith('.json')) {
+            try {
+              const data = JSON.parse(content);
+              if (Array.isArray(data)) {
+                for (const snip of data) {
+                  await invoke('create_snippet', {
+                    userId: user?.id,
+                    title: snip.title || 'Imported_Snippet',
+                    content: snip.content || '',
+                    language: snip.language || 'plaintext',
+                    tags: snip.tags || null,
+                    projectId: selectedProjectId || snip.project_id || null
+                  });
+                  successCount++;
+                }
+                continue;
+              }
+            } catch(e) {}
+          }
+
+          const lang = metadataEngine.guessLanguage(content, fileName);
+          const tags = metadataEngine.predictTags(content);
+          const title = metadataEngine.extractTitle(content) || fileName.split('.')[0];
+
+          await invoke('create_snippet', {
+            userId: user?.id,
+            title,
+            content,
+            language: lang,
+            tags: tags.join(','),
+            projectId: selectedProjectId
+          });
+          successCount++;
+        } catch(e) {}
+      }
+      
+      toast.success(`Injected ${successCount} assets into repository`);
+      onSuccess();
+      onClose();
+
+    } catch (e: any) {
+      toast.error('Native uplink failure: ' + e.toString());
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const processBulkArray = async (data: any[]) => {
+    let count = 0;
+    for (const snip of data) {
+      await invoke('create_snippet', {
+        userId: user?.id,
+        title: snip.title || 'Imported_Snippet',
+        content: snip.content || '',
+        language: snip.language || 'plaintext',
+        tags: snip.tags || null,
+        projectId: selectedProjectId || snip.project_id || null
+      });
+      count++;
+    }
+    toast.success(`Bulk ingestion of ${count} snippets complete`);
+    onSuccess();
+    onClose();
   };
 
   return (
@@ -278,16 +352,14 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
                  <div 
-                   onDrop={(e) => { e.preventDefault(); if (e.dataTransfer.files?.[0]) processFile(e.dataTransfer.files[0]); }}
-                   onDragOver={(e) => e.preventDefault()}
-                   onClick={() => fileInputRef.current?.click()}
+                   onClick={handleNativeOpen}
                    className="w-full max-w-lg aspect-square border-2 border-dashed border-[#353534] hover:border-[#e60000] bg-[#111111]/50 flex flex-col items-center justify-center gap-6 cursor-pointer transition-all group"
                  >
-                    <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => { if (e.target.files?.[0]) processFile(e.target.files[0]); }} />
                     <UploadCloud size={48} className="text-[#adaaad] group-hover:text-[#e60000] transition-colors" />
                     <div className="text-center">
                        <p className="text-white font-main font-bold text-lg uppercase tracking-[1px] mb-2">Uplink System Module</p>
-                       <p className="text-[#adaaad] text-[11px] font-mono uppercase">Drag/Drop or Click to inject file buffer</p>
+                       <p className="text-[#adaaad] text-[11px] font-mono uppercase">Click to browse native filesystem</p>
+                       <p className="text-[#e60000] text-[9px] font-mono uppercase mt-2 opacity-50">Supports multi-file selection & batch ingestion</p>
                     </div>
                  </div>
               </div>

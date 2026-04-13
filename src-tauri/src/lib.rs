@@ -36,6 +36,8 @@ pub fn run() {
     tauri::Builder::default()
         .manage(state)
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .setup(move |app| {
             // Initialize database
             db::init_db(app.handle())?;
@@ -95,6 +97,7 @@ pub fn run() {
             snippet::update_snippet,
             snippet::delete_snippet,
             snippet::toggle_archive,
+            snippet::archive_snippet,
             snippet::get_snippet_versions,
             snippet::rollback_snippet,
             telemetry::get_telemetry_snapshot,

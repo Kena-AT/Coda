@@ -79,7 +79,6 @@ export const HardwareVisualization: React.FC = () => {
 
 
   const analyticsTask = snapshot?.tasks.find(t => t.name === 'analytics');
-  const maintenanceTask = snapshot?.tasks.find(t => t.name === 'maintenance');
 
   // Pulse animation speed based on CPU
   const pulseDuration = useMemo(() => {
@@ -227,9 +226,9 @@ export const HardwareVisualization: React.FC = () => {
 
           <div className="mt-auto flex flex-col items-end">
              <span className="text-[10px] text-white font-mono">DB_FSIZE: {dbSizeStr}</span>
-             {vaultState?.issues_found > 0 && (
+             {(vaultState?.issues_found ?? 0) > 0 && (
                <span className="text-[8px] text-[#ff0000] font-mono">
-                 {vaultState.issues_found} ISSUES
+                 {vaultState?.issues_found} ISSUES
                </span>
              )}
              <div className="flex gap-2 mt-2">

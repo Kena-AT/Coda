@@ -22,6 +22,16 @@ const TAG_PATTERNS: Record<string, RegExp> = {
   'ui': /\b(div|span|className|html|css|style)\b/i,
 };
 
+const IMPORT_PATTERNS: Record<string, RegExp> = {
+  'react': /import.*from\s+['"]react['"]/,
+  'tauri': /import.*from\s+['"]@tauri-apps/,
+  'express': /require\(['"]express['"]\)|import.*from\s+['"]express['"]/,
+  'fs': /import.*from\s+['"](fs|node:fs)['"]|require\(['"]fs['"]\)/,
+  'database-driver': /import.*from\s+['"](pg|mysql|sqlite3|prisma|mongoose)['"]/,
+  'utility': /import.*from\s+['"](lodash|axios|moment|dayjs)['"]/,
+  'styling': /import.*from\s+['"].*\.(css|scss|sass|less)['"]/,
+};
+
 export const metadataEngine = {
   guessLanguage(content: string, filename?: string): string {
     if (filename) {
@@ -42,25 +52,45 @@ export const metadataEngine = {
   },
 
   predictTags(content: string): string[] {
-    const tags: string[] = [];
+    const tags = new Set<string>();
+    
+    // Check general keyword patterns
     for (const [tag, pattern] of Object.entries(TAG_PATTERNS)) {
-      if (pattern.test(content)) tags.push(tag);
+      if (pattern.test(content)) tags.add(tag);
     }
-    return tags;
+
+    // Check import intelligence patterns
+    for (const [tag, pattern] of Object.entries(IMPORT_PATTERNS)) {
+      if (pattern.test(content)) tags.add(tag);
+    }
+    
+    return Array.from(tags);
   },
 
   extractTitle(content: string): string {
     const lines = content.split('\n');
+    
+    // 1. Try to find a heading in a comment
     for (const line of lines) {
       const trimmed = line.trim();
-      // Look for first comment line or first non-empty line
       if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('#')) {
-        return trimmed.replace(/[#/\\*]/g, '').trim().substring(0, 40);
-      }
-      if (trimmed.length > 0) {
-        return trimmed.substring(0, 40);
+        const cleaned = trimmed.replace(/[#/\\*]/g, '').trim();
+        if (cleaned && cleaned.length > 3) return cleaned.substring(0, 40);
       }
     }
+
+    // 2. Try to find an export or class/function declaration
+    const declarationMatch = content.match(/\b(export\s+)?(const|function|class|interface|type|let)\s+([a-zA-Z0-9_$]+)/);
+    if (declarationMatch && declarationMatch[3]) {
+      return declarationMatch[3].substring(0, 40);
+    }
+
+    // 3. Fallback to first non-empty line
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.length > 0) return trimmed.substring(0, 40);
+    }
+    
     return 'Untitled_Snippet';
   }
 };

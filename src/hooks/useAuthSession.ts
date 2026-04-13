@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { sessionManager, authApi } from '../store/authStore';
+import { sessionManager } from '../store/authStore';
 import { useStore } from '../store/useStore';
 import toast from 'react-hot-toast';
 

@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { X, FileJson, FileCode, Trash2, Rocket, Cpu, ShieldCheck } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import toast from 'react-hot-toast';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 
 interface Props {
   isOpen: boolean;
@@ -44,20 +46,27 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     }
     setIsExporting(true);
     try {
+      const defaultName = exportFormat === 'json' 
+        ? `coda_backup_${new Date().toISOString().split('T')[0]}.json`
+        : `coda_modules_${new Date().toISOString().split('T')[0]}.txt`;
+
+      const filePath = await save({
+        filters: [{
+          name: exportFormat === 'json' ? 'JSON Data' : 'Text Module',
+          extensions: [exportFormat === 'json' ? 'json' : 'txt']
+        }],
+        defaultPath: defaultName
+      });
+
+      if (!filePath) {
+        setIsExporting(false);
+        return;
+      }
+
+      let content = '';
       if (exportFormat === 'json') {
-        const payload = JSON.stringify(selectedSnippets, null, 2);
-        const blob = new Blob([payload], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `coda_backup_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        toast.success(`${selectedIds.length} snippets exported via JSON pipeline`);
+        content = JSON.stringify(selectedSnippets, null, 2);
       } else {
-        let content = '';
         selectedSnippets.forEach(s => {
           content += `\n/* ==========================================\n`;
           content += ` * Title: ${s.title}\n`;
@@ -66,17 +75,13 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
           content += ` * ========================================== */\n\n`;
           content += `${s.content}\n\n`;
         });
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `coda_modules_${new Date().toISOString().split('T')[0]}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        toast.success(`${selectedIds.length} snippets compiled into single module`);
       }
+
+      await writeTextFile(filePath, content);
+      
+      toast.success(`Export successful: ${filePath.split(/[/\\]/).pop()}`, {
+        style: { background: '#19191c', color: '#fffbfe', borderLeft: '4px solid #15ff00', fontSize: '11px', fontFamily: 'Space Grotesk' }
+      });
       onClose();
     } catch (e: any) {
       toast.error('Export protocol failure: ' + e.toString());

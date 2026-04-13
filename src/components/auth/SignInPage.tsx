@@ -17,7 +17,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected] = useState(true);
 
   const localNodeAddress = '127.0.0.1:443';
 
