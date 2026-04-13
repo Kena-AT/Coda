@@ -60,7 +60,7 @@ pub fn get_archive_candidates(
 
     // 2. Fetch non-archived snippets
     let mut stmt = conn.prepare("
-        SELECT id, title, project_id, last_used_at, copy_count, created_at, updated_at, tags, archive_snoozed_until
+        SELECT id, title, project_id, last_used_at, copy_count, created_at, tags, archive_snoozed_until
         FROM snippets 
         WHERE user_id = ? AND is_archived = 0
     ").map_err(|e| e.to_string())?;
@@ -74,8 +74,7 @@ pub fn get_archive_candidates(
             row.get::<_, i32>(4)?,
             row.get::<_, Option<String>>(5)?,
             row.get::<_, Option<String>>(6)?,
-            row.get::<_, Option<String>>(7)?,
-            row.get::<_, Option<String>>(8)?
+            row.get::<_, Option<String>>(7)?
         ))
     }).map_err(|e| e.to_string())?;
 
@@ -83,7 +82,7 @@ pub fn get_archive_candidates(
     let mut candidates = Vec::new();
 
     for c in candidates_iter {
-        let (id, title, proj_id, last_used, copies, created, updated, tags, snoozed) = c.map_err(|e| e.to_string())?;
+        let (id, title, proj_id, last_used, copies, created, tags, snoozed) = c.map_err(|e| e.to_string())?;
 
         // A. Safety: Snooze Check
         if let Some(s_date) = snoozed {
@@ -96,19 +95,14 @@ pub fn get_archive_candidates(
         let tags_str = tags.unwrap_or_default().to_lowercase();
         if settings.exclude_favorites && tags_str.contains("favorite") { continue; }
 
-        // C. Safety: Recently Updated Check (< 7 days)
-        let update_time_str = updated.clone().unwrap_or_else(|| created.clone().unwrap_or_default());
-        let update_time = chrono::DateTime::parse_from_rfc3339(&update_time_str)
-            .map(|dt| dt.with_timezone(&chrono::Utc))
-            .unwrap_or(now);
-        if (now - update_time).num_days() < 7 { continue; }
-
-        // D. Calculation
-        let activity_time_str = last_used.clone().unwrap_or_else(|| updated.clone().unwrap_or_else(|| created.clone().unwrap_or_default()));
+        // C. Calculation: Use last_used_at as the inactivity clock, not updated_at.
+        //    A snippet that was edited but never copied/used is still a candidate.
+        let activity_time_str = last_used.clone().unwrap_or_else(|| created.clone().unwrap_or_default());
         let last_activity = chrono::DateTime::parse_from_rfc3339(&activity_time_str)
             .map(|dt| dt.with_timezone(&chrono::Utc))
             .unwrap_or(now);
         let days_unused = (now - last_activity).num_days() as i32;
+
 
         if days_unused > settings.auto_archive_days {
             // archive_score = days_unused + (never_copied * 20) + (low_popularity * 10)

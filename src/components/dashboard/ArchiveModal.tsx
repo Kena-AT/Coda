@@ -97,8 +97,8 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({ isOpen, onClose, onR
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-2xl bg-slate-950 border border-red-500/30 rounded-xl shadow-[0_0_50px_rgba(239,68,68,0.15)] overflow-hidden">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
+      <div className="relative w-full max-w-2xl bg-[#0e0e10] border border-red-500/30 rounded-xl shadow-[0_0_50px_rgba(239,68,68,0.15)] overflow-hidden">
         {/* Header (CYBERPUNK STYLE) */}
         <div className="bg-red-500/10 border-b border-red-500/20 p-6 flex items-center gap-4">
           <div className="p-3 bg-red-500/20 rounded-lg animate-pulse">

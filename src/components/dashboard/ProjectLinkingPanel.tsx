@@ -9,6 +9,7 @@ import {
   Zap,
   Tag
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface RelatedSnippet {
   id: number;
@@ -105,6 +106,25 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
           </p>
         </div>
         <div className="flex gap-2">
+          <button 
+            onClick={() => {
+              setLoading(true);
+              setTimeout(() => {
+                // Re-triggering effect by setting loading true and letting dependencies do the work
+                // But we'll also manually trigger recompute here for instant gratification
+                invoke('recompute_snippet_links', { snippetId: snippetId, userId: user!.id })
+                  .then(() => invoke<RelatedSnippet[]>('get_related_snippets', { snippetId: snippetId, userId: user!.id }))
+                  .then(data => {
+                    setRelated(data);
+                    setLoading(false);
+                    toast.success('Relations recomputed', { style: { background: '#1a1a1a', color: '#fff', fontSize: '10px' } });
+                  });
+              }, 500);
+            }}
+            className="px-2 py-1 hover:bg-red-500/20 border border-slate-700/50 rounded text-[10px] font-mono text-slate-400 hover:text-red-400 transition-colors"
+          >
+            RE-SCAN
+          </button>
           <div className="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] font-mono text-red-400">
             {related.length} NODES_FOUND
           </div>

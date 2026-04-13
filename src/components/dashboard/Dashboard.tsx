@@ -7,7 +7,8 @@ import {
   Activity,
   Database,
   Upload,
-  Download
+  Download,
+  Archive
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { Sidebar } from '../layout/Sidebar';
@@ -68,6 +69,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [hasCandidates, setHasCandidates] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -128,11 +130,18 @@ export const Dashboard: React.FC = () => {
       if (!user) return;
       try {
         const candidates = await invoke<any[]>('get_archive_candidates', { userId: user.id });
+        setHasCandidates(candidates.length > 0);
         if (candidates.length > 0) {
           setIsArchiveModalOpen(true);
+          toast.success(
+            `Smart Archiver: ${candidates.length} stale snippets detected`,
+            { icon: '🗄️', duration: 10000, style: { background: '#1a1a1a', color: '#fff', border: '1px solid #e60000' } }
+          );
         }
       } catch (e) {
         console.error('Archiver check failed:', e);
+        toast.error('Smart Archiver scan failed');
+        setHasCandidates(false);
       }
     };
     checkArchivable();
@@ -220,6 +229,14 @@ export const Dashboard: React.FC = () => {
                 title="Export Protocol"
               >
                 <Upload className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => setIsArchiveModalOpen(true)} 
+                className={`flex items-center gap-1.5 transition-all text-[10px] font-mono tracking-widest uppercase group ${hasCandidates ? 'text-red-500 animate-pulse' : 'text-[#adaaad] hover:text-[#e60000]'}`}
+                title="Archive Vault"
+              >
+                <Archive className={`w-4 h-4 transition-transform group-hover:scale-110 ${hasCandidates ? 'text-red-500 ring-4 ring-red-500/20 rounded-full bg-red-500/10' : ''}`} />
+                <span className="hidden xl:inline">ARCHIVE</span>
               </button>
               <button onClick={() => setIsMaintenanceModalOpen(true)} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Settings">
                 <Settings className="w-5 h-5" />

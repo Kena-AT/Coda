@@ -13,7 +13,8 @@ import {
   History,
   LayoutTemplate,
   Zap,
-  ArrowLeft
+  ArrowLeft,
+  Network
 } from 'lucide-react';
 import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
@@ -43,7 +44,7 @@ export const SnippetEditor: React.FC = () => {
   const [isDiffMode, setIsDiffMode] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
-  const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs'>('recs'); // Default to recs for new sprint
+  const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs' | 'links'>('recs'); // Default to recs for new sprint
   const [showRollbackModal, setShowRollbackModal] = useState(false);
 
   // Handle creating new project from dropdown
@@ -304,9 +305,10 @@ export const SnippetEditor: React.FC = () => {
           </div>
         </div>
 
-        {/* The Monaco Editor */}
-        <div className="flex-1 relative flex flex-col">
-           <div className="flex-1 relative">
+        {/* Scrollable Content Area: Editor + Linking Panel */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col min-h-0">
+          {/* The Monaco Editor - fixed height so linking panel is always reachable */}
+          <div className="h-[500px] shrink-0 relative">
            {isDiffMode && selectedVersion ? (
              <DiffEditor
                height="100%"
@@ -338,12 +340,19 @@ export const SnippetEditor: React.FC = () => {
                }}
              />
            )}
-        </div>
-        </div>
+          </div>
 
-        {selectedSnippetId !== -1 && (
-          <ProjectLinkingPanel snippetId={selectedSnippetId!} />
-        )}
+          {/* Cross-Project Links (Default Visibility) */}
+          {selectedSnippetId !== -1 && (
+            <div className="mt-8 border-t border-[#353534]/20 p-8 bg-[#0e0e0e]/30">
+              <div className="flex items-center gap-3 mb-6">
+                <Network size={18} className="text-[#e60000]" />
+                <h4 className="text-[12px] font-bold text-white tracking-[2px] uppercase">Behavioral Correlations</h4>
+              </div>
+              <ProjectLinkingPanel snippetId={selectedSnippetId!} />
+            </div>
+          )}
+        </div>
 
       </div>
 
@@ -357,18 +366,31 @@ export const SnippetEditor: React.FC = () => {
             className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'recs' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <Zap size={14} />
-            SMART_RECS
+            RECS
           </button>
           <button 
             onClick={() => setRightSidebarTab('history')}
             className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'history' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <History size={14} />
-            HISTORY
+            LOG
           </button>
+          {selectedSnippetId !== -1 && (
+            <button 
+              onClick={() => setRightSidebarTab('links')}
+              className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'links' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+            >
+              <Network size={14} />
+              LINKS
+            </button>
+          )}
         </div>
 
-        {rightSidebarTab === 'recs' ? (
+        {rightSidebarTab === 'links' && selectedSnippetId !== -1 ? (
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <ProjectLinkingPanel snippetId={selectedSnippetId!} />
+          </div>
+        ) : rightSidebarTab === 'recs' ? (
           <div className="flex-1 flex flex-col overflow-hidden">
              <SmartRecommendations 
                currentLanguage={snippet.language || 'javascript'} 
