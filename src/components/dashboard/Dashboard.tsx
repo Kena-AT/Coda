@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Search, 
-  Settings,
+  Settings as SettingsIcon,
   Power,
   Shield,
   Activity,
@@ -19,11 +19,16 @@ import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import { ArchiveModal } from './ArchiveModal';
 import { ProjectVault } from './ProjectVault';
-import { MaintenanceSettingsModal } from './MaintenanceSettingsModal';
 import { IntelligenceDashboard } from './IntelligenceDashboard';
 import { GlobalSearchResults } from './GlobalSearchResults';
 import { ExportModal } from './ExportModal';
 import { ImportModal } from './ImportModal';
+import { SettingsPage } from './SettingsPage';
+import { BackupRestorePage } from './BackupRestorePage';
+import { ChangePasswordPage } from './ChangePasswordPage';
+import { VersionInfoPage } from './VersionInfoPage';
+import { LogoutConfirmationPage } from './LogoutConfirmationPage';
+import { sendNotification } from '@tauri-apps/plugin-notification';
 import { sessionManager, authApi } from '../../store/authStore';
 import { useAuthSession } from '../../hooks/useAuthSession';
 
@@ -39,38 +44,17 @@ export const Dashboard: React.FC = () => {
     searchQuery,
     setSearchQuery,
     setProjects,
-    activeTab
+    activeTab,
+    setActiveTab,
+    settings
   } = useStore();
 
   // Enable automatic token expiry tracking and refresh
   useAuthSession();
 
-  const handleLogout = async () => {
-    if (!user) return;
-    
-    try {
-      const session = sessionManager.getSession();
-      if (session) {
-        // Call backend to invalidate session
-        await authApi.logout(
-          session.accessToken,
-          session.refreshToken,
-          user.id
-        );
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Always clear local session regardless of backend response
-      sessionManager.clearSession();
-      setUser(null);
-      toast.success('Logged out successfully');
-    }
-  };
 
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [hasCandidates, setHasCandidates] = useState(false);
-  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
@@ -146,6 +130,29 @@ export const Dashboard: React.FC = () => {
     };
     checkArchivable();
   }, [user, activeTab, !!searchQuery]);
+
+  // Keyboard Shortcuts Support (Sprint 10)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey) {
+        if (e.key.toUpperCase() === settings.shortcuts.copy.toUpperCase()) {
+          // If a snippet is selected, copy logic...
+        }
+        if (e.key.toUpperCase() === settings.shortcuts.newSnippet.toUpperCase()) {
+          e.preventDefault();
+          setSelectedSnippetId(-1);
+        }
+        if (e.key.toUpperCase() === settings.shortcuts.search.toUpperCase()) {
+          e.preventDefault();
+          const searchInput = document.querySelector('input[placeholder="GLOBAL_SEARCH_CMD..."]') as HTMLInputElement;
+          if (searchInput) searchInput.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [settings.shortcuts, setSelectedSnippetId]);
 
   // When selected tab changes, clear snippet editor
   useEffect(() => {
@@ -238,10 +245,10 @@ export const Dashboard: React.FC = () => {
                 <Archive className={`w-4 h-4 transition-transform group-hover:scale-110 ${hasCandidates ? 'text-red-500 ring-4 ring-red-500/20 rounded-full bg-red-500/10' : ''}`} />
                 <span className="hidden xl:inline">ARCHIVE</span>
               </button>
-              <button onClick={() => setIsMaintenanceModalOpen(true)} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Settings">
-                <Settings className="w-5 h-5" />
+              <button onClick={() => setActiveTab('settings')} className={`transition-colors ${activeTab === 'settings' ? 'text-[#e60000]' : 'text-[#adaaad] hover:text-[#e60000]'}`} title="Settings">
+                <SettingsIcon className="w-5 h-5" />
               </button>
-              <button onClick={handleLogout} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Logout">
+              <button onClick={() => setActiveTab('logout-confirm')} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Logout">
                 <Power className="w-5 h-5" />
               </button>
             </div>
@@ -253,6 +260,16 @@ export const Dashboard: React.FC = () => {
             <SnippetEditor />
           ) : searchQuery ? (
             <GlobalSearchResults />
+          ) : activeTab === 'settings' ? (
+            <SettingsPage onNavigate={(page) => setActiveTab(page)} />
+          ) : activeTab === 'backup' ? (
+            <BackupRestorePage onBack={() => setActiveTab('settings')} />
+          ) : activeTab === 'change-password' ? (
+            <ChangePasswordPage onBack={() => setActiveTab('settings')} />
+          ) : activeTab === 'version' ? (
+            <VersionInfoPage onBack={() => setActiveTab('settings')} />
+          ) : activeTab === 'logout-confirm' ? (
+            <LogoutConfirmationPage onCancel={() => setActiveTab('settings')} />
           ) : activeTab === 'analytics' ? (
             <AnalyticsPage />
           ) : activeTab === 'projects' ? (
@@ -348,10 +365,6 @@ export const Dashboard: React.FC = () => {
         isOpen={isArchiveModalOpen} 
         onClose={() => setIsArchiveModalOpen(false)} 
         onRefresh={fetchSnippets} 
-      />
-      <MaintenanceSettingsModal 
-        isOpen={isMaintenanceModalOpen}
-        onClose={() => setIsMaintenanceModalOpen(false)}
       />
       <ExportModal 
         isOpen={isExportModalOpen}

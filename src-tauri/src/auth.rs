@@ -363,8 +363,55 @@ pub fn validate_token(token: String, token_type: String) -> Result<bool, String>
 }
 
 #[tauri::command]
-pub fn check_auth(_token: String) -> bool {
-    // This would verify the JWT token
-    // For local desktop app, we can store it in Memory or Secure Storage
-    true
+pub fn change_master_password(
+    app_handle: AppHandle,
+    user_id: i32,
+    current_password: String,
+    new_password: String,
+) -> Result<AuthResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    let hash: String = conn.query_row(
+        "SELECT master_password_hash FROM users WHERE id = ?",
+        [user_id],
+        |row| row.get(0)
+    ).map_err(|_| "User not found".to_string())?;
+
+    let parsed_hash = PasswordHash::new(&hash).map_err(|e| e.to_string())?;
+    let argon2 = Argon2::default();
+
+    if argon2.verify_password(current_password.as_bytes(), &parsed_hash).is_ok() {
+        // Hash new password
+        let salt = SaltString::generate(&mut OsRng);
+        let new_hash = argon2.hash_password(new_password.as_bytes(), &salt)
+            .map_err(|e| e.to_string())?
+            .to_string();
+
+        conn.execute(
+            "UPDATE users SET master_password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            rusqlite::params![new_hash, user_id]
+        ).map_err(|e| e.to_string())?;
+
+        Ok(AuthResponse {
+            success: true,
+            token: None,
+            refresh_token: None,
+            user_id: None,
+            username: None,
+            access_expires_at: None,
+            refresh_expires_at: None,
+            message: "Master password updated successfully".to_string(),
+        })
+    } else {
+        Ok(AuthResponse {
+            success: false,
+            token: None,
+            refresh_token: None,
+            user_id: None,
+            username: None,
+            access_expires_at: None,
+            refresh_expires_at: None,
+            message: "Verify command failed: Current password mismatch".to_string(),
+        })
+    }
 }

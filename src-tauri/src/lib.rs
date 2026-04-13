@@ -8,6 +8,7 @@ mod patterns;
 mod project;
 mod archiver;
 mod vault_maintenance;
+mod backup;
 
 use dashmap::DashMap;
 use tauri::Manager;
@@ -38,6 +39,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_notification::init())
         .setup(move |app| {
             // Initialize database
             db::init_db(app.handle())?;
@@ -88,10 +90,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             auth::signup,
             auth::login,
-            auth::check_auth,
             auth::refresh_access_token,
             auth::logout,
             auth::validate_token,
+            auth::change_master_password,
             snippet::create_snippet,
             snippet::list_snippets,
             snippet::update_snippet,
@@ -131,7 +133,9 @@ pub fn run() {
             vault_maintenance::get_vault_config,
             vault_maintenance::update_vault_config,
             vault_maintenance::add_vault_monitor,
-            snippet::validate_snippet_title
+            snippet::validate_snippet_title,
+            backup::create_backup,
+            backup::restore_backup
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -35,6 +35,27 @@ export interface UserSettings {
   min_copy_threshold: number;
 }
 
+export interface Settings {
+  lockoutThreshold: number;
+  autoLockTimer: number; // minutes
+  pushAlerts: boolean;
+  soundEffects: boolean;
+  theme: 'crimson' | 'void' | 'matrix';
+  fontSize: number;
+  shortcuts: {
+    copy: string;
+    newSnippet: string;
+    search: string;
+  };
+}
+
+interface AppError {
+  title: string;
+  message: string;
+  logs: { timestamp: string; level: string; message: string }[];
+  onRetry?: () => void;
+}
+
 interface AppState {
   user: { id: number; username: string } | null;
   snippets: Snippet[];
@@ -53,8 +74,8 @@ interface AppState {
   sessionCopies: Record<number, number>;
   incrementCopy: (id: number) => void;
 
-  selectedSnippetId: number | null;
-  setSelectedSnippetId: (id: number | null) => void;
+  selectedSnippetId: number | null | -1;
+  setSelectedSnippetId: (id: number | null | -1) => void;
 
   selectedProjectId: number | null;
   setSelectedProjectId: (id: number | null) => void;
@@ -62,8 +83,8 @@ interface AppState {
   projects: Project[];
   setProjects: (projects: Project[]) => void;
   
-  settings: UserSettings | null;
-  setSettings: (settings: UserSettings) => void;
+  settings: Settings;
+  setSettings: (settings: Partial<Settings>) => void;
 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -71,13 +92,8 @@ interface AppState {
   preSelectedProjectId: number | null;
   setPreSelectedProjectId: (id: number | null) => void;
 
-  globalError: {
-    title: string;
-    message: string;
-    logs: { timestamp: string; level: string; message: string }[];
-    onRetry?: () => void;
-  } | null;
-  setGlobalError: (error: { title: string; message: string; logs: { timestamp: string; level: string; message: string }[]; onRetry?: () => void } | null) => void;
+  globalError: AppError | null;
+  setGlobalError: (error: AppError | null) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -107,8 +123,22 @@ export const useStore = create<AppState>((set) => ({
   projects: [],
   setProjects: (projects) => set({ projects }),
 
-  settings: null,
-  setSettings: (settings) => set({ settings }),
+  settings: {
+    lockoutThreshold: 3,
+    autoLockTimer: 15,
+    pushAlerts: true,
+    soundEffects: false,
+    theme: 'crimson',
+    fontSize: 125,
+    shortcuts: {
+      copy: 'C',
+      newSnippet: 'N',
+      search: 'F'
+    }
+  },
+  setSettings: (newSettings) => set((state) => ({ 
+    settings: { ...state.settings, ...newSettings } 
+  })),
 
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
