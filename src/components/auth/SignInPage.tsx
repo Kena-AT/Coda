@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Check, Copy, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, Check, Copy, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
 import { authApi, sessionManager, type AuthResponse } from '../../store/authStore';
 
@@ -164,21 +164,33 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
             {/* Password */}
             <div className="relative">
               <label className="absolute -top-4 left-0 text-[10px] tracking-[1px] text-[#adaaad] font-main uppercase">Password</label>
-              <input 
-                type={showPassword ? "text" : "password"} 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent border-b border-[#48474a] px-3 py-3 mt-4 text-[#48474a] outline-none focus:border-[#e60000] focus:text-white transition-colors font-main text-[14px] pr-10"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 bottom-3 text-[#48474a] hover:text-[#e60000] transition-colors"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`w-full bg-transparent border-b px-3 py-3 mt-4 outline-none transition-colors font-main text-[14px] pr-10 ${error ? 'border-red-600 text-red-500' : 'border-[#48474a] text-[#48474a] focus:border-[#e60000] focus:text-white'}`}
+                  required
+                />
+                {error && (
+                  <div className="absolute right-8 bottom-3 text-red-600 animate-pulse">
+                     <AlertTriangle size={16} />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-0 bottom-3 transition-colors ${error ? 'text-red-600' : 'text-[#48474a] hover:text-[#e60000]'}`}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {error && (
+                <p className="text-red-600 text-[9px] font-mono mt-2 uppercase tracking-tight font-bold">
+                  INVALID_CREDENTIALS // RESOLVE_ENTITY_CONFLICT
+                </p>
+              )}
             </div>
 
             {/* Remember Me Checkbox */}
@@ -198,10 +210,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                 Remember me on this device
               </span>
             </div>
-
-            {error && !error.includes('locked') && (
-              <p className="text-[#e60000] text-[12px] font-bold tracking-tight">{error}</p>
-            )}
 
             <div className="pt-2 flex flex-col gap-6">
               <button 

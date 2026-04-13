@@ -69,6 +69,30 @@ pub fn create_snippet(
     project_id: Option<i32>
 ) -> Result<SnippetResponse, String> {
     let conn = get_db_connection(&app_handle)?;
+
+    // 1. Validation: Basic
+    if title.trim().is_empty() {
+        return Ok(SnippetResponse { success: false, message: "VALIDATION_ERROR: Title cannot be empty".to_string(), data: None });
+    }
+    if language.trim().is_empty() {
+        return Ok(SnippetResponse { success: false, message: "VALIDATION_ERROR: Language selection required".to_string(), data: None });
+    }
+
+    // 2. Validation: Size (Max 500KB)
+    if content.len() > 512 * 1024 {
+        return Ok(SnippetResponse { success: false, message: "VALIDATION_ERROR: Snippet size exceeds 512KB limit".to_string(), data: None });
+    }
+
+    // 3. Validation: Duplicate Title
+    let exists: bool = conn.query_row(
+        "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND is_archived = 0)",
+        rusqlite::params![user_id, title],
+        |row| row.get(0)
+    ).unwrap_or(false);
+
+    if exists {
+        return Ok(SnippetResponse { success: false, message: "TITLE_ALREADY_EXISTS".to_string(), data: None });
+    }
     
     let detected_patterns = crate::patterns::get_pattern_tags_json(&content);
     
@@ -87,10 +111,29 @@ pub fn create_snippet(
         },
         Err(e) => Ok(SnippetResponse {
             success: false,
-            message: format!("Failed to create snippet: {}", e),
+            message: format!("INTERNAL_ERROR: {}", e),
             data: None,
         }),
     }
+}
+
+#[tauri::command]
+pub fn validate_snippet_title(app_handle: AppHandle, user_id: i32, title: String, exclude_id: Option<i32>) -> Result<bool, String> {
+    let conn = get_db_connection(&app_handle)?;
+    let exists: bool = if let Some(id) = exclude_id {
+        conn.query_row(
+            "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND id != ? AND is_archived = 0)",
+            rusqlite::params![user_id, title, id],
+            |row| row.get(0)
+        ).unwrap_or(false)
+    } else {
+        conn.query_row(
+            "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND is_archived = 0)",
+            rusqlite::params![user_id, title],
+            |row| row.get(0)
+        ).unwrap_or(false)
+    };
+    Ok(exists)
 }
 
 #[tauri::command]
@@ -202,6 +245,30 @@ pub fn update_snippet(
         }
     }
 
+    // 1. Validation: Basic
+    if title.trim().is_empty() {
+        return Ok(SnippetResponse { success: false, message: "VALIDATION_ERROR: Title cannot be empty".to_string(), data: None });
+    }
+    if language.trim().is_empty() {
+        return Ok(SnippetResponse { success: false, message: "VALIDATION_ERROR: Language selection required".to_string(), data: None });
+    }
+
+    // 2. Validation: Size (Max 500KB)
+    if content.len() > 512 * 1024 {
+        return Ok(SnippetResponse { success: false, message: "VALIDATION_ERROR: Snippet size exceeds 512KB limit".to_string(), data: None });
+    }
+
+    // 3. Validation: Duplicate Title
+    let exists: bool = tx.query_row(
+        "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND id != ? AND is_archived = 0)",
+        rusqlite::params![user_id, title, id],
+        |row| row.get(0)
+    ).unwrap_or(false);
+
+    if exists {
+        return Ok(SnippetResponse { success: false, message: "TITLE_ALREADY_EXISTS".to_string(), data: None });
+    }
+
     // Update main snippet
     let detected_patterns = crate::patterns::get_pattern_tags_json(&content);
     
@@ -211,7 +278,7 @@ pub fn update_snippet(
     ).map_err(|e| e.to_string())?;
 
     if let Err(e) = tx.commit() {
-        return Ok(SnippetResponse { success: false, message: format!("Transaction commit failed: {}", e), data: None });
+        return Ok(SnippetResponse { success: false, message: format!("CRITICAL_ERROR: {}", e), data: None });
     }
     state.snippet_cache.remove(&user_id);
     // Record save timing

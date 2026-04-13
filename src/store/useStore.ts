@@ -70,6 +70,14 @@ interface AppState {
 
   preSelectedProjectId: number | null;
   setPreSelectedProjectId: (id: number | null) => void;
+
+  globalError: {
+    title: string;
+    message: string;
+    logs: { timestamp: string; level: string; message: string }[];
+    onRetry?: () => void;
+  } | null;
+  setGlobalError: (error: { title: string; message: string; logs: { timestamp: string; level: string; message: string }[]; onRetry?: () => void } | null) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -107,6 +115,9 @@ export const useStore = create<AppState>((set) => ({
 
   preSelectedProjectId: null,
   setPreSelectedProjectId: (id) => set({ preSelectedProjectId: id }),
+
+  globalError: null,
+  setGlobalError: (globalError) => set({ globalError }),
 
   sessionCopies: {},
   incrementCopy: (id) => set((state) => ({

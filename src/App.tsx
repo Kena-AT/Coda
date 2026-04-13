@@ -3,6 +3,7 @@ import { WelcomePage } from './components/auth/WelcomePage';
 import { SignUpPage } from './components/auth/SignUpPage';
 import { SignInPage } from './components/auth/SignInPage';
 import { Dashboard } from './components/dashboard/Dashboard';
+import { GlobalErrorModal } from './components/dashboard/GlobalErrorModal';
 import { useStore } from './store/useStore';
 import { Toaster } from 'react-hot-toast';
 import { sessionManager, authApi } from './store/authStore';
@@ -78,6 +79,7 @@ function App() {
   return (
     <main className="min-h-screen">
       <Toaster position="bottom-right" />
+      <GlobalErrorModal />
       {step === 'welcome' && (
         <WelcomePage 
           onGetStarted={() => setStep('signup')} 

@@ -130,7 +130,8 @@ pub fn run() {
             vault_maintenance::run_vault_maintenance,
             vault_maintenance::get_vault_config,
             vault_maintenance::update_vault_config,
-            vault_maintenance::add_vault_monitor
+            vault_maintenance::add_vault_monitor,
+            snippet::validate_snippet_title
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
