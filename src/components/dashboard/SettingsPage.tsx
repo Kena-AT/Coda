@@ -9,15 +9,9 @@ import {
   Database, 
   Info, 
   Key,
-  Volume2,
-  Settings as SettingsIcon,
-  Layout,
-  Code,
-  Zap,
   Lock,
   MessageSquare,
   Activity,
-  User,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
@@ -346,26 +340,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               </div>
            </div>
            <p className="text-[9px] font-mono text-[#e5e2e1]/20 tracking-tighter uppercase whitespace-nowrap">
-             © 2023 CODE_CORP // ALL RIGHTS REDACTED.
+             © 2026 K.A.Y.E // ALL RIGHTS RESERVED.
            </p>
         </footer>
-      </div>
-
-      {/* Top Header Actions (Absolute Positioning for Top Right) */}
-      <div className="absolute top-0 right-0 p-4 flex gap-4 z-50">
-        <button onMouseEnter={() => playSound('hover')} className="p-2 text-[#e5e2e1]/40 hover:text-white transition-colors">
-          <Activity size={18} />
-        </button>
-        <button onMouseEnter={() => playSound('hover')} className="p-2 text-[#e60000] hover:text-[#ff0000] transition-colors">
-          <User size={18} />
-        </button>
-        <button 
-          onClick={() => { playSound('click'); onBack(); }}
-          onMouseEnter={() => playSound('hover')}
-          className="p-2 text-[#e5e2e1]/40 hover:text-white transition-colors"
-        >
-          <SettingsIcon size={18} />
-        </button>
       </div>
 
     </div>
