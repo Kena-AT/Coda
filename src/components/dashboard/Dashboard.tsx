@@ -10,6 +10,7 @@ import {
   Download,
   Archive
 } from 'lucide-react';
+import { soundService } from '../../utils/sounds';
 import { useStore } from '../../store/useStore';
 import { Sidebar } from '../layout/Sidebar';
 import { HardwareVisualization } from './HardwareVisualization';
@@ -68,34 +69,14 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     // Auditory feedback loop
     const unlisten = listen('play-fx', () => {
-      if (!settings.pushAlerts && !settings.soundEffects) return; // Respect global quiet mode
-      if (!settings.soundEffects) return;
-      
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const playBeep = (freq: number, startTime: number, duration: number) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(0.05, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-        
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-      };
-
-      // Cyberpunk double-beep
-      playBeep(1200, audioCtx.currentTime, 0.08);
-      playBeep(1800, audioCtx.currentTime + 0.12, 0.04);
+      if (!settings.soundEffects) return; // Respect global quiet mode
+      soundService.playSuccess();
     });
 
     return () => {
       unlisten.then(f => f());
     };
-  }, [settings.soundEffects, settings.pushAlerts]);
+  }, [settings.soundEffects]);
 
   useEffect(() => {
     const checkStatus = async () => {

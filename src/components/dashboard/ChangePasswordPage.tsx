@@ -4,12 +4,15 @@ import { useStore } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
 import { toast } from 'react-hot-toast';
 
+import { useSoundEffect } from '../../hooks/useSoundEffect';
+
 interface ChangePasswordPageProps {
   onBack: () => void;
 }
 
 export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }) => {
   const { user } = useStore();
+  const playSound = useSoundEffect();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,10 +35,12 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
 
   const handleUpdate = async () => {
     if (newPassword !== confirmPassword) {
+      playSound('error');
       toast.error('New passwords do not match');
       return;
     }
     if (newPassword.length < 8) {
+      playSound('error');
       toast.error('Master key must be at least 8 segments');
       return;
     }
@@ -49,12 +54,15 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
       });
 
       if (response.success) {
+        playSound('success');
         toast.success(response.message);
         onBack();
       } else {
+        playSound('error');
         toast.error(response.message);
       }
     } catch (err) {
+      playSound('error');
       toast.error('System failure during re-key sequence');
     } finally {
       setLoading(false);
@@ -67,7 +75,8 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
         
         {/* Nav */}
         <button 
-          onClick={onBack}
+          onClick={() => { playSound('transition'); onBack(); }}
+          onMouseEnter={() => playSound('hover')}
           className="flex items-center gap-2 text-[#737373] hover:text-white transition-colors mb-12 font-mono text-[10px] uppercase tracking-[1px]"
         >
           <ArrowLeft size={14} />
@@ -93,7 +102,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                   </div>
                </div>
                <div className="p-8 bg-[#131313] border-t border-[#353534] space-y-4">
-                 <h4 className="text-lg font-main font-bold text-white uppercase">Vault Access</h4>
+                 <h4 className="text-md font-main font-bold text-white uppercase">Vault Access</h4>
                  <p className="text-[9px] font-mono text-[#737373] leading-relaxed uppercase">
                    CRITICAL: Re-keying the vault requires full synchronization. Failure to maintain key integrity may result in permanent data redaction.
                  </p>
@@ -115,7 +124,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
           <div className="flex-1 space-y-12 pb-12">
             <div className="space-y-2">
               <span className="text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">Identity Management</span>
-              <h1 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">
+              <h1 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">
                 Change Master<br />Key
               </h1>
             </div>
@@ -134,11 +143,13 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                      type={showCurrent ? "text" : "password"}
                      value={currentPassword}
                      onChange={(e) => setCurrentPassword(e.target.value)}
+                     onMouseEnter={() => playSound('hover')}
                      className="w-full bg-transparent border-b border-[#2a2a2e] focus:border-white transition-all py-3 font-main text-white placeholder:text-[#2a2a2e] outline-none tracking-[2px]"
                      placeholder="••••••••••••"
                    />
                    <button 
-                     onClick={() => setShowCurrent(!showCurrent)}
+                     onClick={() => { playSound('click'); setShowCurrent(!showCurrent); }}
+                     onMouseEnter={() => playSound('hover')}
                      className="absolute right-8 bottom-3.5"
                    >
                      {showCurrent ? <EyeOff size={16} className="text-[#737373]" /> : <Eye size={16} className="text-[#737373]" />}
@@ -157,11 +168,13 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                      type={showNew ? "text" : "password"}
                      value={newPassword}
                      onChange={(e) => setNewPassword(e.target.value)}
+                     onMouseEnter={() => playSound('hover')}
                      className="w-full bg-transparent border-b border-[#2a2a2e] focus:border-white transition-all py-3 font-main text-white placeholder:text-[#2a2a2e] outline-none tracking-[2px]"
                      placeholder="ENTER_SECURE_PHRASE"
                    />
                    <button 
-                     onClick={() => setShowNew(!showNew)}
+                     onClick={() => { playSound('click'); setShowNew(!showNew); }}
+                     onMouseEnter={() => playSound('hover')}
                      className="absolute right-0 bottom-3.5"
                    >
                      {showNew ? <EyeOff size={16} className="text-[#737373]" /> : <Eye size={16} className="text-[#737373]" />}
@@ -197,6 +210,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                    type="password"
                    value={confirmPassword}
                    onChange={(e) => setConfirmPassword(e.target.value)}
+                   onMouseEnter={() => playSound('hover')}
                    className="w-full bg-transparent border-b border-[#2a2a2e] focus:border-white transition-all py-3 font-main text-white placeholder:text-[#2a2a2e] outline-none tracking-[2px]"
                    placeholder="RE-ENTER_PHRASE"
                 />
@@ -205,7 +219,8 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
               {/* Action */}
               <div className="flex gap-4 pt-12">
                 <button 
-                  onClick={handleUpdate}
+                  onClick={() => { playSound('click'); handleUpdate(); }}
+                  onMouseEnter={() => playSound('hover')}
                   disabled={loading}
                   className="px-10 py-5 bg-[#e60000] hover:bg-[#ff0000] text-white font-main font-bold uppercase text-[13px] tracking-[1px] flex items-center gap-3 transition-all disabled:opacity-50"
                 >
@@ -213,7 +228,8 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                    RE-KEY VAULT
                 </button>
                 <button 
-                  onClick={onBack}
+                  onClick={() => { playSound('transition'); onBack(); }}
+                  onMouseEnter={() => playSound('hover')}
                   className="px-10 py-5 bg-[#1f1f22] border border-[#353534] hover:bg-[#252529] text-[#adaaad] font-main font-bold uppercase text-[13px] tracking-[1px] transition-all"
                 >
                    CANCEL

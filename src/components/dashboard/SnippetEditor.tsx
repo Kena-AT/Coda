@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
+import { soundService } from '../../utils/sounds';
 
 interface Version {
   id: number;
@@ -55,6 +57,8 @@ export const SnippetEditor: React.FC = () => {
   const [monacoInstance, setMonacoInstance] = useState<any>(null);
   const { setGlobalError } = useStore();
 
+  const playSound = useSoundEffect();
+
   // Debounced title check
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -69,6 +73,7 @@ export const SnippetEditor: React.FC = () => {
           excludeId: selectedSnippetId === -1 ? null : selectedSnippetId
         });
         if (exists) {
+          playSound('error');
           setTitleError('TITLE_ALREADY_EXISTS');
         } else {
           setTitleError(null);
@@ -99,6 +104,12 @@ export const SnippetEditor: React.FC = () => {
       });
     }
 
+    // Play feedback if new issues found (debounced probably better, but let's keep it simple)
+    if (issues.length > validationIssues.length) {
+       const errors = issues.filter(i => i.severity === 'error');
+       if (errors.length > 0) playSound('error');
+    }
+
     setValidationIssues(issues);
 
     // Apply decorations if editor is ready
@@ -121,7 +132,6 @@ export const SnippetEditor: React.FC = () => {
 
   // Handle creating new project from dropdown
   const handleCreateProjectFromDropdown = async () => {
-    // We'll replace the prompt with a triggered flag that ProjectVault can handle or a local modal
     const name = prompt('Enter new project designation:');
     if (!name?.trim() || !user) return;
     
@@ -133,6 +143,7 @@ export const SnippetEditor: React.FC = () => {
         color: null
       });
       if (response.success) {
+        playSound('success');
         const newProject = response.data?.[0];
         if (newProject) {
           setProjects([...projects, newProject]);
@@ -140,9 +151,11 @@ export const SnippetEditor: React.FC = () => {
           toast.success(`Project Sector "${name}" Initialized`);
         }
       } else {
+        playSound('error');
         toast.error(response.message || 'Sector initialization protocol failed');
       }
     } catch (err: any) {
+      playSound('error');
       toast.error(`Infrastructure Error: ${err.toString()}`);
     }
   };
@@ -192,10 +205,12 @@ export const SnippetEditor: React.FC = () => {
 
   const handleSave = async () => {
     if (!snippet.title || !snippet.content) {
+      playSound('error');
       toast.error('Title and content are required');
       return;
     }
     if (titleError) {
+      playSound('error');
       toast.error('Cannot commit: Title collision detected');
       return;
     }
@@ -215,6 +230,7 @@ export const SnippetEditor: React.FC = () => {
       );
 
       if (response.success) {
+        playSound('success');
         toast.success(selectedSnippetId === -1 ? 'System buffer recorded' : 'Matrix updated and versioned');
         if (selectedSnippetId === -1) {
           setSelectedSnippetId(null);
@@ -224,6 +240,7 @@ export const SnippetEditor: React.FC = () => {
           loadVersions(selectedSnippetId!);
         }
       } else {
+        playSound('error');
         if (response.message.startsWith('INTERNAL_ERROR') || response.message.startsWith('CRITICAL_ERROR')) {
           setGlobalError({
             title: 'SYSTEM FAILURE',
@@ -240,6 +257,7 @@ export const SnippetEditor: React.FC = () => {
         }
       }
     } catch (err: any) {
+      playSound('error');
       toast.error(err.toString());
     } finally {
       setSaving(false);
@@ -292,7 +310,8 @@ export const SnippetEditor: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button 
-                onClick={() => setSelectedSnippetId(null)}
+                onClick={() => { playSound('transition'); setSelectedSnippetId(null); }}
+                onMouseEnter={() => playSound('hover')}
                 className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
                 title="Back to Dashboard"
               >
@@ -305,7 +324,8 @@ export const SnippetEditor: React.FC = () => {
             </div>
             <div className="flex items-center gap-4">
               <button 
-                onClick={() => setShowTemplates(true)}
+                onClick={() => { playSound('click'); setShowTemplates(true); }}
+                onMouseEnter={() => playSound('hover')}
                 className="px-6 py-2 border border-[#e60000] text-[#e60000] flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase hover:bg-[#e60000] hover:text-white transition-all group"
                 title="Protocol Template Override"
               >
@@ -313,7 +333,8 @@ export const SnippetEditor: React.FC = () => {
                 TEMPLATE_OVERRIDE
               </button>
               <button 
-                onClick={handleSave}
+                onClick={() => { playSound('click'); handleSave(); }}
+                onMouseEnter={() => playSound('hover')}
                 disabled={saving}
                 className={`px-6 py-2 flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase transition-all disabled:opacity-50 ${titleError ? 'bg-[#353534] text-slate-500 cursor-not-allowed' : 'bg-[#e60000] text-white hover:bg-[#ff0000]'}`}
               >
@@ -322,9 +343,11 @@ export const SnippetEditor: React.FC = () => {
               </button>
               <button 
                 onClick={() => {
+                  playSound('transition');
                   setSelectedSnippetId(null);
                   setPreSelectedProjectId(null);
                 }}
+                onMouseEnter={() => playSound('hover')}
                 className="p-2 border border-[#353534]/50 text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
                 title="Close Editor"
               >
@@ -460,21 +483,24 @@ export const SnippetEditor: React.FC = () => {
         {/* Tab Switcher */}
         <div className="flex border-b border-[#353534]/20">
           <button 
-            onClick={() => setRightSidebarTab('validation')}
+            onClick={() => { playSound('click'); setRightSidebarTab('validation'); }}
+            onMouseEnter={() => playSound('hover')}
             className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'validation' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <ShieldAlert size={14} />
             SCAN
           </button>
           <button 
-            onClick={() => setRightSidebarTab('recs')}
+            onClick={() => { playSound('click'); setRightSidebarTab('recs'); }}
+            onMouseEnter={() => playSound('hover')}
             className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'recs' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <Zap size={14} />
             RECS
           </button>
           <button 
-            onClick={() => setRightSidebarTab('history')}
+            onClick={() => { playSound('click'); setRightSidebarTab('history'); }}
+            onMouseEnter={() => playSound('hover')}
             className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'history' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <History size={14} />
@@ -482,7 +508,8 @@ export const SnippetEditor: React.FC = () => {
           </button>
           {selectedSnippetId !== -1 && (
             <button 
-              onClick={() => setRightSidebarTab('links')}
+              onClick={() => { playSound('click'); setRightSidebarTab('links'); }}
+              onMouseEnter={() => playSound('hover')}
               className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'links' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
             >
               <Network size={14} />
@@ -622,11 +649,11 @@ export const SnippetEditor: React.FC = () => {
                 <>
                   <div className="text-[10px] text-[#adaaad] font-main tracking-[1px] uppercase ml-2 mt-4 mb-2">Commits</div>
                   {versions.map(v => (
-                    <button 
-                      key={v.id}
-                      onClick={() => { setSelectedVersion(v); setIsDiffMode(true); }}
-                      className={`w-full text-left p-4 bg-[#1c1b1b] opacity-70 border transition-all ${selectedVersion?.id === v.id ? 'border-[#e60000] opacity-100' : 'border-transparent hover:border-[#353534]'}`}
-                    >
+                  <button 
+                    onClick={() => { playSound('transition'); setSelectedVersion(v); setIsDiffMode(true); }}
+                    onMouseEnter={() => playSound('hover')}
+                    className={`w-full text-left p-4 bg-[#1c1b1b] opacity-70 border transition-all ${selectedVersion?.id === v.id ? 'border-[#e60000] opacity-100' : 'border-transparent hover:border-[#353534]'}`}
+                  >
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center gap-2">
                               <History className="w-3.5 h-3.5 text-[#adaaad]" />
@@ -634,53 +661,55 @@ export const SnippetEditor: React.FC = () => {
                           </div>
                           <span className="text-[9px] text-[#e60000] font-mono">{formatDate(v.created_at)}</span>
                         </div>
-                    </button>
-                  ))}
-                </>
-              )}
+                  </button>
+                ))}
+              </>
+            )}
 
-              {selectedSnippetId === -1 && (
-                <div className="text-[10px] text-[#adaaad] p-4 font-mono">Save initial snippet to begin version tracking.</div>
-              )}
-            </div>
-
-            {isDiffMode && (
-              <div className="p-6 bg-[#131313] border-t border-[#353534]/20 flex flex-col gap-4 sticky bottom-0">
-                <div className="text-[9px] text-[#adaaad] font-mono uppercase text-center mb-2">
-                  Warning: Reverting destroys current unsaved changes.
-                </div>
-                <button 
-                  onClick={handleRollback}
-                  className="w-full bg-[#353534] hover:bg-[#e60000] text-white py-3 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1.5px] uppercase transition-colors"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Rollback to this state
-                </button>
-              </div>
+            {selectedSnippetId === -1 && (
+              <div className="text-[10px] text-[#adaaad] p-4 font-mono">Save initial snippet to begin version tracking.</div>
             )}
           </div>
-        )}
 
-      </aside>
-
-      {showTemplates && (
-        <BoilerplateSelector 
-          onClose={() => setShowTemplates(false)}
-          onSelect={(content: string) => {
-             setSnippet({ ...snippet, content });
-             toast.success('Matrix template merged successfully');
-          }}
-          currentContent={snippet.content || ''}
-        />
+          {isDiffMode && (
+            <div className="p-6 bg-[#131313] border-t border-[#353534]/20 flex flex-col gap-4 sticky bottom-0">
+              <div className="text-[9px] text-[#adaaad] font-mono uppercase text-center mb-2">
+                Warning: Reverting destroys current unsaved changes.
+              </div>
+              <button 
+                onClick={() => { playSound('click'); handleRollback(); }}
+                onMouseEnter={() => playSound('hover')}
+                className="w-full bg-[#353534] hover:bg-[#e60000] text-white py-3 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1.5px] uppercase transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Rollback to this state
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
-      <RollbackConfirmModal
-        isOpen={showRollbackModal}
-        onConfirm={executeRollback}
-        onCancel={() => setShowRollbackModal(false)}
-        versionDate={selectedVersion?.created_at ? formatDate(selectedVersion.created_at) : undefined}
-        versionId={selectedVersion?.id}
+    </aside>
+
+    {showTemplates && (
+      <BoilerplateSelector 
+        onClose={() => { playSound('click'); setShowTemplates(false); }}
+        onSelect={(content: string) => {
+           playSound('success');
+           setSnippet({ ...snippet, content });
+           toast.success('Matrix template merged successfully');
+        }}
+        currentContent={snippet.content || ''}
       />
+    )}
+
+    <RollbackConfirmModal
+      isOpen={showRollbackModal}
+      onConfirm={() => { playSound('click'); executeRollback(); }}
+      onCancel={() => { playSound('click'); setShowRollbackModal(false); }}
+      versionDate={selectedVersion?.created_at ? formatDate(selectedVersion.created_at) : undefined}
+      versionId={selectedVersion?.id}
+    />
     </div>
   );
 };

@@ -20,6 +20,7 @@ import {
 import { SnippetCard } from './SnippetCard';
 import toast from 'react-hot-toast';
 import { filterSnippets } from '../../utils/searchEngine';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
 
 export const ProjectVault: React.FC = () => {
   const { 
@@ -34,6 +35,8 @@ export const ProjectVault: React.FC = () => {
     searchQuery,
     setPreSelectedProjectId
   } = useStore();
+
+  const playSound = useSoundEffect();
 
   const [stats, setStats] = useState<Record<number, any>>({});
   const [loadingStats, setLoadingStats] = useState(true);
@@ -123,15 +126,18 @@ export const ProjectVault: React.FC = () => {
         color: null
       });
       if (resp.success) {
+        playSound('success');
         await fetchProjects();
         setNewProjectName('');
         setNewProjectDesc('');
         setShowCreateModal(false);
         toast.success('Sector initialized and indexed');
       } else {
+        playSound('error');
         toast.error(resp.message || 'Initialization protocol failed');
       }
     } catch(err: any) {
+      playSound('error');
       toast.error(`Infrastructure Error: ${err.toString()}`);
     } finally {
       setIsCreating(false);
@@ -142,6 +148,7 @@ export const ProjectVault: React.FC = () => {
     if (projectId === -1) return;
     const p = allProjects.find(proj => proj.id === projectId);
     if (p) {
+      playSound('click');
       setProjectToDelete(projectId);
       setProjectToDeleteName(p.name);
       setShowDeleteModal(true);
@@ -149,6 +156,7 @@ export const ProjectVault: React.FC = () => {
   };
 
   const closeDeleteModal = () => {
+    playSound('click');
     setShowDeleteModal(false);
     setProjectToDelete(null);
     setProjectToDeleteName('');
@@ -159,12 +167,14 @@ export const ProjectVault: React.FC = () => {
     try {
       const resp = await invoke<any>('delete_project', { id: projectToDelete, userId: user.id });
       if (resp.success) {
+        playSound('success');
         toast.success('Project sector purged');
         if (selectedProjectId === projectToDelete) setSelectedProjectId(null);
         await fetchProjects();
         await fetchSnippets();
       }
     } catch (err) {
+      playSound('error');
       toast.error('Purge failed');
     } finally {
       closeDeleteModal();
@@ -280,7 +290,8 @@ export const ProjectVault: React.FC = () => {
         <div className="p-8 border-b border-[#222226] bg-[#0e0e0e]">
           <div className="flex items-center gap-2 text-[#adaaad] text-[10px] font-mono tracking-widest uppercase mb-4">
             <button 
-              onClick={() => setSelectedProjectId(null)}
+              onClick={() => { playSound('click'); setSelectedProjectId(null); }}
+              onMouseEnter={() => playSound('hover')}
               className="hover:text-white flex items-center gap-1 transition-colors"
             >
               PROJECTS
@@ -297,20 +308,22 @@ export const ProjectVault: React.FC = () => {
                     type="text" 
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
+                    onFocus={() => playSound('hover')}
                     className="text-3xl font-main font-bold bg-[#151515] border border-[#222226] text-white px-3 py-1 outline-none uppercase tracking-[-1.5px]"
                   />
                   <input 
                     type="text" 
                     value={editDesc}
                     onChange={e => setEditDesc(e.target.value)}
+                    onFocus={() => playSound('hover')}
                     placeholder="ENTER_DESCRIPTION..."
                     className="text-[#adaaad] font-mono text-[11px] bg-[#151515] border border-[#222226] px-3 py-1 outline-none uppercase"
                   />
                   <div className="flex gap-2">
-                    <button onClick={handleUpdateActiveProject} className="flex items-center gap-2 px-4 py-1.5 bg-[#e60000] text-white text-[10px] font-bold uppercase transition-colors hover:bg-[#ff0000]">
+                    <button onClick={() => { playSound('click'); handleUpdateActiveProject(); }} className="flex items-center gap-2 px-4 py-1.5 bg-[#e60000] text-white text-[10px] font-bold uppercase transition-colors hover:bg-[#ff0000]">
                       <Check size={14} /> SAVE_METADATA
                     </button>
-                    <button onClick={() => setIsEditing(false)} className="px-4 py-1.5 border border-[#222226] text-[#adaaad] text-[10px] font-bold uppercase hover:text-white transition-colors">
+                    <button onClick={() => { playSound('click'); setIsEditing(false); }} className="px-4 py-1.5 border border-[#222226] text-[#adaaad] text-[10px] font-bold uppercase hover:text-white transition-colors">
                       <X size={14} /> CANCEL
                     </button>
                   </div>
@@ -319,7 +332,8 @@ export const ProjectVault: React.FC = () => {
                 <>
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => setSelectedProjectId(null)}
+                      onClick={() => { playSound('click'); setSelectedProjectId(null); }}
+                      onMouseEnter={() => playSound('hover')}
                       className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
                       title="Back to Projects"
                     >
@@ -342,9 +356,11 @@ export const ProjectVault: React.FC = () => {
               {!isEditing && (
                 <button 
                   onClick={() => {
+                    playSound('click');
                     setPreSelectedProjectId(activeProject.id);
                     setSelectedSnippetId(-1);
                   }}
+                  onMouseEnter={() => playSound('hover')}
                   className="flex items-center gap-2 px-6 py-2 bg-[#e60000] text-white text-[10px] font-bold uppercase hover:bg-[#ff0000] hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
                 >
                   <Plus size={14} /> INITIALISE_SNIPPET
@@ -356,16 +372,17 @@ export const ProjectVault: React.FC = () => {
                   type="text" 
                   value={localSearch}
                   onChange={e => setLocalSearch(e.target.value)}
+                  onFocus={() => playSound('hover')}
                   placeholder="FILTER_SCOPED_VAULT..."
                   className="w-full bg-[#151515] border border-[#222226] pl-9 pr-4 py-2 text-[#adaaad] text-[10px] uppercase font-mono outline-none focus:border-[#e60000] transition-colors"
                 />
               </div>
               {activeProject.id !== -1 && (
                 <>
-                   <button onClick={() => setIsEditing(true)} className="p-2 border border-[#222226] text-[#adaaad] hover:text-white transition-colors" title="Edit Metadata">
+                   <button onClick={() => { playSound('click'); setIsEditing(true); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[#222226] text-[#adaaad] hover:text-white transition-colors" title="Edit Metadata">
                     <Edit2 size={16} />
                   </button>
-                  <button onClick={() => openDeleteModal(activeProject.id!)} className="p-2 border border-[#222226] text-[#adaaad] hover:text-[#e60000] transition-colors" title="Purge Project">
+                  <button onClick={() => { playSound('click'); openDeleteModal(activeProject.id!); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[#222226] text-[#adaaad] hover:text-[#e60000] transition-colors" title="Purge Project">
                     <Trash2 size={16} />
                   </button>
                 </>
@@ -386,12 +403,14 @@ export const ProjectVault: React.FC = () => {
                 <div key={snippet.id} className="h-[220px]">
                    <SnippetCard 
                       snippet={snippet}
-                      onEdit={() => setSelectedSnippetId(snippet.id!)}
+                      onEdit={() => { playSound('transition'); setSelectedSnippetId(snippet.id!); }}
                       onDelete={() => {
-                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, userId: user?.id }).then(() => fetchSnippets());
+                        playSound('click');
+                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, userId: user?.id }).then(() => { playSound('success'); fetchSnippets(); });
                       }}
                       onArchive={() => {
-                        invoke('archive_snippet', { id: snippet.id, userId: user?.id }).then(() => fetchSnippets());
+                        playSound('click');
+                        invoke('archive_snippet', { id: snippet.id, userId: user?.id }).then(() => { playSound('success'); fetchSnippets(); });
                       }}
                    />
                 </div>
@@ -427,7 +446,8 @@ export const ProjectVault: React.FC = () => {
               <div 
                 key={p.id} 
                 className="bg-[#151515] border border-[#222226] p-6 hover:border-[#e60000]/50 transition-all group cursor-pointer relative flex flex-col h-full"
-                onClick={() => setSelectedProjectId(p.id)}
+                onClick={() => { playSound('transition'); setSelectedProjectId(p.id); }}
+                onMouseEnter={() => playSound('hover')}
               >
                 <div className="flex justify-between items-start mb-6">
                   {editingProjectId === p.id ? (

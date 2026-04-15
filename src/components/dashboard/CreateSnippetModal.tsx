@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
 import toast from 'react-hot-toast';
 
 interface CreateSnippetModalProps {
@@ -22,6 +23,7 @@ interface CreateSnippetModalProps {
 
 export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, onClose, onSnippetCreated }) => {
   const { user, projects, preSelectedProjectId, setPreSelectedProjectId } = useStore();
+  const playSound = useSoundEffect();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [language, setLanguage] = useState('javascript');
@@ -50,6 +52,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
       });
 
       if (response.success) {
+        playSound('success');
         toast.success('Snippet synchronized with database', {
           style: {
             background: '#19191c',
@@ -69,9 +72,11 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
         setProjectId(null);
         setPreSelectedProjectId(null);
       } else {
+        playSound('error');
         setError(response.message);
       }
     } catch (err: any) {
+      playSound('error');
       setError(err.toString());
     } finally {
       setLoading(false);
@@ -92,7 +97,8 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
              <span className="text-[10px] text-[#adaaad] tracking-[1px] uppercase opacity-50">Local Buffer Entry System</span>
           </div>
           <button 
-            onClick={onClose}
+            onClick={() => { playSound('click'); onClose(); }}
+            onMouseEnter={() => playSound('hover')}
             className="p-2 text-[#adaaad] hover:text-[#e60000] transition-colors"
           >
             <X className="w-6 h-6" />
@@ -120,6 +126,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 type="text" 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                onFocus={() => playSound('hover')}
                 placeholder="Database Logic Cluster..."
                 className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm"
                 required
@@ -134,7 +141,8 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
               </div>
               <select 
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={(e) => { playSound('click'); setLanguage(e.target.value); }}
+                onMouseEnter={() => playSound('hover')}
                 className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm appearance-none"
               >
                 <option value="javascript">JavaScript</option>
@@ -158,6 +166,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 type="text" 
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
+                onFocus={() => playSound('hover')}
                 placeholder="API, Utility, Auth..."
                 className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm"
               />
@@ -171,7 +180,8 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
               </div>
               <select 
                 value={projectId || ''}
-                onChange={(e) => setProjectId(e.target.value ? parseInt(e.target.value) : null)}
+                onChange={(e) => { playSound('click'); setProjectId(e.target.value ? parseInt(e.target.value) : null); }}
+                onMouseEnter={() => playSound('hover')}
                 className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm appearance-none"
               >
                 <option value="">NO_PROJECT_ASSIGNED (INBOX)</option>
@@ -193,6 +203,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
             <textarea 
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              onFocus={() => playSound('hover')}
               placeholder="export const connect = () => { ... }"
               className="flex-1 bg-[#0a0a0c] border border-[#222226] p-4 text-[#f3ffca] font-mono text-xs outline-none focus:border-[#e60000] transition-colors resize-none overflow-y-auto custom-scrollbar"
               required
@@ -207,7 +218,8 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
             <div className="flex items-center gap-4">
               <button 
                 type="button"
-                onClick={onClose}
+                onClick={() => { playSound('click'); onClose(); }}
+                onMouseEnter={() => playSound('hover')}
                 className="text-xs font-main text-[#adaaad] uppercase tracking-[1px] hover:text-white transition-colors"
                 disabled={loading}
               >
@@ -216,6 +228,8 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
               <button 
                 type="submit"
                 disabled={loading}
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => playSound('click')}
                 className="bg-[#e60000] text-white flex items-center gap-3 px-8 py-3 font-main font-bold text-xs tracking-[2px] uppercase hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
               >
                 <Save className="w-4 h-4" />

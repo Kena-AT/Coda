@@ -4,7 +4,6 @@ import {
   Bell, 
   Palette, 
   Type, 
-  Keyboard, 
   User, 
   ChevronRight, 
   LogOut, 
@@ -12,124 +11,146 @@ import {
   Info, 
   Key,
   Volume2,
-  Zap
+  Trash2,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
+import { soundService } from '../../utils/sounds';
 import { invoke } from '@tauri-apps/api/core';
-import { useEffect } from 'react';
 
 interface SettingsPageProps {
+  onBack: () => void;
   onNavigate: (page: string) => void;
 }
 
-export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
+export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }) => {
   const { settings, setSettings } = useStore();
+  const playSound = useSoundEffect();
 
-  useEffect(() => {
-    // Sync with backend on load
-    const syncSettings = async () => {
-      try {
-        const prefs = await invoke('get_user_preferences') as any;
-        setSettings({
-          lockoutThreshold: prefs.lockout_threshold,
-          autoLockTimer: prefs.lockout_duration_mins,
-          pushAlerts: prefs.push_alerts,
-          soundEffects: prefs.sound_effects,
-        });
-      } catch (err) {
-        console.error('Failed to sync settings:', err);
-      }
-    };
-    syncSettings();
-  }, []);
-
-  const handleUpdateSetting = async (updates: any) => {
-    const newSettings = { ...settings, ...updates };
+  const handleUpdateSetting = async (updates: Partial<typeof settings>) => {
     setSettings(updates);
+    
+    // Auditory feedback
+    if (updates.soundEffects !== undefined) {
+      if (updates.soundEffects) soundService.playSuccess();
+      else soundService.playClick();
+    } else {
+      playSound('click');
+    }
     
     try {
       await invoke('update_user_preferences', {
         prefs: {
-          auto_archive_days: 30, // Default for now
-          exclude_favorites: true,
-          min_copy_threshold: 10,
-          push_alerts: newSettings.pushAlerts,
-          sound_effects: newSettings.soundEffects,
-          lockout_threshold: newSettings.lockoutThreshold,
-          lockout_duration_mins: newSettings.autoLockTimer
+          push_alerts: updates.pushAlerts ?? settings.pushAlerts,
+          sound_effects: updates.soundEffects ?? settings.soundEffects,
+          auto_lock_timer: updates.autoLockTimer ?? settings.autoLockTimer,
+          lockout_threshold: updates.lockoutThreshold ?? settings.lockoutThreshold,
+          font_size: updates.fontSize ?? settings.fontSize,
+          theme_mode: updates.theme ?? settings.theme,
+          keyboard_shortcuts: JSON.stringify(updates.shortcuts ?? settings.shortcuts),
         }
       });
-    } catch (err) {
-      console.error('Failed to update backend settings:', err);
+    } catch (error) {
+      console.error('Failed to update preferences:', error);
     }
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0e0e10] custom-scrollbar p-12">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <div className="flex-1 overflow-y-auto bg-[#0a0a0c] p-12">
+      <div className="max-w-4xl mx-auto space-y-16">
         
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[#adaaad] font-mono text-[10px] tracking-[1px] uppercase">
-            <div className="w-1.5 h-1.5 bg-[#e60000] rounded-full animate-pulse" />
-            System Configuration Active
+        {/* Header Section */}
+        <div className="flex justify-between items-end border-b border-[#1f1f22] pb-12">
+          <div className="space-y-4">
+            <button 
+              onClick={() => { playSound('click'); onBack(); }}
+              className="group flex items-center gap-2 text-[#737373] hover:text-[#e60000] transition-colors"
+            >
+              <ChevronRight className="w-4 h-4 rotate-180" />
+              <span className="text-[10px] font-mono uppercase tracking-[2px]">Terminal_Exit</span>
+            </button>
+            <h1 className="text-2xl font-main font-black text-white tracking-[-1px] uppercase">
+              System_Settings<span className="text-[#e60000]">.env</span>
+            </h1>
           </div>
-          <h1 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase">APP_SETTINGS</h1>
-          <p className="text-[#e60000] font-mono text-[10px] tracking-[1px]">v4.0.2 // ENCRYPTION_STRENGTH: MAXIMUM</p>
+          <div className="text-right">
+             <p className="text-[9px] font-mono text-[#737373] uppercase mb-1">Last Sync: {new Date().toLocaleTimeString()}</p>
+             <div className="flex items-center justify-end gap-2 text-[#e60000]">
+                <div className="w-1.5 h-1.5 bg-[#e60000] animate-pulse" />
+                <span className="text-[10px] font-mono uppercase tracking-[1px]">Data_Link_Secure</span>
+             </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           
           {/* 01 // SECURITY_OVERRIDE */}
           <div className="bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden flex flex-col">
-            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30 flex justify-between items-center">
+            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30">
               <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">01 // SECURITY_OVERRIDE</span>
             </div>
             <div className="p-8 space-y-8 flex-1">
-              <h3 className="text-xl font-main font-bold text-white uppercase flex items-center gap-3">
+              <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
                 <Shield className="w-6 h-6 text-[#e60000]" />
                 LOCKOUT POLICY
               </h3>
-              
+
               <div className="space-y-6">
-                <div className="space-y-4">
-                  <label className="text-[10px] font-mono text-[#adaaad] uppercase tracking-[1px]">
-                    {">"} Failed attempts threshold
-                  </label>
-                  <div className="flex items-end gap-4 border-b border-[#353534]/50 pb-2">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end">
+                    <p className="text-[13px] font-main font-bold text-white uppercase">Failed attempts threshold</p>
+                    <span className="text-xl font-main font-bold text-[#e60000]">
+                      {settings.lockoutThreshold} <span className="text-[9px] font-mono text-[#737373]">ATTEMPTS</span>
+                    </span>
+                  </div>
+                  <div className="h-6 relative flex items-center">
+                    <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
+                       <div 
+                         className="h-full bg-[#e60000] transition-all"
+                         style={{ width: `${(settings.lockoutThreshold / 10) * 100}%` }}
+                       />
+                    </div>
                     <input 
-                      type="number" 
+                      type="range"
+                      min="1"
+                      max="10"
+                      step="1"
                       value={settings.lockoutThreshold}
-                      onChange={(e) => handleUpdateSetting({ lockoutThreshold: parseInt(e.target.value) })}
-                      className="bg-transparent text-3xl font-main font-bold text-white outline-none w-20"
+                      onChange={(e) => {
+                        handleUpdateSetting({ lockoutThreshold: parseInt(e.target.value) });
+                      }}
+                      onMouseEnter={() => playSound('hover')}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
                     />
-                    <span className="text-[9px] font-mono text-[#737373] uppercase pb-1">ATTEMPTS</span>
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-4">
-                  <label className="text-[10px] font-mono text-[#adaaad] uppercase tracking-[1px]">
-                    {">"} Auto-lock timer
-                  </label>
-                  <div className="flex items-center gap-6">
-                    <div className="flex-1 h-3 bg-[#1f1f22] rounded-sm overflow-hidden border border-[#353534]/30 relative group">
-                      <div 
-                        className="h-full bg-[#e60000] transition-all duration-300" 
-                        style={{ width: `${(settings.autoLockTimer / 60) * 100}%` }} 
-                      />
-                      <input 
-                        type="range"
-                        min="5"
-                        max="60"
-                        step="5"
-                        value={settings.autoLockTimer}
-                        onChange={(e) => handleUpdateSetting({ autoLockTimer: parseInt(e.target.value) })}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                    </div>
-                    <span className="text-2xl font-main font-bold text-white w-20 text-right">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end">
+                    <p className="text-[13px] font-main font-bold text-white uppercase">Auto-lock timer</p>
+                    <span className="text-xl font-main font-bold text-[#e60000]">
                       {settings.autoLockTimer}:00
                     </span>
+                  </div>
+                  <div className="h-6 relative flex items-center">
+                    <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
+                       <div 
+                         className="h-full bg-[#e60000] transition-all"
+                         style={{ width: `${(settings.autoLockTimer / 60) * 100}%` }}
+                       />
+                    </div>
+                    <input 
+                      type="range"
+                      min="5"
+                      max="60"
+                      step="5"
+                      value={settings.autoLockTimer}
+                      onChange={(e) => {
+                        handleUpdateSetting({ autoLockTimer: parseInt(e.target.value) });
+                      }}
+                      onMouseEnter={() => playSound('hover')}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
                   </div>
                   <p className="text-[9px] font-mono text-[#737373] italic">Recommended: 05:00 - 30:00</p>
                 </div>
@@ -143,7 +164,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
               <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">02 // SIGNAL_PROTOCOL</span>
             </div>
             <div className="p-8 space-y-8 flex-1">
-              <h3 className="text-xl font-main font-bold text-white uppercase flex items-center gap-3">
+              <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
                 <Bell className="w-6 h-6 text-[#e60000]" />
                 NOTIFICATIONS
               </h3>
@@ -181,187 +202,143 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* 03 // OPTIC_ARRAY */}
-          <div className="bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden md:col-span-2">
-            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30">
-              <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">03 // OPTIC_ARRAY</span>
-            </div>
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* 03 // CORE_AESTHETICS */}
+          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12 lg:col-span-2 bg-[#131313] border border-[#353534]/30">
               <div className="space-y-8">
-                 <h3 className="text-xl font-main font-bold text-white uppercase flex items-center gap-3">
+                <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
                   <Palette className="w-6 h-6 text-[#e60000]" />
                   THEME ENGINE
                 </h3>
-                <div className="space-y-6">
-                   <select 
-                     value={settings.theme}
-                     onChange={(e) => handleUpdateSetting({ theme: e.target.value as any })}
-                     className="w-full bg-[#1f1f22] border border-[#353534]/50 p-4 text-white font-main uppercase text-[12px] outline-none appearance-none cursor-pointer"
-                   >
-                     <option value="crimson">Crimson Protocol</option>
-                     <option value="void">Void Null</option>
-                     <option value="matrix">Matrix Grid</option>
-                   </select>
-                   <div className="flex gap-4">
-                      {['crimson', 'void', 'matrix'].map((t) => (
-                        <div 
-                          key={t}
-                          onClick={() => handleUpdateSetting({ theme: t as any })}
-                          className={`flex-1 h-12 border transition-all cursor-pointer ${settings.theme === t ? 'border-[#e60000]' : 'border-[#353534]'}`}
-                          style={{ backgroundColor: t === 'crimson' ? '#e60000' : t === 'void' ? '#0e0e10' : '#00ff41' }}
-                        />
-                      ))}
-                   </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['crimson', 'void', 'matrix'] as const).map((theme) => (
+                    <button
+                      key={theme}
+                      onClick={() => handleUpdateSetting({ theme })}
+                      onMouseEnter={() => playSound('hover')}
+                      className={`p-3 border transition-all text-center ${
+                        settings.theme === theme 
+                        ? 'border-[#e60000] bg-[#e60000]/10 text-white' 
+                        : 'border-[#353534] text-[#737373] hover:border-white/30'
+                      }`}
+                    >
+                      <span className="text-[10px] font-mono uppercase tracking-[1px]">{theme}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className="space-y-8">
-                 <h3 className="text-xl font-main font-bold text-white uppercase flex items-center gap-3">
+                <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
                   <Type className="w-6 h-6 text-[#e60000]" />
                   FONT CONFIG
                 </h3>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-[#adaaad] uppercase">Scale Factor</span>
+                  <div className="flex justify-between items-end">
+                    <p className="text-[10px] font-mono text-[#737373] uppercase">Display Scale</p>
                     <span className="text-xl font-main font-bold text-white">{settings.fontSize}%</span>
                   </div>
-                  <input 
-                    type="range"
-                    min="80"
-                    max="150"
-                    step="5"
-                    value={settings.fontSize}
-                    onChange={(e) => handleUpdateSetting({ fontSize: parseInt(e.target.value) })}
-                    className="w-full appearance-none bg-[#1f1f22] h-1 rounded-full outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-[#e60000] [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
-                  />
-                  <div className="mt-8 p-4 bg-[#1f1f22]/50 border border-[#353534]/30 rounded-sm">
-                    <p className="text-[9px] font-mono text-[#737373] mb-2 uppercase">Preview:</p>
-                    <p className="text-white font-main" style={{ fontSize: `${(settings.fontSize / 100) * 14}px` }}>
-                      The quick brown fox jumps over the lazy dog. 
-                      0123456789. UTF-8 encoded.
-                    </p>
+                  <div className="h-6 relative flex items-center">
+                    <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
+                       <div 
+                         className="h-full bg-white transition-all"
+                         style={{ width: `${((settings.fontSize - 80) / 70) * 100}%` }}
+                       />
+                    </div>
+                    <input 
+                      type="range"
+                      min="80"
+                      max="150"
+                      step="5"
+                      value={settings.fontSize}
+                      onChange={(e) => handleUpdateSetting({ fontSize: parseInt(e.target.value) })}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
                   </div>
                 </div>
               </div>
-            </div>
           </div>
 
-          {/* 04 // RAPID_ACCESS */}
-          <div className="bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden">
-            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30">
-              <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">04 // RAPID_ACCESS</span>
-            </div>
-            <div className="p-8 space-y-8">
-              <h3 className="text-2xl font-main font-bold text-white uppercase flex items-center gap-3">
-                <Keyboard className="w-6 h-6 text-[#e60000]" />
-                SHORTCUTS
-              </h3>
-              <div className="space-y-4">
-                {[
-                  { label: 'Copy Snippet', key: settings.shortcuts.copy },
-                  { label: 'New Snippet', key: settings.shortcuts.newSnippet },
-                  { label: 'Global Search', key: settings.shortcuts.search }
-                ].map((s, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 border-b border-[#353534]/10">
-                    <span className="text-[12px] font-main text-[#adaaad]">{s.label}</span>
-                    <div className="flex gap-2">
-                       <span className="px-2 py-1 bg-[#1f1f22] border border-[#353534]/50 rounded text-[10px] font-mono text-white">Ctrl</span>
-                       <span className="px-2 py-1 bg-[#1f1f22] border border-[#353534]/50 rounded text-[10px] font-mono text-white">{s.key}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* 04 // DATA_MANAGEMENT */}
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+             <button 
+               onClick={() => { playSound('transition'); onNavigate('backup'); }}
+               className="group flex flex-col items-start p-8 bg-[#1f1f22]/30 border border-[#353534]/20 hover:border-[#e60000]/50 transition-all text-left"
+             >
+                <Database className="w-8 h-8 text-[#adaaad] mb-6 group-hover:text-[#e60000] transition-colors" />
+                <div className="space-y-1">
+                  <span className="text-[13px] font-main font-bold text-white uppercase">Vault_Backup_Control</span>
+                  <span className="text-[9px] font-mono text-[#737373] uppercase tracking-[1px]">Access local redundancy protocols</span>
+                </div>
+             </button>
+
+             <button 
+               onClick={() => { playSound('transition'); onNavigate('password'); }}
+               className="group flex flex-col items-start p-8 bg-[#1f1f22]/30 border border-[#353534]/20 hover:border-[#e60000]/50 transition-all text-left"
+             >
+                <Key className="w-8 h-8 text-[#adaaad] mb-6 group-hover:text-[#e60000] transition-colors" />
+                <div className="space-y-1">
+                  <span className="text-[13px] font-main font-bold text-white uppercase">Security_Key_Rotation</span>
+                  <span className="text-[9px] font-mono text-[#737373] uppercase tracking-[1px]">Modify administrative credentials</span>
+                </div>
+             </button>
+
+             <button 
+                onClick={() => { playSound('transition'); onNavigate('version'); }}
+                className="group flex flex-col items-start p-8 bg-[#131313] border border-[#353534]/20 hover:bg-[#1f1f22] transition-all text-left"
+             >
+                <Info className="w-8 h-8 text-[#737373] mb-6" />
+                <div className="space-y-1">
+                  <span className="text-[13px] font-main font-bold text-white uppercase tracking-tight">System_Manifest</span>
+                  <span className="text-[9px] font-mono text-[#737373] uppercase">Build_V2.0.4-STABLE // RED_CORE</span>
+                </div>
+             </button>
+
+             <button 
+                className="group flex flex-col items-start p-8 bg-[#131313] border border-[#353534]/20 hover:bg-[#1f1f22] transition-all text-left"
+             >
+                <User className="w-8 h-8 text-[#737373] mb-6" />
+                <div className="space-y-1">
+                  <span className="text-[13px] font-main font-bold text-white uppercase tracking-tight">Active_Operator</span>
+                  <span className="text-[9px] font-mono text-[#737373] uppercase">Admin_clearance_Level_1</span>
+                </div>
+             </button>
           </div>
 
-          {/* 05 // IDENTITY_VAULT */}
-          <div className="bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden">
-            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30">
-              <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">05 // IDENTITY_VAULT</span>
-            </div>
-            <div className="p-8 space-y-8">
-              <h3 className="text-2xl font-main font-bold text-white uppercase flex items-center gap-3">
-                <User className="w-6 h-6 text-[#e60000]" />
-                ACCOUNT
-              </h3>
-              <div className="space-y-3">
-                <button 
-                  onClick={() => onNavigate('change-password')}
-                  className="w-full flex items-center justify-between p-4 bg-[#1f1f22]/30 hover:bg-[#1f1f22]/60 border border-[#353534]/20 rounded-sm transition-all group"
-                >
-                  <div className="flex items-center gap-4 text-left">
-                    <Key className="w-5 h-5 text-[#737373] group-hover:text-white transition-colors" />
-                    <div className="space-y-0.5">
-                      <p className="text-[13px] font-main font-bold text-white uppercase">Change master password</p>
-                      <p className="text-[9px] font-mono text-[#737373] uppercase">Re-key security enclave</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#737373]" />
+          <div className="lg:col-span-2 pt-12 space-y-6">
+             <div className="flex items-center gap-4 text-[#737373]">
+                <div className="h-[1px] flex-1 bg-[#1f1f22]" />
+                <span className="text-[10px] font-mono uppercase tracking-[2px]">Advanced_Threat_Nullification</span>
+                <div className="h-[1px] flex-1 bg-[#1f1f22]" />
+             </div>
+             
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button className="flex items-center justify-between p-6 border border-[#353534]/30 bg-red-600/5 hover:bg-red-600/10 transition-all group">
+                   <div className="flex items-center gap-4">
+                      <Trash2 className="text-[#e60000] w-5 h-5" />
+                      <div className="text-left">
+                        <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider">Empty_Trash_Buffer</p>
+                        <p className="text-[9px] font-mono text-[#737373] uppercase">Irreversible_Redaction</p>
+                      </div>
+                   </div>
+                   <ChevronRight className="w-4 h-4 text-[#e60000] group-hover:translate-x-1 transition-transform" />
                 </button>
 
                 <button 
-                  onClick={() => onNavigate('backup')}
-                  className="w-full flex items-center justify-between p-4 bg-[#1f1f22]/30 hover:bg-[#1f1f22]/60 border border-[#353534]/20 rounded-sm transition-all group"
+                  onClick={() => { playSound('error'); onNavigate('logout'); }}
+                  className="flex items-center justify-between p-6 border border-[#353534]/30 bg-white/5 hover:bg-white/10 transition-all group"
                 >
-                  <div className="flex items-center gap-4 text-left">
-                    <Database className="w-5 h-5 text-[#737373] group-hover:text-white transition-colors" />
-                    <div className="space-y-0.5">
-                      <p className="text-[13px] font-main font-bold text-white uppercase">Local backup / restore</p>
-                      <p className="text-[9px] font-mono text-[#737373] uppercase">Manage database snapshots and recovery</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#737373]" />
+                   <div className="flex items-center gap-4">
+                      <LogOut className="text-white w-5 h-5" />
+                      <div className="text-left">
+                        <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider">Terminate_Session</p>
+                        <p className="text-[9px] font-mono text-[#737373] uppercase">Drop_All_Data_Links</p>
+                      </div>
+                   </div>
+                   <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                 </button>
-
-                <button 
-                  onClick={() => onNavigate('version')}
-                  className="w-full flex items-center justify-between p-4 bg-[#1f1f22]/30 hover:bg-[#1f1f22]/60 border border-[#353534]/20 rounded-sm transition-all group"
-                >
-                  <div className="flex items-center gap-4 text-left">
-                    <Info className="w-5 h-5 text-[#737373] group-hover:text-white transition-colors" />
-                    <div className="space-y-0.5">
-                      <p className="text-[13px] font-main font-bold text-white uppercase">About / version info</p>
-                      <p className="text-[9px] font-mono text-[#737373] uppercase">System manifest and protocol history</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#737373]" />
-                </button>
-
-                <button 
-                  onClick={() => onNavigate('logout-confirm')}
-                  className="w-full flex items-center justify-between p-4 mt-4 bg-red-600/5 hover:bg-red-600/10 border border-red-600/20 rounded-sm transition-all group"
-                >
-                  <div className="flex items-center gap-4 text-left">
-                    <LogOut className="w-5 h-5 text-red-600" />
-                    <div className="space-y-0.5">
-                      <p className="text-[13px] font-main font-bold text-red-600 uppercase">Logout</p>
-                      <p className="text-[9px] font-mono text-red-600/50 uppercase">Terminate active session</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-red-600/50" />
-                </button>
-              </div>
-            </div>
+             </div>
           </div>
 
-        </div>
-
-        {/* Footer info */}
-        <div className="pt-12 border-t border-[#353534]/20 flex justify-between items-end pb-12">
-           <div className="flex gap-12">
-              <div className="space-y-1">
-                 <span className="text-[9px] font-mono text-[#737373] uppercase block">Build</span>
-                 <span className="text-[11px] font-main text-white uppercase">STABLE_2024.10.14</span>
-              </div>
-              <div className="space-y-1">
-                 <span className="text-[9px] font-mono text-[#737373] uppercase block">Environment</span>
-                 <span className="text-[11px] font-main text-white uppercase flex items-center gap-2">
-                    <Zap size={12} className="text-[#e60000]" />
-                    SECURE_NODE_B4
-                 </span>
-              </div>
-           </div>
-           <p className="text-[9px] font-mono text-[#737373] uppercase">© 2024 CODA_CORP // ALL RIGHTS REDACTED.</p>
         </div>
 
       </div>

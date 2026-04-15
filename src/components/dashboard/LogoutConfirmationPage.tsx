@@ -1,9 +1,10 @@
 import React from 'react';
 import { Power, ShieldAlert, Monitor } from 'lucide-react';
 import { useStore } from '../../store/useStore';
-import { invoke } from '@tauri-apps/api/core';
 import { sessionManager, authApi } from '../../store/authStore';
 import toast from 'react-hot-toast';
+
+import { useSoundEffect } from '../../hooks/useSoundEffect';
 
 interface LogoutConfirmationPageProps {
   onCancel: () => void;
@@ -11,6 +12,7 @@ interface LogoutConfirmationPageProps {
 
 export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ onCancel }) => {
   const { user, setUser } = useStore();
+  const playSound = useSoundEffect();
 
   const handleLogout = async () => {
     try {
@@ -62,38 +64,40 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-3xl font-main font-bold text-white tracking-[-1px] uppercase">
+          <h2 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase">
             TERMINATE_SESSION?
           </h2>
           <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#e60000]/50 to-transparent" />
-          <p className="text-[#e60000] font-mono text-[11px] tracking-[2px] uppercase">
+          <p className="text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">
              All uncommitted buffers will be persisted to local storage.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-1 px-4">
           <button 
-            onClick={handleLogout}
+            onClick={() => { playSound('click'); handleLogout(); }}
+            onMouseEnter={() => playSound('hover')}
             className="group relative flex flex-col items-start p-8 bg-[#e60000] hover:bg-[#ff0000] transition-all text-left overflow-hidden"
           >
             <div className="mb-8 w-10 h-10 border border-white/30 flex items-center justify-center bg-white/10 group-hover:scale-110 transition-transform">
                 <Monitor className="w-5 h-5 text-white" />
             </div>
             <div className="space-y-1">
-              <span className="text-[14px] font-main font-bold text-white uppercase block leading-tight">Logout // End_session</span>
+              <span className="text-[12px] font-main font-bold text-white uppercase block leading-tight">Logout // End_session</span>
               <span className="text-[9px] font-mono text-white/70 uppercase">Execute_sig_quit</span>
             </div>
           </button>
 
           <button 
-            onClick={onCancel}
+            onClick={() => { playSound('transition'); onCancel(); }}
+            onMouseEnter={() => playSound('hover')}
             className="group relative flex flex-col items-start p-8 bg-[#1f1f22] hover:bg-[#252529] border border-[#353534] transition-all text-left"
           >
              <div className="mb-8 w-10 h-10 border border-[#353534] flex items-center justify-center group-hover:bg-[#353534]/30 transition-all">
                 <ShieldAlert className="w-5 h-5 text-[#adaaad]" />
             </div>
             <div className="space-y-1">
-              <span className="text-[14px] font-main font-bold text-white uppercase block leading-tight">Stay_active // Abort</span>
+              <span className="text-[12px] font-main font-bold text-white uppercase block leading-tight">Stay_active // Abort</span>
               <span className="text-[9px] font-mono text-[#737373] uppercase leading-tight">Return_to_root</span>
             </div>
           </button>

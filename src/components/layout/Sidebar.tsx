@@ -10,6 +10,7 @@ import {
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useStore } from '../../store/useStore';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,6 +22,13 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
   const { activeTab, setActiveTab } = useStore();
+  const playSound = useSoundEffect();
+
+  const handleTabClick = (id: string) => {
+    playSound('click');
+    setActiveTab(id);
+  };
+
   const navItems = [
     { id: 'library', label: 'Library', icon: Folder },
     { id: 'projects', label: 'Projects', icon: FolderGit2 },
@@ -35,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
       
       {/* Logo Section */}
       <div className="px-6 mb-12">
-        <div className="flex items-center gap-3 mb-1">
+        <div className="flex items-center gap-3 mb-1 cursor-pointer" onMouseEnter={() => playSound('hover')}>
           <div className="w-4 h-4 bg-[#e60000]" />
           <h1 className="text-[13px] font-main font-bold text-[#e60000] tracking-[1px] uppercase">TERMINAL_SYSTEM</h1>
         </div>
@@ -47,7 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
         {navItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleTabClick(item.id)}
+            onMouseEnter={() => playSound('hover')}
             className={cn(
               "w-full flex items-center gap-4 px-4 py-3 transition-colors duration-200 group relative",
               activeTab === item.id 
@@ -67,7 +76,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
       {/* Action Button */}
       <div className="px-6">
         <button 
-          onClick={onNewSnippet}
+          onClick={() => { playSound('click'); onNewSnippet(); }}
+          onMouseEnter={() => playSound('hover')}
           className="w-full bg-[#e60000] text-white flex items-center justify-center gap-2 py-4 font-main font-bold text-[11px] tracking-[2px] uppercase hover:bg-[#ff0000] transition-colors"
         >
           <span>NEW_SNIPPET</span>
