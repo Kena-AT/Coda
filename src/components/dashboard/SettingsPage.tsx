@@ -4,14 +4,20 @@ import {
   Bell, 
   Palette, 
   Type, 
-  User, 
   ChevronRight, 
   LogOut, 
   Database, 
   Info, 
   Key,
   Volume2,
-  Trash2,
+  Settings as SettingsIcon,
+  Layout,
+  Code,
+  Zap,
+  Lock,
+  MessageSquare,
+  Activity,
+  User,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
@@ -30,7 +36,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
   const handleUpdateSetting = async (updates: Partial<typeof settings>) => {
     setSettings(updates);
     
-    // Auditory feedback
     if (updates.soundEffects !== undefined) {
       if (updates.soundEffects) soundService.playSuccess();
       else soundService.playClick();
@@ -56,292 +61,313 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0a0a0c] p-12">
-      <div className="max-w-4xl mx-auto space-y-16">
+    <div className="flex-1 w-full h-full bg-[#131313] text-[#e5e2e1] overflow-y-auto font-main relative scrollbar-hide">
+      
+      {/* Background Decoration */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] flex items-center justify-center overflow-hidden">
+        <h1 className="text-[200px] font-bold tracking-[-10px] leading-none select-none">CODE_BASE</h1>
+      </div>
+
+      <div className="max-w-6xl mx-auto p-12 relative flex flex-col z-10">
         
         {/* Header Section */}
-        <div className="flex justify-between items-end border-b border-[#1f1f22] pb-12">
-          <div className="space-y-4">
-            <button 
-              onClick={() => { playSound('click'); onBack(); }}
-              className="group flex items-center gap-2 text-[#737373] hover:text-[#e60000] transition-colors"
-            >
-              <ChevronRight className="w-4 h-4 rotate-180" />
-              <span className="text-[10px] font-mono uppercase tracking-[2px]">Terminal_Exit</span>
-            </button>
-            <h1 className="text-2xl font-main font-black text-white tracking-[-1px] uppercase">
-              System_Settings<span className="text-[#e60000]">.env</span>
-            </h1>
-          </div>
-          <div className="text-right">
-             <p className="text-[9px] font-mono text-[#737373] uppercase mb-1">Last Sync: {new Date().toLocaleTimeString()}</p>
-             <div className="flex items-center justify-end gap-2 text-[#e60000]">
-                <div className="w-1.5 h-1.5 bg-[#e60000] animate-pulse" />
-                <span className="text-[10px] font-mono uppercase tracking-[1px]">Data_Link_Secure</span>
-             </div>
-          </div>
-        </div>
+        <header className="mb-12 border-l-4 border-[#e60000] pl-6 space-y-2 relative">
+          <button 
+            onClick={() => { playSound('click'); onBack(); }}
+            onMouseEnter={() => playSound('hover')}
+            className="absolute -top-4 -left-6 p-2 text-[#e5e2e1]/20 hover:text-white transition-colors"
+          >
+            <ChevronRight className="w-4 h-4 rotate-180" />
+          </button>
+          <p className="text-[10px] font-mono text-[#e5e2e1]/40 uppercase tracking-[3px]">System.Configuration.Active</p>
+          <h1 className="text-5xl font-bold tracking-tighter text-[#e5e2e1]">APP_SETTINGS</h1>
+          <p className="text-[14px] font-mono text-[#e60000] uppercase">v4.0.2 // ENCRYPTION_STRENGTH: MAXIMUM</p>
+        </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 flex-1">
           
-          {/* 01 // SECURITY_OVERRIDE */}
-          <div className="bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden flex flex-col">
-            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30">
-              <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">01 // SECURITY_OVERRIDE</span>
+          {/* Section: Lockout Policy */}
+          <section className="bg-[#0e0e0e] border border-[#353534] flex flex-col relative overflow-hidden group">
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-[#e60000]/5 rotate-45 transform pointer-events-none" />
+            <div className="bg-[#353534] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
+              01 // Security_Override
             </div>
-            <div className="p-8 space-y-8 flex-1">
-              <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
-                <Shield className="w-6 h-6 text-[#e60000]" />
+            <div className="p-8 space-y-8 relative z-10">
+              <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
+                <Shield className="text-[#e60000]" size={24} />
                 LOCKOUT POLICY
               </h3>
-
+              
               <div className="space-y-6">
-                <div className="space-y-3">
+                {/* Threshold Slider */}
+                <div className="space-y-2">
                   <div className="flex justify-between items-end">
-                    <p className="text-[13px] font-main font-bold text-white uppercase">Failed attempts threshold</p>
-                    <span className="text-xl font-main font-bold text-[#e60000]">
-                      {settings.lockoutThreshold} <span className="text-[9px] font-mono text-[#737373]">ATTEMPTS</span>
-                    </span>
+                    <p className="text-[13px] font-bold text-[#e5e2e1]/80">FAILED_ATTEMPTS_THRESHOLD</p>
+                    <span className="text-[#e60000] font-bold text-xl">{settings.lockoutThreshold}</span>
                   </div>
-                  <div className="h-6 relative flex items-center">
-                    <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
-                       <div 
-                         className="h-full bg-[#e60000] transition-all"
-                         style={{ width: `${(settings.lockoutThreshold / 10) * 100}%` }}
-                       />
+                  <div className="h-6 relative overflow-hidden flex items-center">
+                    <div className="h-2 w-full bg-[#353534]/50 relative">
+                      <div 
+                        className="h-full bg-[#e60000] transition-all duration-300 shadow-[0_0_10px_rgba(230,0,0,0.5)]" 
+                        style={{ width: `${(settings.lockoutThreshold / 10) * 100}%` }}
+                      />
                     </div>
                     <input 
-                      type="range"
-                      min="1"
-                      max="10"
-                      step="1"
+                      type="range" min="1" max="10" 
                       value={settings.lockoutThreshold}
-                      onChange={(e) => {
-                        handleUpdateSetting({ lockoutThreshold: parseInt(e.target.value) });
-                      }}
-                      onMouseEnter={() => playSound('hover')}
+                      onChange={(e) => handleUpdateSetting({ lockoutThreshold: parseInt(e.target.value) })}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                {/* Timer Slider */}
+                <div className="space-y-2">
                   <div className="flex justify-between items-end">
-                    <p className="text-[13px] font-main font-bold text-white uppercase">Auto-lock timer</p>
-                    <span className="text-xl font-main font-bold text-[#e60000]">
-                      {settings.autoLockTimer}:00
-                    </span>
+                    <p className="text-[13px] font-bold text-[#e5e2e1]/80">AUTO_LOCK_TIMER</p>
+                    <span className="text-[#e60000] font-bold text-xl">{settings.autoLockTimer}:00</span>
                   </div>
-                  <div className="h-6 relative flex items-center">
-                    <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
-                       <div 
-                         className="h-full bg-[#e60000] transition-all"
-                         style={{ width: `${(settings.autoLockTimer / 60) * 100}%` }}
-                       />
-                    </div>
+                  <div className="h-2 w-full bg-[#353534]/50 relative">
+                    <div 
+                      className="h-full bg-[#e60000] transition-all duration-300" 
+                      style={{ width: `${(settings.autoLockTimer / 60) * 100}%` }}
+                    />
                     <input 
-                      type="range"
-                      min="5"
-                      max="60"
-                      step="5"
+                      type="range" min="5" max="60" step="5"
                       value={settings.autoLockTimer}
-                      onChange={(e) => {
-                        handleUpdateSetting({ autoLockTimer: parseInt(e.target.value) });
-                      }}
-                      onMouseEnter={() => playSound('hover')}
+                      onChange={(e) => handleUpdateSetting({ autoLockTimer: parseInt(e.target.value) })}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                   </div>
-                  <p className="text-[9px] font-mono text-[#737373] italic">Recommended: 05:00 - 30:00</p>
+                  <p className="text-[9px] font-mono text-[#e5e2e1]/30">Recommended: [05:00 - 30:00]</p>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 02 // SIGNAL_PROTOCOL */}
-          <div className="bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden flex flex-col">
-            <div className="bg-[#1f1f22]/50 p-3 border-b border-[#353534]/30">
-              <span className="text-[10px] font-mono text-[#737373] tracking-[1px]">02 // SIGNAL_PROTOCOL</span>
+          {/* Section: Notifications */}
+          <section className="bg-[#0e0e0e] border border-[#353534] flex flex-col">
+            <div className="bg-[#353534] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
+              02 // Signal_Protocol
             </div>
-            <div className="p-8 space-y-8 flex-1">
-              <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
-                <Bell className="w-6 h-6 text-[#e60000]" />
+            <div className="p-8 space-y-8">
+              <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
+                <Bell className="text-[#e60000]" size={24} />
                 NOTIFICATIONS
               </h3>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-[#1f1f22]/30 border border-[#353534]/20 rounded-sm">
+                {/* Push Alerts Toggle */}
+                <div className="flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 rounded-sm">
                   <div className="space-y-1">
-                    <p className="text-[13px] font-main font-bold text-white uppercase">Push alerts</p>
-                    <p className="text-[9px] font-mono text-[#737373] uppercase">System broadcast to device</p>
+                    <p className="text-[13px] font-bold">PUSH_ALERTS</p>
+                    <p className="text-[9px] font-mono text-[#e5e2e1]/30 uppercase tracking-tighter">System broadcast to device</p>
                   </div>
                   <button 
                     onClick={() => handleUpdateSetting({ pushAlerts: !settings.pushAlerts })}
-                    className={`w-12 h-6 rounded-sm transition-all relative ${settings.pushAlerts ? 'bg-[#e60000]' : 'bg-[#2a2a2e]'}`}
+                    className={`w-12 h-6 rounded-sm transition-all relative ${settings.pushAlerts ? 'bg-[#e60000]' : 'bg-[#353534]'}`}
                   >
                     <div className={`absolute top-1 w-4 h-4 bg-white transition-all ${settings.pushAlerts ? 'right-1' : 'left-1'}`} />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-[#1f1f22]/30 border border-[#353534]/20 rounded-sm">
+                {/* Sound Effects Toggle */}
+                <div className="flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 rounded-sm">
                   <div className="space-y-1">
-                    <p className="text-[13px] font-main font-bold text-white uppercase flex items-center gap-2">
-                       Sound effects
-                       <Volume2 className="w-3.5 h-3.5 opacity-50" />
-                    </p>
-                    <p className="text-[9px] font-mono text-[#737373] uppercase">Auditory feedback loops</p>
+                    <p className="text-[13px] font-bold">SOUND_EFFECTS</p>
+                    <p className="text-[9px] font-mono text-[#e5e2e1]/30 uppercase tracking-tighter">Auditory feedback loops</p>
                   </div>
                   <button 
                     onClick={() => handleUpdateSetting({ soundEffects: !settings.soundEffects })}
-                    className={`w-12 h-6 rounded-sm transition-all relative ${settings.soundEffects ? 'bg-slate-600' : 'bg-[#2a2a2e]'}`}
+                    className={`w-12 h-6 rounded-sm transition-all relative ${settings.soundEffects ? 'bg-white/40' : 'bg-[#353534]'}`}
                   >
                     <div className={`absolute top-1 w-4 h-4 bg-white transition-all ${settings.soundEffects ? 'right-1' : 'left-1'}`} />
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 03 // CORE_AESTHETICS */}
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12 lg:col-span-2 bg-[#131313] border border-[#353534]/30">
+          {/* Section: Theme/Aesthetics & Font */}
+          <section className="bg-[#0e0e0e] border border-[#353534] xl:col-span-2 flex flex-col">
+            <div className="bg-[#353534] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
+              03 // Core_Aesthetics
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 p-8 gap-16">
+              {/* Theme Selection */}
               <div className="space-y-8">
-                <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
-                  <Palette className="w-6 h-6 text-[#e60000]" />
-                  THEME ENGINE
+                <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
+                  <Palette className="text-[#e60000]" size={24} />
+                  THEME_ENGINE
                 </h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1">
                   {(['crimson', 'void', 'matrix'] as const).map((theme) => (
                     <button
                       key={theme}
                       onClick={() => handleUpdateSetting({ theme })}
-                      onMouseEnter={() => playSound('hover')}
-                      className={`p-3 border transition-all text-center ${
+                      className={`p-4 border font-mono text-[10px] uppercase tracking-widest transition-all ${
                         settings.theme === theme 
-                        ? 'border-[#e60000] bg-[#e60000]/10 text-white' 
-                        : 'border-[#353534] text-[#737373] hover:border-white/30'
+                        ? 'bg-[#e60000] border-[#e60000] text-white' 
+                        : 'bg-[#131313] border-[#353534] text-[#e5e2e1]/40 hover:border-white/20'
                       }`}
                     >
-                      <span className="text-[10px] font-mono uppercase tracking-[1px]">{theme}</span>
+                      {theme}
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Font Configuration */}
               <div className="space-y-8">
-                <h3 className="text-lg font-main font-bold text-white uppercase flex items-center gap-3">
-                  <Type className="w-6 h-6 text-[#e60000]" />
-                  FONT CONFIG
+                <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
+                  <Type className="text-[#e60000]" size={24} />
+                  FONT_CONFIG
                 </h3>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-end">
-                    <p className="text-[10px] font-mono text-[#737373] uppercase">Display Scale</p>
-                    <span className="text-xl font-main font-bold text-white">{settings.fontSize}%</span>
+                  <div className="flex justify-between items-end border-b border-[#353534] pb-2">
+                    <p className="text-[13px] font-bold">DISPLAY_SCALE</p>
+                    <span className="text-[#e60000] font-bold text-xl">{settings.fontSize}%</span>
                   </div>
-                  <div className="h-6 relative flex items-center">
-                    <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
-                       <div 
-                         className="h-full bg-white transition-all"
-                         style={{ width: `${((settings.fontSize - 80) / 70) * 100}%` }}
-                       />
-                    </div>
+                  <div className="h-0.5 w-full bg-[#353534] relative">
+                    <div 
+                      className="absolute top-[-4px] h-3 w-3 bg-[#e60000] rounded-full shadow-[0_0_10px_rgba(230,0,0,0.5)] cursor-pointer" 
+                      style={{ left: `${((settings.fontSize - 80) / 70) * 100}%` }}
+                    />
                     <input 
-                      type="range"
-                      min="80"
-                      max="150"
-                      step="5"
+                      type="range" min="80" max="150" step="5"
                       value={settings.fontSize}
                       onChange={(e) => handleUpdateSetting({ fontSize: parseInt(e.target.value) })}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                   </div>
+                  <p className="text-[11px] font-mono text-[#e5e2e1]/30 uppercase pt-2 bg-[#131313]/50 p-4">
+                    NOTE: This adjustment modifies the interface dimension multipliers.
+                  </p>
                 </div>
               </div>
-          </div>
+            </div>
+          </section>
 
-          {/* 04 // DATA_MANAGEMENT */}
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-             <button 
-               onClick={() => { playSound('transition'); onNavigate('backup'); }}
-               className="group flex flex-col items-start p-8 bg-[#1f1f22]/30 border border-[#353534]/20 hover:border-[#e60000]/50 transition-all text-left"
-             >
-                <Database className="w-8 h-8 text-[#adaaad] mb-6 group-hover:text-[#e60000] transition-colors" />
-                <div className="space-y-1">
-                  <span className="text-[13px] font-main font-bold text-white uppercase">Vault_Backup_Control</span>
-                  <span className="text-[9px] font-mono text-[#737373] uppercase tracking-[1px]">Access local redundancy protocols</span>
-                </div>
-             </button>
-
-             <button 
-               onClick={() => { playSound('transition'); onNavigate('password'); }}
-               className="group flex flex-col items-start p-8 bg-[#1f1f22]/30 border border-[#353534]/20 hover:border-[#e60000]/50 transition-all text-left"
-             >
-                <Key className="w-8 h-8 text-[#adaaad] mb-6 group-hover:text-[#e60000] transition-colors" />
-                <div className="space-y-1">
-                  <span className="text-[13px] font-main font-bold text-white uppercase">Security_Key_Rotation</span>
-                  <span className="text-[9px] font-mono text-[#737373] uppercase tracking-[1px]">Modify administrative credentials</span>
-                </div>
-             </button>
-
-             <button 
-                onClick={() => { playSound('transition'); onNavigate('version'); }}
-                className="group flex flex-col items-start p-8 bg-[#131313] border border-[#353534]/20 hover:bg-[#1f1f22] transition-all text-left"
-             >
-                <Info className="w-8 h-8 text-[#737373] mb-6" />
-                <div className="space-y-1">
-                  <span className="text-[13px] font-main font-bold text-white uppercase tracking-tight">System_Manifest</span>
-                  <span className="text-[9px] font-mono text-[#737373] uppercase">Build_V2.0.4-STABLE // RED_CORE</span>
-                </div>
-             </button>
-
-             <button 
-                className="group flex flex-col items-start p-8 bg-[#131313] border border-[#353534]/20 hover:bg-[#1f1f22] transition-all text-left"
-             >
-                <User className="w-8 h-8 text-[#737373] mb-6" />
-                <div className="space-y-1">
-                  <span className="text-[13px] font-main font-bold text-white uppercase tracking-tight">Active_Operator</span>
-                  <span className="text-[9px] font-mono text-[#737373] uppercase">Admin_clearance_Level_1</span>
-                </div>
-             </button>
-          </div>
-
-          <div className="lg:col-span-2 pt-12 space-y-6">
-             <div className="flex items-center gap-4 text-[#737373]">
-                <div className="h-[1px] flex-1 bg-[#1f1f22]" />
-                <span className="text-[10px] font-mono uppercase tracking-[2px]">Advanced_Threat_Nullification</span>
-                <div className="h-[1px] flex-1 bg-[#1f1f22]" />
-             </div>
-             
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button className="flex items-center justify-between p-6 border border-[#353534]/30 bg-red-600/5 hover:bg-red-600/10 transition-all group">
-                   <div className="flex items-center gap-4">
-                      <Trash2 className="text-[#e60000] w-5 h-5" />
-                      <div className="text-left">
-                        <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider">Empty_Trash_Buffer</p>
-                        <p className="text-[9px] font-mono text-[#737373] uppercase">Irreversible_Redaction</p>
+          {/* Section: Shortcuts */}
+          <section className="bg-[#0e0e0e] border border-[#353534] flex flex-col">
+            <div className="bg-[#353534] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
+              04 // Control_Binding
+            </div>
+            <div className="p-8 space-y-8 flex-1 pb-40">
+              <h3 className="text-xl font-bold tracking-tight uppercase">SHORTCUTS</h3>
+              <div className="space-y-2">
+                 {[
+                   { label: 'Save Snippet', keys: ['⌘', 'S'] },
+                   { label: 'New Snippet', keys: ['⌘', 'N'] },
+                   { label: 'Search All', keys: ['⌘', 'F'] },
+                 ].map((s, idx) => (
+                   <div key={idx} className="flex items-center justify-between py-2 border-b border-[#353534]/20 group">
+                      <span className="text-[#e5e2e1]/60 text-[12px] uppercase font-mono group-hover:text-white transition-colors">{s.label}</span>
+                      <div className="flex gap-1">
+                        {s.keys.map((k, kidx) => (
+                          <span key={kidx} className="bg-[#131313] border border-[#353534] px-1.5 py-0.5 rounded-sm text-[10px] text-[#e5e2e1]/80 min-w-[20px] text-center">{k}</span>
+                        ))}
                       </div>
                    </div>
-                   <ChevronRight className="w-4 h-4 text-[#e60000] group-hover:translate-x-1 transition-transform" />
+                 ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Section: Account */}
+          <section className="bg-[#0e0e0e] border border-[#353534] flex flex-col">
+            <div className="bg-[#353534] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
+              05 // Authentication
+            </div>
+            <div className="p-8 space-y-4">
+              <h3 className="text-xl font-bold tracking-tight uppercase">ACCOUNT</h3>
+              
+              <div className="space-y-2">
+                <button 
+                  onClick={() => { playSound('transition'); onNavigate('password'); }}
+                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    <Key size={18} className="text-[#e5e2e1]/40" />
+                    <span className="text-[12px] font-bold uppercase tracking-tight">CHANGE MASTER PASSWORD</span>
+                  </div>
+                  <ChevronRight size={14} className="text-[#e5e2e1]/20" />
+                </button>
+
+                <button 
+                  onClick={() => { playSound('transition'); onNavigate('backup'); }}
+                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    <Database size={18} className="text-[#e5e2e1]/40" />
+                    <span className="text-[12px] font-bold uppercase tracking-tight">LOCAL BACKUP / RESTORE</span>
+                  </div>
+                  <ChevronRight size={14} className="text-[#e5e2e1]/20" />
+                </button>
+
+                <button 
+                  onClick={() => { playSound('transition'); onNavigate('version'); }}
+                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    <Info size={18} className="text-[#e5e2e1]/40" />
+                    <span className="text-[12px] font-bold uppercase tracking-tight">VERSION_INFO_v.4.0.2</span>
+                  </div>
+                  <ChevronRight size={14} className="text-[#e5e2e1]/20" />
                 </button>
 
                 <button 
                   onClick={() => { playSound('error'); onNavigate('logout'); }}
-                  className="flex items-center justify-between p-6 border border-[#353534]/30 bg-white/5 hover:bg-white/10 transition-all group"
+                  className="w-full flex items-center justify-between p-4 bg-[#e60000]/5 border border-[#e60000]/20 hover:bg-[#e60000]/10 transition-all text-left group"
                 >
-                   <div className="flex items-center gap-4">
-                      <LogOut className="text-white w-5 h-5" />
-                      <div className="text-left">
-                        <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider">Terminate_Session</p>
-                        <p className="text-[9px] font-mono text-[#737373] uppercase">Drop_All_Data_Links</p>
-                      </div>
-                   </div>
-                   <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                  <div className="flex items-center gap-4">
+                    <LogOut size={18} className="text-[#e60000]" />
+                    <span className="text-[12px] font-bold uppercase tracking-tight text-[#e60000]">LOGOUT</span>
+                  </div>
+                  <Activity size={14} className="text-[#e60000] animate-pulse" />
                 </button>
-             </div>
-          </div>
+              </div>
+            </div>
+          </section>
 
         </div>
 
+        {/* Footer Meta */}
+        <footer className="mt-12 pt-8 border-t border-white/5 flex items-center justify-between">
+           <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                 <Lock size={12} className="text-[#e60000]" />
+                 <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">CRYPTO_CORE: v4</span>
+              </div>
+              <div className="flex items-center gap-2">
+                 <MessageSquare size={12} className="text-[#e5e2e1]/40" />
+                 <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">LATENCY: 12ms</span>
+              </div>
+           </div>
+           <p className="text-[9px] font-mono text-[#e5e2e1]/20 tracking-tighter uppercase whitespace-nowrap">
+             © 2023 CODE_CORP // ALL RIGHTS REDACTED.
+           </p>
+        </footer>
       </div>
+
+      {/* Top Header Actions (Absolute Positioning for Top Right) */}
+      <div className="absolute top-0 right-0 p-4 flex gap-4 z-50">
+        <button onMouseEnter={() => playSound('hover')} className="p-2 text-[#e5e2e1]/40 hover:text-white transition-colors">
+          <Activity size={18} />
+        </button>
+        <button onMouseEnter={() => playSound('hover')} className="p-2 text-[#e60000] hover:text-[#ff0000] transition-colors">
+          <User size={18} />
+        </button>
+        <button 
+          onClick={() => { playSound('click'); onBack(); }}
+          onMouseEnter={() => playSound('hover')}
+          className="p-2 text-[#e5e2e1]/40 hover:text-white transition-colors"
+        >
+          <SettingsIcon size={18} />
+        </button>
+      </div>
+
     </div>
   );
 };
