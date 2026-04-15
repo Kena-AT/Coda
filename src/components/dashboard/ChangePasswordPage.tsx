@@ -125,7 +125,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
             <div className="space-y-2">
               <span className="text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">Identity Management</span>
               <h1 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">
-                Change Master<br />Key
+                Change Master Key
               </h1>
             </div>
 
