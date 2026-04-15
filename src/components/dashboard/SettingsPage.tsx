@@ -285,7 +285,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               
               <div className="space-y-2">
                 <button 
-                  onClick={() => { playSound('transition'); onNavigate('password'); }}
+                  onClick={() => { playSound('transition'); onNavigate('change-password'); }}
                   className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
                 >
                   <div className="flex items-center gap-4">
@@ -318,7 +318,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                 </button>
 
                 <button 
-                  onClick={() => { playSound('error'); onNavigate('logout'); }}
+                  onClick={() => { playSound('error'); onNavigate('logout-confirm'); }}
                   className="w-full flex items-center justify-between p-4 bg-[#e60000]/5 border border-[#e60000]/20 hover:bg-[#e60000]/10 transition-all text-left group"
                 >
                   <div className="flex items-center gap-4">
