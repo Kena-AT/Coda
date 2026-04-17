@@ -196,7 +196,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                   THEME_ENGINE
                 </h3>
                 <div className="grid grid-cols-3 gap-1">
-                  {(['crimson', 'void', 'matrix'] as const).map((theme) => (
+                  {(['crimson', 'void', 'matrix', 'glacier'] as const).map((theme) => (
                     <button
                       key={theme}
                       onClick={() => handleUpdateSetting({ theme })}

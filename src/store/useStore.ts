@@ -40,7 +40,7 @@ export interface Settings {
   autoLockTimer: number; // minutes
   pushAlerts: boolean;
   soundEffects: boolean;
-  theme: 'crimson' | 'void' | 'matrix';
+  theme: 'crimson' | 'void' | 'matrix' | 'glacier';
   fontSize: number;
   shortcuts: {
     copy: string;
