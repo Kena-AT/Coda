@@ -42,6 +42,16 @@
   --accent-secondary: #33ff6e;
 }
 
+[data-theme='glacier'] {
+  --bg-primary: #000a0f;
+  --bg-secondary: #00151f;
+  --bg-tertiary: #001f2e;
+  --accent: #00f2ff;
+  --accent-glow: rgba(0, 242, 255, 0.4);
+  --border: #002a35;
+  --accent-secondary: #70f9ff;
+}
+
 * {
   margin: 0;
   padding: 0;
