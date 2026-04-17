@@ -64,13 +64,13 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0e0e10] p-6 selection:bg-[var(--accent)] selection:text-white overflow-hidden relative">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)] p-6 selection:bg-[var(--accent)] selection:text-white overflow-hidden relative">
       <ParallaxBackground />
 
-      <main className="w-full max-w-[896px] h-[741px] flex bg-[#19191c]/80 backdrop-blur-xl border border-[var(--border)] shadow-[0_25px_43px_-12px_rgba(0,0,0,0.25)] relative z-10 overflow-hidden">
+      <main className="w-full max-w-[896px] h-[741px] flex bg-[var(--bg-secondary)]/80 backdrop-blur-xl border border-[var(--border)] shadow-[0_25px_43px_-12px_rgba(0,0,0,0.25)] relative z-10 overflow-hidden">
         
         {/* Left Side: Visual Anchor */}
-        <div className="hidden md:flex w-[373px] bg-[#1f1f22] p-10 flex-col justify-between relative overflow-hidden">
+        <div className="hidden md:flex w-[373px] bg-[var(--bg-tertiary)] p-10 flex flex-col justify-between relative overflow-hidden">
           {/* Abstract technological background representation */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#1f1f22] to-transparent opacity-50 z-0" />
           
@@ -91,7 +91,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
         </div>
 
         {/* Right Side: Interaction Canvas */}
-        <div className="flex-1 bg-[#0e0e10] p-[64px] flex flex-col relative">
+        <div className="flex-1 bg-[var(--bg-primary)] p-[64px] flex flex-col relative">
           
           {/* Back Button */}
           <button 

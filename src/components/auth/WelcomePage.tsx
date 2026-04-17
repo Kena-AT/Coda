@@ -12,7 +12,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
     <div className="relative min-h-screen flex flex-col bg-[var(--bg-primary)] text-[#ffffff] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
 
       {/* Header - Top Navigation Bar */}
-      <header className="absolute top-0 left-0 w-full h-[56px] bg-[#19191c] border-b border-[var(--border)] px-6 flex items-center justify-between z-50">
+      <header className="absolute top-0 left-0 w-full h-[56px] bg-[var(--bg-secondary)] border-b border-[var(--border)] px-6 flex items-center justify-between z-50">
         <div className="text-[var(--accent)] font-main font-bold text-[14px] tracking-[2px]">CODA</div>
       </header>
 
