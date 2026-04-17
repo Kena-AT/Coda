@@ -91,13 +91,13 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                <div className="bg-[#1f1f22] p-2 border-b border-[#353534] flex items-center justify-between">
                  <span className="text-[10px] font-mono text-[#737373]">Security_Token_V4</span>
                  <div className="flex gap-1">
-                   <div className="w-1 h-1 bg-[#e60000]" />
-                   <div className="w-1 h-3 bg-[#e60000]" />
+                   <div className="w-1 h-1 bg-[var(--accent)]" />
+                   <div className="w-1 h-3 bg-[var(--accent)]" />
                  </div>
                </div>
                <div className="p-8 aspect-square flex items-center justify-center bg-[#0a0a0c]">
                   <div className="w-40 h-40 bg-[#1f1f22] border border-[#353534] flex items-center justify-center relative">
-                    <Shield className="w-12 h-12 text-[#e60000]" />
+                    <Shield className="w-12 h-12 text-[var(--accent)]" />
                     <div className="absolute inset-0 border-[8px] border-black/80" />
                   </div>
                </div>
@@ -123,7 +123,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
           {/* Right Panel: Form */}
           <div className="flex-1 space-y-12 pb-12">
             <div className="space-y-2">
-              <span className="text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">Identity Management</span>
+              <span className="text-[var(--accent)] font-mono text-[10px] tracking-[2px] uppercase">Identity Management</span>
               <h1 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">
                 Change Master Key
               </h1>
@@ -134,7 +134,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
               {/* 01 Current Key */}
               <div className="space-y-4 relative">
                 <div className="flex items-center gap-4">
-                  <span className="text-[#e60000] font-mono text-[11px]">01</span>
+                  <span className="text-[var(--accent)] font-mono text-[11px]">01</span>
                   <label className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">Current Master Key</label>
                 </div>
                 <div className="relative group">
@@ -160,7 +160,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
               {/* 02 New Key */}
               <div className="space-y-4 relative">
                 <div className="flex items-center gap-4">
-                  <span className="text-[#e60000] font-mono text-[11px]">02</span>
+                  <span className="text-[var(--accent)] font-mono text-[11px]">02</span>
                   <label className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">New Encryption Key</label>
                 </div>
                 <div className="relative">
@@ -185,13 +185,13 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                 <div className="space-y-2 pt-4">
                    <div className="flex justify-between items-end">
                       <span className="text-[9px] font-mono text-[#737373] uppercase">Entropy Strength</span>
-                      <span className={`text-[10px] font-mono font-bold uppercase transition-colors ${strength > 75 ? 'text-[#e60000]' : 'text-[#737373]'}`}>
+                      <span className={`text-[10px] font-mono font-bold uppercase transition-colors ${strength > 75 ? 'text-[var(--accent)]' : 'text-[#737373]'}`}>
                          {strength === 100 ? 'OPTIMAL' : strength > 50 ? 'SECURE' : 'MINIMUM'}
                       </span>
                    </div>
                    <div className="h-0.5 w-full bg-[#1f1f22] overflow-hidden relative">
                       <div 
-                        className="h-full bg-[#e60000] transition-all duration-500" 
+                        className="h-full bg-[var(--accent)] transition-all duration-500" 
                         style={{ width: `${strength}%` }} 
                       />
                       <div className="absolute top-0 right-1/4 h-full w-[1px] bg-red-950" />
@@ -203,7 +203,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
               {/* 03 Confirm Key */}
               <div className="space-y-4 relative">
                 <div className="flex items-center gap-4">
-                  <span className="text-[#e60000] font-mono text-[11px]">03</span>
+                  <span className="text-[var(--accent)] font-mono text-[11px]">03</span>
                   <label className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">Confirm Key</label>
                 </div>
                 <input 
@@ -222,7 +222,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                   onClick={() => { playSound('click'); handleUpdate(); }}
                   onMouseEnter={() => playSound('hover')}
                   disabled={loading}
-                  className="px-10 py-5 bg-[#e60000] hover:bg-[#ff0000] text-white font-main font-bold uppercase text-[13px] tracking-[1px] flex items-center gap-3 transition-all disabled:opacity-50"
+                  className="px-10 py-5 bg-[var(--accent)] hover:bg-[#ff0000] text-white font-main font-bold uppercase text-[13px] tracking-[1px] flex items-center gap-3 transition-all disabled:opacity-50"
                 >
                    {loading ? <RefreshCcw className="w-5 h-5 animate-spin" /> : <Lock className="w-5 h-5" />}
                    RE-KEY VAULT

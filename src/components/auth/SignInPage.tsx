@@ -64,7 +64,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0e0e10] p-6 selection:bg-[#e60000] selection:text-white overflow-hidden relative">
+    <div className="min-h-screen flex items-center justify-center bg-[#0e0e10] p-6 selection:bg-[var(--accent)] selection:text-white overflow-hidden relative">
       <ParallaxBackground />
 
       <main className="w-full max-w-[896px] h-[741px] flex bg-[#19191c]/80 backdrop-blur-xl border border-[#222226] shadow-[0_25px_43px_-12px_rgba(0,0,0,0.25)] relative z-10 overflow-hidden">
@@ -75,7 +75,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
           <div className="absolute inset-0 bg-gradient-to-b from-[#1f1f22] to-transparent opacity-50 z-0" />
           
           <div className="z-10 w-full">
-            <h1 className="text-4xl font-main font-bold text-[#e60000] tracking-[-1.8px] mb-2 leading-none cursor-pointer" onClick={onBack}>CODA</h1>
+            <h1 className="text-4xl font-main font-bold text-[var(--accent)] tracking-[-1.8px] mb-2 leading-none cursor-pointer" onClick={onBack}>CODA</h1>
             <p className="text-[#adaaad] font-main text-xs tracking-[1.2px] uppercase opacity-70">Sovereign Terminal Access</p>
           </div>
 
@@ -96,7 +96,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
           {/* Back Button */}
           <button 
             onClick={onBack}
-            className="absolute top-8 right-8 text-[#adaaad] hover:text-[#e60000] transition-colors flex items-center gap-2 group"
+            className="absolute top-8 right-8 text-[#adaaad] hover:text-[var(--accent)] transition-colors flex items-center gap-2 group"
           >
             <span className="text-[10px] font-main tracking-[2px] uppercase opacity-0 group-hover:opacity-100 transition-opacity">Return_to_Central</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -108,13 +108,13 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
           <div className="w-full flex justify-between items-start mb-10">
             <div className="flex flex-col gap-2">
               <h2 className="text-3xl font-main font-bold text-[#fffbfe] tracking-[-0.75px] uppercase">AUTH_INIT</h2>
-              <div className="w-12 h-1 bg-[#e60000]" />
+              <div className="w-12 h-1 bg-[var(--accent)]" />
             </div>
             <div className="text-right">
               <span className="text-[#adaaad] font-main text-[10px] block mb-1">Local Node:</span>
               <button
                 onClick={handleCopyAddress}
-                className="group flex items-center gap-2 text-[#e60000] font-main text-[12px] hover:text-[#ff3333] transition-colors"
+                className="group flex items-center gap-2 text-[var(--accent)] font-main text-[12px] hover:text-[#ff3333] transition-colors"
                 title={copied ? 'Copied!' : 'Click to copy address'}
               >
                 <span className={copied ? 'text-[#f3ffca]' : ''}>
@@ -156,7 +156,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-transparent border-b border-[#48474a] px-3 py-3 mt-4 text-[#48474a] outline-none focus:border-[#e60000] focus:text-white transition-colors font-main text-[14px]"
+                className="w-full bg-transparent border-b border-[#48474a] px-3 py-3 mt-4 text-[#48474a] outline-none focus:border-[var(--accent)] focus:text-white transition-colors font-main text-[14px]"
                 required
               />
             </div>
@@ -169,7 +169,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                   type={showPassword ? "text" : "password"} 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full bg-transparent border-b px-3 py-3 mt-4 outline-none transition-colors font-main text-[14px] pr-10 ${error ? 'border-red-600 text-red-500' : 'border-[#48474a] text-[#48474a] focus:border-[#e60000] focus:text-white'}`}
+                  className={`w-full bg-transparent border-b px-3 py-3 mt-4 outline-none transition-colors font-main text-[14px] pr-10 ${error ? 'border-red-600 text-red-500' : 'border-[#48474a] text-[#48474a] focus:border-[var(--accent)] focus:text-white'}`}
                   required
                 />
                 {error && (
@@ -180,7 +180,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className={`absolute right-0 bottom-3 transition-colors ${error ? 'text-red-600' : 'text-[#48474a] hover:text-[#e60000]'}`}
+                  className={`absolute right-0 bottom-3 transition-colors ${error ? 'text-red-600' : 'text-[#48474a] hover:text-[var(--accent)]'}`}
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -200,8 +200,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                 onClick={() => setRememberMe(!rememberMe)}
                 className={`w-5 h-5 rounded flex items-center justify-center transition-all ${
                   rememberMe
-                    ? 'bg-[#e60000] border-2 border-[#e60000] shadow-[0_0_10px_rgba(230,0,0,0.4)]'
-                    : 'bg-[#222226] border-2 border-[#e60000]/60 hover:border-[#e60000] hover:bg-[#2a2a2e]'
+                    ? 'bg-[var(--accent)] border-2 border-[var(--accent)] shadow-[0_0_10px_rgba(230,0,0,0.4)]'
+                    : 'bg-[#222226] border-2 border-[var(--accent)]/60 hover:border-[var(--accent)] hover:bg-[#2a2a2e]'
                 }`}
               >
                 {rememberMe && <Check className="w-3.5 h-3.5 text-white" />}
@@ -215,7 +215,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
               <button 
                 type="submit" 
                 disabled={loading}
-                className="relative w-full bg-[#e60000] text-[#006165] flex items-center justify-center py-4 font-main font-bold text-[14px] tracking-[2.8px] hover:shadow-[0_0_35px_rgba(0,244,254,0.1)] transition-all uppercase"
+                className="relative w-full bg-[var(--accent)] text-[#006165] flex items-center justify-center py-4 font-main font-bold text-[14px] tracking-[2.8px] hover:shadow-[0_0_35px_rgba(0,244,254,0.1)] transition-all uppercase"
               >
                 {loading ? 'VERIFYING...' : 'SIGN IN'}
               </button>

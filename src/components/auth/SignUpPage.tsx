@@ -43,7 +43,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
         {/* Back Button */}
         <button 
           onClick={onBack}
-          className="absolute top-6 right-6 text-[#adaaad] hover:text-[#e60000] transition-colors flex items-center gap-2 group"
+          className="absolute top-6 right-6 text-[#adaaad] hover:text-[var(--accent)] transition-colors flex items-center gap-2 group"
         >
           <span className="text-[9px] font-main tracking-[2px] uppercase opacity-0 group-hover:opacity-100 transition-opacity">Abort_Session</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,7 +55,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
         <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#00f5ff]/50 to-[#ff59e3]/50" />
 
         <div className="w-full flex flex-col items-center mb-10 text-center">
-          <h1 className="text-4xl font-main font-bold text-[#e60000] tracking-[-2px] mb-2">CODA</h1>
+          <h1 className="text-4xl font-main font-bold text-[var(--accent)] tracking-[-2px] mb-2">CODA</h1>
           <p className="text-[#adaaad] font-main text-[12px] tracking-[2.4px] uppercase">Establish Secure Terminal Session</p>
         </div>
 
@@ -64,14 +64,14 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
           <div className="space-y-2">
             <div className="flex justify-between items-center mb-1">
               <label className="text-[12px] tracking-[1.2px] text-[#adaaad] font-main uppercase">Identity_Handle</label>
-              <span className="text-[10px] text-[#e60000]/50 uppercase">Required</span>
+              <span className="text-[10px] text-[var(--accent)]/50 uppercase">Required</span>
             </div>
             <input 
               type="text" 
               placeholder="e.g. root_admin"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-transparent border-b border-[#48474a] px-0 py-3 text-white outline-none focus:border-[#e60000] transition-colors font-mono text-sm placeholder:text-[#48474a]/80"
+              className="w-full bg-transparent border-b border-[#48474a] px-0 py-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-mono text-sm placeholder:text-[#48474a]/80"
               required
             />
           </div>
@@ -84,13 +84,13 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
               placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-transparent border-b border-[#48474a] px-0 py-3 outline-none focus:border-[#e60000] transition-colors text-white font-mono text-sm placeholder:text-[#48474a]/80 pr-10"
+              className="w-full bg-transparent border-b border-[#48474a] px-0 py-3 outline-none focus:border-[var(--accent)] transition-colors text-white font-mono text-sm placeholder:text-[#48474a]/80 pr-10"
               required
             />
             <button
                type="button"
                onClick={() => setShowPassword(!showPassword)}
-               className="absolute right-0 bottom-3 text-[#48474a] hover:text-[#e60000] transition-colors"
+               className="absolute right-0 bottom-3 text-[#48474a] hover:text-[var(--accent)] transition-colors"
                tabIndex={-1}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -125,7 +125,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-[#e60000] text-[#006165] flex items-center justify-center py-4 font-bold text-[14px] tracking-[2.8px] shadow-[0_0_20px_rgba(0,244,254,0.1)] hover:shadow-[0_0_30px_rgba(0,244,254,0.2)] transition-all uppercase"
+              className="w-full bg-[var(--accent)] text-[#006165] flex items-center justify-center py-4 font-bold text-[14px] tracking-[2.8px] shadow-[0_0_20px_rgba(0,244,254,0.1)] hover:shadow-[0_0_30px_rgba(0,244,254,0.2)] transition-all uppercase"
             >
               {loading ? 'INIT...' : 'SIGN UP'}
             </button>

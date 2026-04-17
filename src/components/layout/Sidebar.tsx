@@ -44,8 +44,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
       {/* Logo Section */}
       <div className="px-6 mb-12">
         <div className="flex items-center gap-3 mb-1 cursor-pointer" onMouseEnter={() => playSound('hover')}>
-          <div className="w-4 h-4 bg-[#e60000]" />
-          <h1 className="text-[13px] font-main font-bold text-[#e60000] tracking-[1px] uppercase">TERMINAL_SYSTEM</h1>
+          <div className="w-4 h-4 bg-[var(--accent)]" />
+          <h1 className="text-[13px] font-main font-bold text-[var(--accent)] tracking-[1px] uppercase">TERMINAL_SYSTEM</h1>
         </div>
         <p className="text-[#adaaad] font-main text-[9px] tracking-[1px] uppercase opacity-60 ml-7">v2.0.4-STABLE</p>
       </div>
@@ -60,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
             className={cn(
               "w-full flex items-center gap-4 px-4 py-3 transition-colors duration-200 group relative",
               activeTab === item.id 
-                ? "bg-[#e60000] text-white" 
+                ? "bg-[var(--accent)] text-white" 
                 : "text-[#adaaad] hover:text-white"
             )}
           >
@@ -78,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
         <button 
           onClick={() => { playSound('click'); onNewSnippet(); }}
           onMouseEnter={() => playSound('hover')}
-          className="w-full bg-[#e60000] text-white flex items-center justify-center gap-2 py-4 font-main font-bold text-[11px] tracking-[2px] uppercase hover:bg-[#ff0000] transition-colors"
+          className="w-full bg-[var(--accent)] text-white flex items-center justify-center gap-2 py-4 font-main font-bold text-[11px] tracking-[2px] uppercase hover:bg-[#ff0000] transition-colors"
         >
           <span>NEW_SNIPPET</span>
         </button>

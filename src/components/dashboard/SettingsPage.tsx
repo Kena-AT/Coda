@@ -65,7 +65,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
       <div className="max-w-6xl mx-auto p-12 relative flex flex-col z-10">
         
         {/* Header Section */}
-        <header className="mb-12 border-l-4 border-[#e60000] pl-6 space-y-2 relative">
+        <header className="mb-12 border-l-4 border-[var(--accent)] pl-6 space-y-2 relative">
           <button 
             onClick={() => { playSound('click'); onBack(); }}
             onMouseEnter={() => playSound('hover')}
@@ -75,7 +75,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
           </button>
           <p className="text-[10px] font-mono text-[#e5e2e1]/40 uppercase tracking-[3px]">System.Configuration.Active</p>
           <h1 className="text-5xl font-bold tracking-tighter text-[#e5e2e1]">APP_SETTINGS</h1>
-          <p className="text-[14px] font-mono text-[#e60000] uppercase">v4.0.2 // ENCRYPTION_STRENGTH: MAXIMUM</p>
+          <p className="text-[14px] font-mono text-[var(--accent)] uppercase">v4.0.2 // ENCRYPTION_STRENGTH: MAXIMUM</p>
         </header>
 
         {/* Content Grid */}
@@ -83,13 +83,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
           
           {/* Section: Lockout Policy */}
           <section className="bg-[#0e0e0e] border border-[#353534] flex flex-col relative overflow-hidden group">
-            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-[#e60000]/5 rotate-45 transform pointer-events-none" />
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-[var(--accent)]/5 rotate-45 transform pointer-events-none" />
             <div className="bg-[#353534] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
               01 // Security_Override
             </div>
             <div className="p-8 space-y-8 relative z-10">
               <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
-                <Shield className="text-[#e60000]" size={24} />
+                <Shield className="text-[var(--accent)]" size={24} />
                 LOCKOUT POLICY
               </h3>
               
@@ -98,12 +98,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
                     <p className="text-[13px] font-bold text-[#e5e2e1]/80">FAILED_ATTEMPTS_THRESHOLD</p>
-                    <span className="text-[#e60000] font-bold text-xl">{settings.lockoutThreshold}</span>
+                    <span className="text-[var(--accent)] font-bold text-xl">{settings.lockoutThreshold}</span>
                   </div>
                   <div className="h-6 relative overflow-hidden flex items-center">
                     <div className="h-2 w-full bg-[#353534]/50 relative">
                       <div 
-                        className="h-full bg-[#e60000] transition-all duration-300 shadow-[0_0_10px_rgba(230,0,0,0.5)]" 
+                        className="h-full bg-[var(--accent)] transition-all duration-300 shadow-[0_0_10px_rgba(230,0,0,0.5)]" 
                         style={{ width: `${(settings.lockoutThreshold / 10) * 100}%` }}
                       />
                     </div>
@@ -120,11 +120,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
                     <p className="text-[13px] font-bold text-[#e5e2e1]/80">AUTO_LOCK_TIMER</p>
-                    <span className="text-[#e60000] font-bold text-xl">{settings.autoLockTimer}:00</span>
+                    <span className="text-[var(--accent)] font-bold text-xl">{settings.autoLockTimer}:00</span>
                   </div>
                   <div className="h-2 w-full bg-[#353534]/50 relative">
                     <div 
-                      className="h-full bg-[#e60000] transition-all duration-300" 
+                      className="h-full bg-[var(--accent)] transition-all duration-300" 
                       style={{ width: `${(settings.autoLockTimer / 60) * 100}%` }}
                     />
                     <input 
@@ -147,7 +147,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
             </div>
             <div className="p-8 space-y-8">
               <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
-                <Bell className="text-[#e60000]" size={24} />
+                <Bell className="text-[var(--accent)]" size={24} />
                 NOTIFICATIONS
               </h3>
 
@@ -160,7 +160,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                   </div>
                   <button 
                     onClick={() => handleUpdateSetting({ pushAlerts: !settings.pushAlerts })}
-                    className={`w-12 h-6 rounded-sm transition-all relative ${settings.pushAlerts ? 'bg-[#e60000]' : 'bg-[#353534]'}`}
+                    className={`w-12 h-6 rounded-sm transition-all relative ${settings.pushAlerts ? 'bg-[var(--accent)]' : 'bg-[#353534]'}`}
                   >
                     <div className={`absolute top-1 w-4 h-4 bg-white transition-all ${settings.pushAlerts ? 'right-1' : 'left-1'}`} />
                   </button>
@@ -192,7 +192,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               {/* Theme Selection */}
               <div className="space-y-8">
                 <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
-                  <Palette className="text-[#e60000]" size={24} />
+                  <Palette className="text-[var(--accent)]" size={24} />
                   THEME_ENGINE
                 </h3>
                 <div className="grid grid-cols-3 gap-1">
@@ -202,7 +202,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                       onClick={() => handleUpdateSetting({ theme })}
                       className={`p-4 border font-mono text-[10px] uppercase tracking-widest transition-all ${
                         settings.theme === theme 
-                        ? 'bg-[#e60000] border-[#e60000] text-white' 
+                        ? 'bg-[var(--accent)] border-[var(--accent)] text-white' 
                         : 'bg-[#131313] border-[#353534] text-[#e5e2e1]/40 hover:border-white/20'
                       }`}
                     >
@@ -215,17 +215,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               {/* Font Configuration */}
               <div className="space-y-8">
                 <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
-                  <Type className="text-[#e60000]" size={24} />
+                  <Type className="text-[var(--accent)]" size={24} />
                   FONT_CONFIG
                 </h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-end border-b border-[#353534] pb-2">
                     <p className="text-[13px] font-bold">DISPLAY_SCALE</p>
-                    <span className="text-[#e60000] font-bold text-xl">{settings.fontSize}%</span>
+                    <span className="text-[var(--accent)] font-bold text-xl">{settings.fontSize}%</span>
                   </div>
                   <div className="h-0.5 w-full bg-[#353534] relative">
                     <div 
-                      className="absolute top-[-4px] h-3 w-3 bg-[#e60000] rounded-full shadow-[0_0_10px_rgba(230,0,0,0.5)] cursor-pointer" 
+                      className="absolute top-[-4px] h-3 w-3 bg-[var(--accent)] rounded-full shadow-[0_0_10px_rgba(230,0,0,0.5)] cursor-pointer" 
                       style={{ left: `${((settings.fontSize - 80) / 70) * 100}%` }}
                     />
                     <input 
@@ -280,7 +280,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               <div className="space-y-2">
                 <button 
                   onClick={() => { playSound('transition'); onNavigate('change-password'); }}
-                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
+                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[var(--accent)]/50 transition-all text-left"
                 >
                   <div className="flex items-center gap-4">
                     <Key size={18} className="text-[#e5e2e1]/40" />
@@ -291,7 +291,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
 
                 <button 
                   onClick={() => { playSound('transition'); onNavigate('backup'); }}
-                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
+                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[var(--accent)]/50 transition-all text-left"
                 >
                   <div className="flex items-center gap-4">
                     <Database size={18} className="text-[#e5e2e1]/40" />
@@ -302,7 +302,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
 
                 <button 
                   onClick={() => { playSound('transition'); onNavigate('version'); }}
-                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[#e60000]/50 transition-all text-left"
+                  className="w-full flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/50 hover:border-[var(--accent)]/50 transition-all text-left"
                 >
                   <div className="flex items-center gap-4">
                     <Info size={18} className="text-[#e5e2e1]/40" />
@@ -313,13 +313,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
 
                 <button 
                   onClick={() => { playSound('error'); onNavigate('logout-confirm'); }}
-                  className="w-full flex items-center justify-between p-4 bg-[#e60000]/5 border border-[#e60000]/20 hover:bg-[#e60000]/10 transition-all text-left group"
+                  className="w-full flex items-center justify-between p-4 bg-[var(--accent)]/5 border border-[var(--accent)]/20 hover:bg-[var(--accent)]/10 transition-all text-left group"
                 >
                   <div className="flex items-center gap-4">
-                    <LogOut size={18} className="text-[#e60000]" />
-                    <span className="text-[12px] font-bold uppercase tracking-tight text-[#e60000]">LOGOUT</span>
+                    <LogOut size={18} className="text-[var(--accent)]" />
+                    <span className="text-[12px] font-bold uppercase tracking-tight text-[var(--accent)]">LOGOUT</span>
                   </div>
-                  <Activity size={14} className="text-[#e60000] animate-pulse" />
+                  <Activity size={14} className="text-[var(--accent)] animate-pulse" />
                 </button>
               </div>
             </div>
@@ -331,7 +331,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
         <footer className="mt-12 pt-8 border-t border-white/5 flex items-center justify-between">
            <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                 <Lock size={12} className="text-[#e60000]" />
+                 <Lock size={12} className="text-[var(--accent)]" />
                  <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">CRYPTO_CORE: v4</span>
               </div>
               <div className="flex items-center gap-2">

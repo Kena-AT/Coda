@@ -138,7 +138,7 @@ export const Dashboard: React.FC = () => {
           setIsArchiveModalOpen(true);
           toast.success(
             `Smart Archiver: ${candidates.length} stale snippets detected`,
-            { icon: '🗄️', duration: 10000, style: { background: '#1a1a1a', color: '#fff', border: '1px solid #e60000' } }
+            { icon: '🗄️', duration: 10000, style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)' } }
           );
         }
       } catch (e) {
@@ -197,17 +197,17 @@ export const Dashboard: React.FC = () => {
         {/* Global Navbar Header */}
         <header className="h-[64px] bg-[#111111] border-b border-[#222226] px-8 flex items-center justify-between z-40 shrink-0">
           <div className="flex items-center gap-8">
-            <h2 className="text-lg font-main font-bold text-[#e60000] tracking-[-1px] uppercase cursor-pointer" onClick={() => setSearchQuery('')}>
+            <h2 className="text-lg font-main font-bold text-[var(--accent)] tracking-[-1px] uppercase cursor-pointer" onClick={() => setSearchQuery('')}>
               CODA
             </h2>
             <div className="relative w-[300px] flex items-center">
-              <Search className="absolute left-3 w-[14px] h-[14px] text-[#e60000] z-10" />
+              <Search className="absolute left-3 w-[14px] h-[14px] text-[var(--accent)] z-10" />
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="GLOBAL_SEARCH_CMD..."
-                className="w-full bg-[#0e0e0e] border border-[#222226] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[#e60000] transition-colors font-main text-[11px] tracking-[1px]"
+                className="w-full bg-[#0e0e0e] border border-[#222226] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[var(--accent)] transition-colors font-main text-[11px] tracking-[1px]"
               />
               {searchQuery && (
                  <button 
@@ -223,7 +223,7 @@ export const Dashboard: React.FC = () => {
           <div className="flex items-center gap-8">
             <div className="flex gap-4">
               <div className={`flex items-center justify-center p-1.5 rounded-md border ${
-                systemStatus?.db_healthy ? 'bg-[#15ff00]/10 border-[#15ff00]/30 text-[#15ff00]' : 'bg-[#e60000]/10 border-[#e60000]/30 text-[#e60000]'
+                systemStatus?.db_healthy ? 'bg-[#15ff00]/10 border-[#15ff00]/30 text-[#15ff00]' : 'bg-[var(--accent)]/10 border-[var(--accent)]/30 text-[var(--accent)]'
               }`}>
                 <Database className="w-3.5 h-3.5" />
               </div>
@@ -258,16 +258,16 @@ export const Dashboard: React.FC = () => {
               </button>
               <button 
                 onClick={() => setIsArchiveModalOpen(true)} 
-                className={`flex items-center gap-1.5 transition-all text-[10px] font-mono tracking-widest uppercase group ${hasCandidates ? 'text-red-500 animate-pulse' : 'text-[#adaaad] hover:text-[#e60000]'}`}
+                className={`flex items-center gap-1.5 transition-all text-[10px] font-mono tracking-widest uppercase group ${hasCandidates ? 'text-red-500 animate-pulse' : 'text-[#adaaad] hover:text-[var(--accent)]'}`}
                 title="Archive Vault"
               >
                 <Archive className={`w-4 h-4 transition-transform group-hover:scale-110 ${hasCandidates ? 'text-red-500 ring-4 ring-red-500/20 rounded-full bg-red-500/10' : ''}`} />
                 <span className="hidden xl:inline">ARCHIVE</span>
               </button>
-              <button onClick={() => setActiveTab('settings')} className={`transition-colors ${activeTab === 'settings' ? 'text-[#e60000]' : 'text-[#adaaad] hover:text-[#e60000]'}`} title="Settings">
+              <button onClick={() => setActiveTab('settings')} className={`transition-colors ${activeTab === 'settings' ? 'text-[var(--accent)]' : 'text-[#adaaad] hover:text-[var(--accent)]'}`} title="Settings">
                 <SettingsIcon className="w-5 h-5" />
               </button>
-              <button onClick={() => setActiveTab('logout-confirm')} className="text-[#adaaad] hover:text-[#e60000] transition-colors" title="Logout">
+              <button onClick={() => setActiveTab('logout-confirm')} className="text-[#adaaad] hover:text-[var(--accent)] transition-colors" title="Logout">
                 <Power className="w-5 h-5" />
               </button>
             </div>
@@ -303,7 +303,7 @@ export const Dashboard: React.FC = () => {
                 {/* Section: Usage Analytics */}
                 <div className="flex flex-col gap-6">
                     <div className="flex items-center gap-3 border-b border-[#222226] pb-4">
-                      <div className="w-2 h-2 bg-[#e60000]" />
+                      <div className="w-2 h-2 bg-[var(--accent)]" />
                       <h3 className="text-[11px] font-main font-bold text-white tracking-[1.5px] uppercase">
                           USAGE_ANALYTICS
                       </h3>
@@ -321,7 +321,7 @@ export const Dashboard: React.FC = () => {
                               </div>
                               <div className="h-[2px] bg-[#19191c] relative">
                                 <div 
-                                  className="absolute top-0 left-0 h-full bg-[#e60000] transition-all duration-500" 
+                                  className="absolute top-0 left-0 h-full bg-[var(--accent)] transition-all duration-500" 
                                   style={{ width: `${visualWidth}%` }}
                                 />
                               </div>
@@ -337,16 +337,16 @@ export const Dashboard: React.FC = () => {
                 {/* Section: System Status */}
                 <div className="flex flex-col gap-6">
                     <div className="flex items-center gap-3 border-b border-[#222226] pb-4">
-                      <div className="w-2 h-2 bg-[#e60000]" />
+                      <div className="w-2 h-2 bg-[var(--accent)]" />
                       <h3 className="text-[11px] font-main font-bold text-white tracking-[1.5px] uppercase">
                           SYSTEM_STATUS
                       </h3>
                     </div>
                     <div className="bg-[#151515] p-6 border border-[#222226] relative overflow-hidden flex flex-col font-mono text-[10px] text-[#adaaad] leading-loose">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-[#e60000]" />
+                      <div className="absolute top-0 left-0 w-1 h-full bg-[var(--accent)]" />
                       <div className="grid grid-cols-[100px_1fr] gap-x-2">
                         <span className="uppercase tracking-[1px] opacity-70">ENCRYPTION:</span>
-                        <span className={systemStatus?.session_valid ? "text-[#15ff00]" : "text-[#e60000]"}>
+                        <span className={systemStatus?.session_valid ? "text-[#15ff00]" : "text-[var(--accent)]"}>
                           {systemStatus?.session_valid ? 'SECURE_ACTIVE' : 'DEGRADED_STATE'}
                         </span>
                         
@@ -356,7 +356,7 @@ export const Dashboard: React.FC = () => {
                         </span>
                         
                         <span className="uppercase tracking-[1px] opacity-70">DATABASE:</span>
-                        <span className={systemStatus?.db_healthy ? "text-white" : "text-[#e60000]"}>
+                        <span className={systemStatus?.db_healthy ? "text-white" : "text-[var(--accent)]"}>
                           {systemStatus?.db_healthy ? 'SQLite V3_OK' : 'CONNECTION_ERR'}
                         </span>
                       </div>
@@ -366,7 +366,7 @@ export const Dashboard: React.FC = () => {
                 {/* Section: Hardware Visualization */}
                 <div className="flex flex-col gap-6 mt-auto">
                     <div className="flex items-center gap-3 border-b border-[#222226] pb-4">
-                      <div className="w-2 h-2 bg-[#e60000]" />
+                      <div className="w-2 h-2 bg-[var(--accent)]" />
                       <h3 className="text-[11px] font-main font-bold text-white tracking-[1.5px] uppercase">
                           HARDWARE_VISUALIZATION
                       </h3>

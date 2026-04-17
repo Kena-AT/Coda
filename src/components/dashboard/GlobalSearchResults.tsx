@@ -14,12 +14,12 @@ class SearchErrorBoundary extends Component<{ children: ReactNode }, { hasError:
     if (this.state.hasError) {
       return (
         <div className="flex-1 flex flex-col items-center justify-center bg-[#111111] p-10 text-center">
-          <AlertTriangle className="w-12 h-12 text-[#e60000] mb-4" />
+          <AlertTriangle className="w-12 h-12 text-[var(--accent)] mb-4" />
           <h2 className="text-xl font-main font-bold text-white uppercase mb-2">SEARCH_ENGINE_FAULT</h2>
           <p className="text-[#adaaad] font-mono text-[10px] uppercase mb-8">A fatal error occurred while rendering the results matrix.</p>
           <button 
             onClick={() => window.location.reload()}
-            className="flex items-center gap-2 px-6 py-2 bg-[#e60000] text-white font-mono text-[11px] uppercase hover:bg-[#ff0000] transition-colors"
+            className="flex items-center gap-2 px-6 py-2 bg-[var(--accent)] text-white font-mono text-[11px] uppercase hover:bg-[#ff0000] transition-colors"
           >
             <RefreshCcw size={14} />
             <span>RESTART_CORE</span>
@@ -93,7 +93,7 @@ export const GlobalSearchResults: React.FC = () => {
         </div>
         <h2 className="text-2xl font-main font-bold text-white uppercase mb-4">No results for "{searchQuery}"</h2>
         <p className="text-[#adaaad] font-mono text-xs max-w-md uppercase leading-relaxed">
-          Try broad terms or check your specialized prefixes like <span className="text-[#e60000]">lang:</span>, <span className="text-[#e60000]">tag:</span>, or <span className="text-[#e60000]">is:archived</span>.
+          Try broad terms or check your specialized prefixes like <span className="text-[var(--accent)]">lang:</span>, <span className="text-[var(--accent)]">tag:</span>, or <span className="text-[var(--accent)]">is:archived</span>.
         </p>
       </div>
     );
@@ -114,7 +114,7 @@ export const GlobalSearchResults: React.FC = () => {
           
           <div className="flex gap-4 items-center h-fit">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#151515] border border-[#222226] rounded-sm text-[10px] font-mono text-[#adaaad]">
-               <Info size={12} className="text-[#e60000]" />
+               <Info size={12} className="text-[var(--accent)]" />
                <span>RELEVANCE_SORT_ACTIVE</span>
             </div>
           </div>
@@ -124,7 +124,7 @@ export const GlobalSearchResults: React.FC = () => {
         {projectResults.length > 0 && (
           <div className="mb-16">
             <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-[#e60000]/10 rounded text-[#e60000]">
+              <div className="p-2 bg-[var(--accent)]/10 rounded text-[var(--accent)]">
                 <FolderGit2 size={18} />
               </div>
               <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Project Sectors</h2>
@@ -138,15 +138,15 @@ export const GlobalSearchResults: React.FC = () => {
                     setActiveTab('projects');
                     setSearchQuery('');
                   }}
-                  className="bg-[#151515] border border-[#222226] p-6 hover:border-[#e60000] transition-all cursor-pointer group animate-in zoom-in-95 duration-300"
+                  className="bg-[#151515] border border-[#222226] p-6 hover:border-[var(--accent)] transition-all cursor-pointer group animate-in zoom-in-95 duration-300"
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <div className="p-2 bg-[#222226] text-[#adaaad] group-hover:text-[#e60000] transition-colors">
+                    <div className="p-2 bg-[#222226] text-[#adaaad] group-hover:text-[var(--accent)] transition-colors">
                       <FolderGit2 size={16} />
                     </div>
-                    <ChevronRight size={14} className="text-[#333] group-hover:text-[#e60000] transition-all transform group-hover:translate-x-1" />
+                    <ChevronRight size={14} className="text-[#333] group-hover:text-[var(--accent)] transition-all transform group-hover:translate-x-1" />
                   </div>
-                  <h3 className="text-sm font-bold font-main text-white uppercase mb-2 group-hover:text-[#e60000] transition-colors">{project.name}</h3>
+                  <h3 className="text-sm font-bold font-main text-white uppercase mb-2 group-hover:text-[var(--accent)] transition-colors">{project.name}</h3>
                   <p className="text-[10px] text-[#adaaad] font-mono uppercase line-clamp-1">{project.description || 'NO_DESCRIPTION_PROVIDED'}</p>
                 </div>
               ))}

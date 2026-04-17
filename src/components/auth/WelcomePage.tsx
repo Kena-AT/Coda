@@ -9,11 +9,11 @@ interface WelcomePageProps {
 
 export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin }) => {
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#111111] text-[#ffffff] overflow-x-hidden selection:bg-[#e60000] selection:text-white">
+    <div className="relative min-h-screen flex flex-col bg-[#111111] text-[#ffffff] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
 
       {/* Header - Top Navigation Bar */}
       <header className="absolute top-0 left-0 w-full h-[56px] bg-[#19191c] border-b border-[#222226] px-6 flex items-center justify-between z-50">
-        <div className="text-[#e60000] font-main font-bold text-[14px] tracking-[2px]">CODA</div>
+        <div className="text-[var(--accent)] font-main font-bold text-[14px] tracking-[2px]">CODA</div>
       </header>
 
       {/* Main Content */}
@@ -31,8 +31,8 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center relative z-10"
           >
-            <div className="border-l-2 border-[#e60000] bg-[#19191c]/80 px-4 py-1 mb-6 flex items-center justify-center backdrop-blur-sm">
-              <span className="text-[#e60000] font-main text-[10px] tracking-[1.2px] uppercase">SYSTEM READY // V1.0.0-STABLE</span>
+            <div className="border-l-2 border-[var(--accent)] bg-[#19191c]/80 px-4 py-1 mb-6 flex items-center justify-center backdrop-blur-sm">
+              <span className="text-[var(--accent)] font-main text-[10px] tracking-[1.2px] uppercase">SYSTEM READY // V1.0.0-STABLE</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-[72px] font-main font-bold leading-[0.95] tracking-[-4px] text-[#fffbfe] mb-6 flex flex-col pt-4">
@@ -53,13 +53,13 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             <div className="flex items-center gap-4">
               <button 
                 onClick={onGetStarted}
-                className="bg-[#e60000] text-[#04f5ff] font-main font-bold text-xs tracking-[1.8px] hover:bg-[#ff0000] transition-all px-8 py-4 uppercase border border-[#e60000]"
+                className="bg-[var(--accent)] text-[#04f5ff] font-main font-bold text-xs tracking-[1.8px] hover:bg-[#ff0000] transition-all px-8 py-4 uppercase border border-[var(--accent)]"
               >
                 Get Started
               </button>
               <button 
                 onClick={onLogin}
-                className="border border-[#e60000] text-[#e60000] hover:bg-[#e6000010] bg-[#19191c]/60 backdrop-blur-sm transition-colors font-main font-bold text-xs tracking-[1.8px] uppercase px-8 py-4"
+                className="border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)10] bg-[#19191c]/60 backdrop-blur-sm transition-colors font-main font-bold text-xs tracking-[1.8px] uppercase px-8 py-4"
               >
                 Sign In
               </button>
@@ -93,7 +93,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             {/* Benefit 2: Search (Top Right) */}
             <div className="lg:col-span-4 bg-[#1f1f22] p-8 flex flex-col justify-between min-h-[300px]">
                <div>
-                  <div className="mb-4 text-[#e60000]">
+                  <div className="mb-4 text-[var(--accent)]">
                     {/* Search Icon Placeholder */}
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                   </div>
@@ -103,14 +103,14 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
                   </p>
                </div>
                <div className="pt-8">
-                 <span className="text-[#e60000] font-main text-[8px] tracking-[1px] uppercase">QUERY_EXECUTED: 0.002MS</span>
+                 <span className="text-[var(--accent)] font-main text-[8px] tracking-[1px] uppercase">QUERY_EXECUTED: 0.002MS</span>
                </div>
             </div>
 
             {/* Benefit 3: Recommendations (Bottom Left) */}
             <div className="lg:col-span-4 bg-[#1f1f22] p-8 flex flex-col">
                <div>
-                  <div className="mb-4 text-[#e60000]">
+                  <div className="mb-4 text-[var(--accent)]">
                     {/* Sparkle Icon Placeholder */}
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                   </div>
@@ -121,15 +121,15 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
                </div>
                <div className="mt-auto">
                   <div className="w-full h-1 bg-[#ff59e3]/20 relative">
-                     <div className="absolute top-0 left-0 h-full w-[60%] bg-[#e60000]" />
+                     <div className="absolute top-0 left-0 h-full w-[60%] bg-[var(--accent)]" />
                   </div>
                </div>
             </div>
 
             {/* Benefit 4: Versioning (Bottom Right) */}
-            <div className="lg:col-span-8 bg-[#1f1f22] border-r-2 border-[#e60000] p-8 flex items-center relative gap-8 group">
+            <div className="lg:col-span-8 bg-[#1f1f22] border-r-2 border-[var(--accent)] p-8 flex items-center relative gap-8 group">
                <div className="z-10 flex-1">
-                 <div className="mb-4 text-[#e60000]">
+                 <div className="mb-4 text-[var(--accent)]">
                     {/* Clock Icon Placeholder */}
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                  </div>

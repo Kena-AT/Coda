@@ -126,8 +126,8 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
 
         {/* Header */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">
-            <div className="w-1.5 h-1.5 bg-[#e60000] rounded-full" />
+          <div className="flex items-center gap-2 text-[var(--accent)] font-mono text-[10px] tracking-[2px] uppercase">
+            <div className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full" />
             Vault_Redundancy_Protocol
           </div>
           <div className="flex justify-between items-end">
@@ -147,7 +147,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           <div className="bg-[#131313] border border-[#353534]/30 p-10 space-y-10 relative overflow-hidden group">
              {/* Decor */}
              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Database size={80} className="text-[#e60000]" />
+                <Database size={80} className="text-[var(--accent)]" />
              </div>
 
              <div className="space-y-2 relative z-10">
@@ -167,7 +167,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                   onClick={() => { playSound('click'); handleBackup(); }}
                   onMouseEnter={() => playSound('hover')}
                   disabled={loading}
-                  className="w-full py-5 bg-[#e60000] hover:bg-[#ff0000] text-white font-main font-black uppercase text-[13px] tracking-[1px] flex items-center justify-center gap-3 transition-all disabled:opacity-50"
+                  className="w-full py-5 bg-[var(--accent)] hover:bg-[#ff0000] text-white font-main font-black uppercase text-[13px] tracking-[1px] flex items-center justify-center gap-3 transition-all disabled:opacity-50"
                 >
                   {loading ? <RefreshCcw className="w-5 h-5 animate-spin" /> : <Database className="w-5 h-5" />}
                   INIT_SNAPSHOT
@@ -177,7 +177,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
 
           {/* Metrics */}
           <div className="bg-[#131313] border border-[#353534]/30 rounded-sm p-8 space-y-12">
-            <div className="flex items-center gap-2 text-[#e60000]">
+            <div className="flex items-center gap-2 text-[var(--accent)]">
                <Activity size={18} />
                <span className="text-[10px] font-mono uppercase tracking-[1px]">Vault Metrics</span>
             </div>
@@ -189,7 +189,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                     <p className="text-2xl font-main font-bold text-white">{vaultSize} <span className="text-sm font-light">MB</span></p>
                   </div>
                   <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#e60000] w-2/3" />
+                    <div className="h-full bg-[var(--accent)] w-2/3" />
                   </div>
                </div>
 
@@ -229,7 +229,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                  onClick={() => { playSound('click'); handleRestore(); }}
                  onMouseEnter={() => playSound('hover')}
                  disabled={loading}
-                 className="w-full aspect-square bg-[#1f1f22] border-2 border-dashed border-[#353534]/50 hover:border-[#e60000]/50 hover:bg-[#1f1111]/10 transition-all flex flex-col items-center justify-center gap-4 group"
+                 className="w-full aspect-square bg-[#1f1f22] border-2 border-dashed border-[#353534]/50 hover:border-[var(--accent)]/50 hover:bg-[#1f1111]/10 transition-all flex flex-col items-center justify-center gap-4 group"
                >
                  <div className="w-16 h-16 bg-[#0a0a0c] border border-[#353534] flex items-center justify-center group-hover:scale-110 transition-transform">
                     <FileUp className="w-8 h-8 text-[#737373] group-hover:text-red-600 transition-colors" />

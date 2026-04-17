@@ -57,7 +57,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
           style: {
             background: '#19191c',
             color: '#fffbfe',
-            borderLeft: '4px solid #e60000',
+            borderLeft: '4px solid var(--accent)',
             fontSize: '12px',
             fontFamily: 'Space Grotesk'
           }
@@ -91,7 +91,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
         <div className="flex items-center justify-between p-6 border-b border-[#222226]">
           <div className="flex flex-col gap-1">
              <div className="flex items-center gap-3">
-               <Terminal className="text-[#e60000] w-5 h-5" />
+               <Terminal className="text-[var(--accent)] w-5 h-5" />
                <h2 className="text-xl font-main font-bold text-[#fffbfe] tracking-[-1px] uppercase">NEW_SNIPPET_INIT</h2>
              </div>
              <span className="text-[10px] text-[#adaaad] tracking-[1px] uppercase opacity-50">Local Buffer Entry System</span>
@@ -99,7 +99,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
           <button 
             onClick={() => { playSound('click'); onClose(); }}
             onMouseEnter={() => playSound('hover')}
-            className="p-2 text-[#adaaad] hover:text-[#e60000] transition-colors"
+            className="p-2 text-[#adaaad] hover:text-[var(--accent)] transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -119,7 +119,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
             {/* Title */}
             <div className="relative">
               <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
-                <FileText className="w-3 h-3 text-[#e60000]" />
+                <FileText className="w-3 h-3 text-[var(--accent)]" />
                 <span>Title</span>
               </div>
               <input 
@@ -128,7 +128,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 onChange={(e) => setTitle(e.target.value)}
                 onFocus={() => playSound('hover')}
                 placeholder="Database Logic Cluster..."
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm"
+                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm"
                 required
               />
             </div>
@@ -136,14 +136,14 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
             {/* Language */}
             <div className="relative">
               <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
-                <Code2 className="w-3 h-3 text-[#e60000]" />
+                <Code2 className="w-3 h-3 text-[var(--accent)]" />
                 <span>Language_Key</span>
               </div>
               <select 
                 value={language}
                 onChange={(e) => { playSound('click'); setLanguage(e.target.value); }}
                 onMouseEnter={() => playSound('hover')}
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm appearance-none"
+                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm appearance-none"
               >
                 <option value="javascript">JavaScript</option>
                 <option value="typescript">TypeScript</option>
@@ -159,7 +159,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
             {/* Tags */}
             <div className="relative">
               <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
-                <Tags className="w-3 h-3 text-[#e60000]" />
+                <Tags className="w-3 h-3 text-[var(--accent)]" />
                 <span>Tags (comma-separated)</span>
               </div>
               <input 
@@ -168,21 +168,21 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 onChange={(e) => setTags(e.target.value)}
                 onFocus={() => playSound('hover')}
                 placeholder="API, Utility, Auth..."
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm"
+                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm"
               />
             </div>
 
             {/* Project Selection */}
             <div className="relative">
               <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
-                <FolderGit2 className="w-3 h-3 text-[#e60000]" />
+                <FolderGit2 className="w-3 h-3 text-[var(--accent)]" />
                 <span>Target Project (Sector)</span>
               </div>
               <select 
                 value={projectId || ''}
                 onChange={(e) => { playSound('click'); setProjectId(e.target.value ? parseInt(e.target.value) : null); }}
                 onMouseEnter={() => playSound('hover')}
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[#e60000] transition-colors font-main text-sm appearance-none"
+                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm appearance-none"
               >
                 <option value="">NO_PROJECT_ASSIGNED (INBOX)</option>
                 {projects.map((p) => (
@@ -197,7 +197,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
           {/* Content */}
           <div className="flex-1 flex flex-col h-full min-h-[300px]">
             <div className="flex items-center gap-2 mb-2 text-[#adaaad] text-[10px] uppercase font-main tracking-[1px]">
-              <Hash className="w-3 h-3 text-[#e60000]" />
+              <Hash className="w-3 h-3 text-[var(--accent)]" />
               <span>Snippet_Logic_Body</span>
             </div>
             <textarea 
@@ -205,7 +205,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
               onChange={(e) => setContent(e.target.value)}
               onFocus={() => playSound('hover')}
               placeholder="export const connect = () => { ... }"
-              className="flex-1 bg-[#0a0a0c] border border-[#222226] p-4 text-[#f3ffca] font-mono text-xs outline-none focus:border-[#e60000] transition-colors resize-none overflow-y-auto custom-scrollbar"
+              className="flex-1 bg-[#0a0a0c] border border-[#222226] p-4 text-[#f3ffca] font-mono text-xs outline-none focus:border-[var(--accent)] transition-colors resize-none overflow-y-auto custom-scrollbar"
               required
             />
           </div>
@@ -230,7 +230,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 disabled={loading}
                 onMouseEnter={() => playSound('hover')}
                 onClick={() => playSound('click')}
-                className="bg-[#e60000] text-white flex items-center gap-3 px-8 py-3 font-main font-bold text-xs tracking-[2px] uppercase hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
+                className="bg-[var(--accent)] text-white flex items-center gap-3 px-8 py-3 font-main font-bold text-xs tracking-[2px] uppercase hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'STORING...' : 'STORE_SNIPPET'}</span>

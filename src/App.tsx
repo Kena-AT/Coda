@@ -14,7 +14,12 @@ type AuthStep = 'welcome' | 'signup' | 'signin';
 function App() {
   const [step, setStep] = useState<AuthStep>('welcome');
   const [isLoading, setIsLoading] = useState(true);
-  const { user, setUser } = useStore();
+  const { user, setUser, settings } = useStore();
+
+  // Theme Sync Protocol
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', settings.theme);
+  }, [settings.theme]);
 
   // Auto-login on app startup
   useEffect(() => {
@@ -60,7 +65,7 @@ function App() {
     return (
       <main className="min-h-screen bg-[#0e0e10] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-[#e60000] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
           <span className="text-[#adaaad] font-mono text-xs uppercase tracking-wider">Initializing...</span>
         </div>
       </main>

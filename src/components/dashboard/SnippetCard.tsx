@@ -37,7 +37,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
         style: {
           background: '#19191c',
           color: '#fffbfe',
-          borderLeft: '4px solid #e60000',
+          borderLeft: '4px solid var(--accent)',
           fontSize: '12px',
           fontFamily: 'Space Grotesk'
         }
@@ -74,7 +74,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
     const langs: Record<string, string> = {
       'javascript': '#f3ffca',
       'typescript': '#00f5ff',
-      'rust': '#e60000',
+      'rust': 'var(--accent)',
       'python': '#3776ab',
       'html': '#e34c26',
       'css': '#264de4'
@@ -83,7 +83,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
   };
 
   return (
-    <div className={`group bg-[#151515] border ${snippet.is_archived ? 'border-dashed border-[#353534]/50' : 'border-[#222226]'} p-5 hover:bg-[#19191c] hover:border-[#e60000]/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-lg`}>
+    <div className={`group bg-[#151515] border ${snippet.is_archived ? 'border-dashed border-[#353534]/50' : 'border-[#222226]'} p-5 hover:bg-[#19191c] hover:border-[var(--accent)]/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-lg`}>
       
       {/* Header */}
       <div className="flex justify-between items-start mb-4 relative z-10">
@@ -99,10 +99,10 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
               </span>
             </div>
             {snippet.is_archived && (
-              <span className="text-[8px] font-mono font-bold bg-[#e60000]/20 text-[#e60000] px-1.5 py-0.5 animate-pulse">ARCHIVED</span>
+              <span className="text-[8px] font-mono font-bold bg-[var(--accent)]/20 text-[var(--accent)] px-1.5 py-0.5 animate-pulse">ARCHIVED</span>
             )}
           </div>
-          <h3 className="text-md font-main font-bold text-white group-hover:text-[#e60000] transition-colors line-clamp-1 uppercase mt-1">
+          <h3 className="text-md font-main font-bold text-white group-hover:text-[var(--accent)] transition-colors line-clamp-1 uppercase mt-1">
             <HighlightText text={snippet.title} query={searchQuery} />
           </h3>
         </div>
@@ -110,35 +110,35 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
           <button 
             onClick={copyToClipboard}
-            className="p-1.5 text-[#adaaad] hover:text-[#e60000] transition-colors"
+            className="p-1.5 text-[#adaaad] hover:text-[var(--accent)] transition-colors"
             title="Quick Copy"
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={() => setIsMoving(!isMoving)}
-            className={`p-1.5 transition-colors ${isMoving ? 'text-[#e60000]' : 'text-[#adaaad] hover:text-[#e60000]'}`}
+            className={`p-1.5 transition-colors ${isMoving ? 'text-[var(--accent)]' : 'text-[#adaaad] hover:text-[var(--accent)]'}`}
             title="Move Project"
           >
             <FolderInput className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={onEdit}
-            className="p-1.5 text-[#adaaad] hover:text-[#e60000] transition-colors"
+            className="p-1.5 text-[#adaaad] hover:text-[var(--accent)] transition-colors"
             title="Edit Snippet"
           >
             <Edit3 className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={onArchive}
-            className={`p-1.5 transition-colors ${snippet.is_archived ? 'text-[#e60000]' : 'text-[#adaaad] hover:text-[#e60000]'}`}
+            className={`p-1.5 transition-colors ${snippet.is_archived ? 'text-[var(--accent)]' : 'text-[#adaaad] hover:text-[var(--accent)]'}`}
             title={snippet.is_archived ? "Unarchive" : "Archive"}
           >
             <Archive className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={onDelete}
-            className="p-1.5 text-[#adaaad] hover:text-[#e60000] transition-colors"
+            className="p-1.5 text-[#adaaad] hover:text-[var(--accent)] transition-colors"
             title="Delete Permanently"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -162,7 +162,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
           <div className="flex gap-2 w-full">
             <button 
               onClick={handleMove}
-              className="flex-1 bg-[#e60000] text-white py-2 flex justify-center hover:bg-[#ff0000] transition-colors"
+              className="flex-1 bg-[var(--accent)] text-white py-2 flex justify-center hover:bg-[#ff0000] transition-colors"
             >
               <Check className="w-4 h-4" />
             </button>
@@ -198,7 +198,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
         </div>
         <div className="flex items-center gap-1.5 text-[#adaaad] group-hover:text-white transition-colors cursor-pointer" onClick={onEdit}>
           <span className="text-[9px] font-mono uppercase">Open</span>
-          <ChevronRight className="w-3 h-3 text-[#e60000]" />
+          <ChevronRight className="w-3 h-3 text-[var(--accent)]" />
         </div>
       </div>
     </div>

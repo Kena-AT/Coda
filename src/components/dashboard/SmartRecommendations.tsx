@@ -80,14 +80,14 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
       <div className="px-6 py-4 border-b border-[#222226] flex items-center justify-between">
         <div className="flex flex-col">
           <h3 className="font-main font-bold text-[10px] text-white tracking-[2px] uppercase">Smart_Intelligence</h3>
-          <span className="text-[9px] text-[#e60000] font-mono mt-1">Rule-Based v1.1.0</span>
+          <span className="text-[9px] text-[var(--accent)] font-mono mt-1">Rule-Based v1.1.0</span>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setActiveSubTab('smart')}
             className={cn(
               "px-2 py-0.5 text-[8px] font-bold tracking-[1px] uppercase border",
-              activeSubTab === 'smart' ? "bg-[#e60000] border-[#e60000] text-white" : "border-[#222226] text-[#adaaad]"
+              activeSubTab === 'smart' ? "bg-[var(--accent)] border-[var(--accent)] text-white" : "border-[#222226] text-[#adaaad]"
             )}
           >
             SMART
@@ -96,7 +96,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
             onClick={() => setActiveSubTab('stale')}
             className={cn(
               "px-2 py-0.5 text-[8px] font-bold tracking-[1px] uppercase border",
-              activeSubTab === 'stale' ? "bg-[#e60000] border-[#e60000] text-white" : "border-[#222226] text-[#adaaad]"
+              activeSubTab === 'stale' ? "bg-[var(--accent)] border-[var(--accent)] text-white" : "border-[#222226] text-[#adaaad]"
             )}
           >
             STALE
@@ -117,13 +117,13 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                        {rec.category === "Language Match" ? <Code2 size={12} /> : <Hash size={12} />}
                        <span># {rec.category}</span>
                     </div>
-                    <span className="px-2 py-0.5 bg-[#1c1b1b] text-[#adaaad] text-[8px] uppercase group-hover:bg-[#e60000] group-hover:text-white transition-colors">
+                    <span className="px-2 py-0.5 bg-[#1c1b1b] text-[#adaaad] text-[8px] uppercase group-hover:bg-[var(--accent)] group-hover:text-white transition-colors">
                       {rec.reason}
                     </span>
                  </div>
                  
                  <div 
-                    className="bg-[#131313] border border-[#222226] p-4 flex flex-col gap-3 group-hover:border-[#e60000]/50 transition-all cursor-pointer" 
+                    className="bg-[#131313] border border-[#222226] p-4 flex flex-col gap-3 group-hover:border-[var(--accent)]/50 transition-all cursor-pointer" 
                     onClick={async () => {
                       onPreview(rec.content);
                       try {
@@ -144,11 +144,11 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                         {rec.breakdown.context > 0 && <span className="text-[7px] font-mono text-[#0088ff]">CONTEXT+{Math.round(rec.breakdown.context)}</span>}
                         {rec.breakdown.patterns > 0 && <span className="text-[7px] font-mono text-[#ffaa00]">PATTERN+{Math.round(rec.breakdown.patterns)}</span>}
                         {rec.breakdown.popularity > 0 && <span className="text-[7px] font-mono text-[#ff00ff]">VELOCITY+{Math.round(rec.breakdown.popularity)}</span>}
-                        {rec.breakdown.ctr_penalty > 0 && <span className="text-[7px] font-mono text-[#e60000]">CTR_ADJ-{Math.round(rec.breakdown.ctr_penalty)}</span>}
+                        {rec.breakdown.ctr_penalty > 0 && <span className="text-[7px] font-mono text-[var(--accent)]">CTR_ADJ-{Math.round(rec.breakdown.ctr_penalty)}</span>}
                     </div>
 
                     <div className="flex justify-between items-center pt-2 mt-2 border-t border-[#222226]/50">
-                       <span className="text-[10px] text-[#e60000] font-bold">{rec.match_score}% Match</span>
+                       <span className="text-[10px] text-[var(--accent)] font-bold">{rec.match_score}% Match</span>
                        <div className="flex items-center gap-1 text-[9px] text-[#adaaad] group-hover:text-white transition-colors">
                           <span>Preview & Sync</span>
                           <ChevronRight size={10} />

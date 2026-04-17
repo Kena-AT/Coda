@@ -46,12 +46,12 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <div className="bg-[#111111] border border-[#222226] w-full max-w-md shadow-2xl relative overflow-hidden">
-        <div className="h-1 bg-[#e60000] w-full" />
+        <div className="h-1 bg-[var(--accent)] w-full" />
         
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div className="flex gap-3">
-              <div className="bg-[#e60000]/10 p-2 text-[#e60000]">
+              <div className="bg-[var(--accent)]/10 p-2 text-[var(--accent)]">
                 <Settings2 className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
@@ -71,12 +71,12 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
                   <input 
                     type="range" min="0" max="180" step="15" 
                     value={autoArchiveDays} onChange={(e) => setAutoArchiveDays(Number(e.target.value))}
-                    className="flex-1 accent-[#e60000]"
+                    className="flex-1 accent-[var(--accent)]"
                   />
-                  <span className="text-[#e60000] font-mono font-bold text-[14px] w-12">{autoArchiveDays === 0 ? 'NEVER' : autoArchiveDays}</span>
+                  <span className="text-[var(--accent)] font-mono font-bold text-[14px] w-12">{autoArchiveDays === 0 ? 'NEVER' : autoArchiveDays}</span>
                 </div>
                 {autoArchiveDays === 0 && (
-                  <span className="text-[10px] text-[#e60000] font-mono animate-pulse"><ShieldAlert className="w-3 h-3 inline mr-1" /> Background archiving is disabled</span>
+                  <span className="text-[10px] text-[var(--accent)] font-mono animate-pulse"><ShieldAlert className="w-3 h-3 inline mr-1" /> Background archiving is disabled</span>
                 )}
              </div>
 
@@ -85,13 +85,13 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
                 <input 
                   type="number" min="0" 
                   value={minCopyThreshold} onChange={(e) => setMinCopyThreshold(Number(e.target.value))}
-                  className="bg-[#151515] border border-[#222226] p-3 text-white font-mono text-[14px] focus:outline-none focus:border-[#e60000] transition-colors"
+                  className="bg-[#151515] border border-[#222226] p-3 text-white font-mono text-[14px] focus:outline-none focus:border-[var(--accent)] transition-colors"
                 />
                 <span className="text-[10px] text-[#adaaad] font-mono">Archive immunity for highly-used snippets</span>
              </div>
 
              <div className="flex items-center gap-4 bg-[#151515] p-4 border border-[#222226] cursor-pointer" onClick={() => setExcludeFavorites(!excludeFavorites)}>
-               <div className={`w-4 h-4 border ${excludeFavorites ? 'bg-[#e60000] border-[#e60000]' : 'bg-transparent border-[#adaaad]'} flex items-center justify-center transition-colors`}>
+               <div className={`w-4 h-4 border ${excludeFavorites ? 'bg-[var(--accent)] border-[var(--accent)]' : 'bg-transparent border-[#adaaad]'} flex items-center justify-center transition-colors`}>
                  {excludeFavorites && <div className="w-2 h-2 bg-white" />}
                </div>
                <span className="text-[11px] font-main uppercase tracking-[0.5px] text-white">Protect 'favorite' tag from cleanup</span>
@@ -106,7 +106,7 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-[#e60000] text-white text-[11px] font-main font-bold uppercase tracking-[1.5px] px-8 py-3 hover:bg-[#ff0000] transition-all"
+            className="bg-[var(--accent)] text-white text-[11px] font-main font-bold uppercase tracking-[1.5px] px-8 py-3 hover:bg-[#ff0000] transition-all"
           >
             {isSaving ? 'APPLYING...' : 'APPLY CONFIG'}
           </button>

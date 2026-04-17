@@ -20,9 +20,9 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="w-[420px] bg-[#0e0e0e] border border-[#e60000]/50 shadow-2xl shadow-[#e60000]/20">
+      <div className="w-[420px] bg-[#0e0e0e] border border-[var(--accent)]/50 shadow-2xl shadow-[var(--accent)]/20">
         {/* Header */}
-        <div className="bg-[#e60000] px-6 py-4 flex items-center justify-between">
+        <div className="bg-[var(--accent)] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-white" />
             <span className="text-[12px] font-main font-bold text-white tracking-[1.5px] uppercase">
@@ -55,7 +55,7 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
                 Target Sequence
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono text-[#e60000]">
+                <span className="text-[11px] font-mono text-[var(--accent)]">
                   ID: {versionId?.toString().padStart(6, '0') || 'UNKNOWN'}
                 </span>
                 <span className="text-[10px] font-mono text-white">
@@ -65,8 +65,8 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
             </div>
           )}
 
-          <div className="bg-[#e60000]/10 border border-[#e60000]/30 p-3">
-            <p className="text-[9px] font-mono text-[#e60000] uppercase tracking-[1px] text-center">
+          <div className="bg-[var(--accent)]/10 border border-[var(--accent)]/30 p-3">
+            <p className="text-[9px] font-mono text-[var(--accent)] uppercase tracking-[1px] text-center">
               Warning: This action cannot be undone.
             </p>
           </div>
@@ -82,7 +82,7 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-3 bg-[#e60000] text-white text-[10px] font-bold tracking-[1.5px] uppercase hover:bg-[#ff0000] transition-colors flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-[var(--accent)] text-white text-[10px] font-bold tracking-[1.5px] uppercase hover:bg-[#ff0000] transition-colors flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             EXECUTE

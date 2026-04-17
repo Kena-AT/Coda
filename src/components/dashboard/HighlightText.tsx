@@ -31,8 +31,8 @@ export const HighlightText: React.FC<HighlightTextProps> = ({ text, query, class
         regex.test(part) ? (
           <mark
             key={i}
-            className="bg-[#e60000] text-white rounded-none px-0 py-0 not-italic"
-            style={{ background: '#e60000', color: '#fff' }}
+            className="bg-[var(--accent)] text-white rounded-none px-0 py-0 not-italic"
+            style={{ background: 'var(--accent)', color: '#fff' }}
           >
             {part}
           </mark>

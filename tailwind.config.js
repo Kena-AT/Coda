@@ -8,14 +8,17 @@ export default {
     extend: {
       colors: {
         bg: {
-          primary: '#0e0e10',
-          secondary: '#19191c',
-          tertiary: '#1f1f22',
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          tertiary: 'var(--bg-tertiary)',
         },
-        accent: '#e60000',
+        accent: {
+          DEFAULT: 'var(--accent)',
+          secondary: 'var(--accent-secondary)',
+        },
         text: {
-          primary: '#ffffff',
-          secondary: '#adaaad',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
         },
       },
       fontFamily: {

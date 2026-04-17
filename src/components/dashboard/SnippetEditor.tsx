@@ -312,13 +312,13 @@ export const SnippetEditor: React.FC = () => {
               <button 
                 onClick={() => { playSound('transition'); setSelectedSnippetId(null); }}
                 onMouseEnter={() => playSound('hover')}
-                className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
+                className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors"
                 title="Back to Dashboard"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <h2 className="text-[14px] font-main font-bold text-white tracking-[2px] uppercase flex items-center gap-2">
-                <Terminal className="w-5 h-5 text-[#e60000]" />
+                <Terminal className="w-5 h-5 text-[var(--accent)]" />
                 {selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}
               </h2>
             </div>
@@ -326,7 +326,7 @@ export const SnippetEditor: React.FC = () => {
               <button 
                 onClick={() => { playSound('click'); setShowTemplates(true); }}
                 onMouseEnter={() => playSound('hover')}
-                className="px-6 py-2 border border-[#e60000] text-[#e60000] flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase hover:bg-[#e60000] hover:text-white transition-all group"
+                className="px-6 py-2 border border-[var(--accent)] text-[var(--accent)] flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase hover:bg-[var(--accent)] hover:text-white transition-all group"
                 title="Protocol Template Override"
               >
                 <LayoutTemplate className="w-4 h-4 group-hover:rotate-12 transition-transform" />
@@ -336,7 +336,7 @@ export const SnippetEditor: React.FC = () => {
                 onClick={() => { playSound('click'); handleSave(); }}
                 onMouseEnter={() => playSound('hover')}
                 disabled={saving}
-                className={`px-6 py-2 flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase transition-all disabled:opacity-50 ${titleError ? 'bg-[#353534] text-slate-500 cursor-not-allowed' : 'bg-[#e60000] text-white hover:bg-[#ff0000]'}`}
+                className={`px-6 py-2 flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase transition-all disabled:opacity-50 ${titleError ? 'bg-[#353534] text-slate-500 cursor-not-allowed' : 'bg-[var(--accent)] text-white hover:bg-[#ff0000]'}`}
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'COMMITTING...' : 'SAVE REVISION'}
@@ -348,7 +348,7 @@ export const SnippetEditor: React.FC = () => {
                   setPreSelectedProjectId(null);
                 }}
                 onMouseEnter={() => playSound('hover')}
-                className="p-2 border border-[#353534]/50 text-[#adaaad] hover:text-white hover:border-[#e60000] transition-colors"
+                className="p-2 border border-[#353534]/50 text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors"
                 title="Close Editor"
               >
                 <X className="w-4 h-4" />
@@ -370,7 +370,7 @@ export const SnippetEditor: React.FC = () => {
                  type="text" 
                  value={snippet.title}
                  onChange={e => setSnippet({...snippet, title: e.target.value})}
-                 className={`w-full bg-transparent border-b text-2xl font-main font-bold text-white px-0 py-2 outline-none transition-colors ${titleError ? 'border-red-600' : 'border-[#353534]/50 focus:border-[#e60000]'}`}
+                 className={`w-full bg-transparent border-b text-2xl font-main font-bold text-white px-0 py-2 outline-none transition-colors ${titleError ? 'border-red-600' : 'border-[#353534]/50 focus:border-[var(--accent)]'}`}
                  placeholder="PROXIMA_VOYAGER_01"
                />
                {titleError && (
@@ -391,13 +391,13 @@ export const SnippetEditor: React.FC = () => {
                      setSnippet({...snippet, project_id: value ? parseInt(value) : null});
                    }
                  }}
-                 className="bg-[#1c1b1b] border border-[#353534]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[#e60000] transition-colors cursor-pointer"
+                 className="bg-[#1c1b1b] border border-[#353534]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[var(--accent)] transition-colors cursor-pointer"
                >
                  <option value="">INBOX / UNSORTED</option>
                  {projects.map(p => (
                    <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
                  ))}
-                 <option value="create_new" className="text-[#e60000]">+ CREATE NEW PROJECT</option>
+                 <option value="create_new" className="text-[var(--accent)]">+ CREATE NEW PROJECT</option>
                </select>
              </div>
 
@@ -467,7 +467,7 @@ export const SnippetEditor: React.FC = () => {
           {selectedSnippetId !== -1 && (
             <div className="mt-8 border-t border-[#353534]/20 p-8 bg-[#0e0e0e]/30">
               <div className="flex items-center gap-3 mb-6">
-                <Network size={18} className="text-[#e60000]" />
+                <Network size={18} className="text-[var(--accent)]" />
                 <h4 className="text-[12px] font-bold text-white tracking-[2px] uppercase">Behavioral Correlations</h4>
               </div>
               <ProjectLinkingPanel snippetId={selectedSnippetId!} />
@@ -485,7 +485,7 @@ export const SnippetEditor: React.FC = () => {
           <button 
             onClick={() => { playSound('click'); setRightSidebarTab('validation'); }}
             onMouseEnter={() => playSound('hover')}
-            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'validation' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'validation' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <ShieldAlert size={14} />
             SCAN
@@ -493,7 +493,7 @@ export const SnippetEditor: React.FC = () => {
           <button 
             onClick={() => { playSound('click'); setRightSidebarTab('recs'); }}
             onMouseEnter={() => playSound('hover')}
-            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'recs' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'recs' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <Zap size={14} />
             RECS
@@ -501,7 +501,7 @@ export const SnippetEditor: React.FC = () => {
           <button 
             onClick={() => { playSound('click'); setRightSidebarTab('history'); }}
             onMouseEnter={() => playSound('hover')}
-            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'history' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'history' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <History size={14} />
             LOG
@@ -510,7 +510,7 @@ export const SnippetEditor: React.FC = () => {
             <button 
               onClick={() => { playSound('click'); setRightSidebarTab('links'); }}
               onMouseEnter={() => playSound('hover')}
-              className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'links' ? 'text-[#e60000] border-b-2 border-[#e60000] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+              className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'links' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
             >
               <Network size={14} />
               LINKS
@@ -522,7 +522,7 @@ export const SnippetEditor: React.FC = () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-6 border-b border-[#353534]/20 bg-[#131313]">
                <h3 className="text-white text-[12px] font-main font-bold tracking-[1.5px] uppercase flex items-center gap-2">
-                 <Activity className="w-4 h-4 text-[#e60000]" />
+                 <Activity className="w-4 h-4 text-[var(--accent)]" />
                  CORE_VALIDATION_ENGINE
                </h3>
                <p className="text-[#adaaad] text-[9px] font-mono mt-1">Real-time syntax diagnostic active</p>
@@ -633,11 +633,11 @@ export const SnippetEditor: React.FC = () => {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-4">
               
-              <div className="text-[10px] text-[#e60000] font-main tracking-[1px] uppercase ml-2 mb-2">Active Working Set</div>
+              <div className="text-[10px] text-[var(--accent)] font-main tracking-[1px] uppercase ml-2 mb-2">Active Working Set</div>
               
               <button 
                 onClick={() => { setIsDiffMode(false); setSelectedVersion(null); }}
-                className={`w-full text-left p-4 bg-[#1c1b1b] border-l-2 transition-all ${!isDiffMode ? 'border-[#e60000]' : 'border-transparent hover:border-[#e60000]/50'}`}
+                className={`w-full text-left p-4 bg-[#1c1b1b] border-l-2 transition-all ${!isDiffMode ? 'border-[var(--accent)]' : 'border-transparent hover:border-[var(--accent)]/50'}`}
               >
                 <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-white uppercase font-main">CURRENT</span>
@@ -652,14 +652,14 @@ export const SnippetEditor: React.FC = () => {
                   <button 
                     onClick={() => { playSound('transition'); setSelectedVersion(v); setIsDiffMode(true); }}
                     onMouseEnter={() => playSound('hover')}
-                    className={`w-full text-left p-4 bg-[#1c1b1b] opacity-70 border transition-all ${selectedVersion?.id === v.id ? 'border-[#e60000] opacity-100' : 'border-transparent hover:border-[#353534]'}`}
+                    className={`w-full text-left p-4 bg-[#1c1b1b] opacity-70 border transition-all ${selectedVersion?.id === v.id ? 'border-[var(--accent)] opacity-100' : 'border-transparent hover:border-[#353534]'}`}
                   >
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center gap-2">
                               <History className="w-3.5 h-3.5 text-[#adaaad]" />
                               <span className="text-[10px] text-white font-mono">ID: {v.id.toString().padStart(6, '0')}</span>
                           </div>
-                          <span className="text-[9px] text-[#e60000] font-mono">{formatDate(v.created_at)}</span>
+                          <span className="text-[9px] text-[var(--accent)] font-mono">{formatDate(v.created_at)}</span>
                         </div>
                   </button>
                 ))}
@@ -679,7 +679,7 @@ export const SnippetEditor: React.FC = () => {
               <button 
                 onClick={() => { playSound('click'); handleRollback(); }}
                 onMouseEnter={() => playSound('hover')}
-                className="w-full bg-[#353534] hover:bg-[#e60000] text-white py-3 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1.5px] uppercase transition-colors"
+                className="w-full bg-[#353534] hover:bg-[var(--accent)] text-white py-3 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1.5px] uppercase transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 Rollback to this state

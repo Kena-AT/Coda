@@ -250,7 +250,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
       
       {glow && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-[800px] h-[800px] bg-[#e60000] blur-[250px] rounded-full opacity-[0.15]" />
+          <div className="w-[800px] h-[800px] bg-[var(--accent)] blur-[250px] rounded-full opacity-[0.15]" />
           <div className="absolute w-[500px] h-[500px] bg-[#ff3333] blur-[120px] rounded-full opacity-[0.1]" />
         </div>
       )}
@@ -264,7 +264,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
             y1={line.y1}
             x2={line.x2}
             y2={line.y2}
-            stroke="#e60000"
+            stroke="var(--accent)"
             strokeWidth="0.5"
             opacity={line.opacity * 0.5}
           />
@@ -305,7 +305,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
           cy={dimensions.centerY}
           r="8"
           fill="none"
-          stroke="#e60000"
+          stroke="var(--accent)"
           strokeWidth="0.5"
           opacity="0.3"
         />

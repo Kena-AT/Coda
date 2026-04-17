@@ -68,21 +68,21 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
   };
 
   const getIcon = (tag: string) => {
-    if (tag.includes('rest')) return <Terminal className="w-5 h-5 text-[#e60000]" />;
-    if (tag.includes('hook')) return <Zap className="w-5 h-5 text-[#e60000]" />;
-    if (tag.includes('perf')) return <Database className="w-5 h-5 text-[#e60000]" />;
-    if (tag.includes('auth')) return <Shield className="w-5 h-5 text-[#e60000]" />;
-    return <FileCode className="w-5 h-5 text-[#e60000]" />;
+    if (tag.includes('rest')) return <Terminal className="w-5 h-5 text-[var(--accent)]" />;
+    if (tag.includes('hook')) return <Zap className="w-5 h-5 text-[var(--accent)]" />;
+    if (tag.includes('perf')) return <Database className="w-5 h-5 text-[var(--accent)]" />;
+    if (tag.includes('auth')) return <Shield className="w-5 h-5 text-[var(--accent)]" />;
+    return <FileCode className="w-5 h-5 text-[var(--accent)]" />;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-8 bg-[#131313cc] backdrop-blur-sm selection:bg-[#e60000] selection:text-white">
-      <main className="w-full max-w-6xl h-[80vh] bg-[#0e0e0e] border-t-2 border-[#e60000] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-8 bg-[#131313cc] backdrop-blur-sm selection:bg-[var(--accent)] selection:text-white">
+      <main className="w-full max-w-6xl h-[80vh] bg-[#0e0e0e] border-t-2 border-[var(--accent)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden relative">
         
         {/* Modal Header */}
         <header className="h-12 bg-[#353534] flex items-center justify-between px-4 border-b border-[#0e0e0e]">
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 bg-[#e60000] flex items-center justify-center rounded-sm">
+            <div className="w-5 h-5 bg-[var(--accent)] flex items-center justify-center rounded-sm">
                 <div className="w-3 h-[1px] bg-white" />
                 <div className="w-3 h-[1px] bg-white rotate-90 absolute" />
             </div>
@@ -109,7 +109,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                   <button
                     key={lang}
                     onClick={() => setSelectedLang(lang)}
-                    className={`px-4 py-1 text-[10px] font-main font-bold transition-all ${selectedLang === lang ? 'bg-[#e60000] text-white' : 'text-[#adaaad] hover:text-white'}`}
+                    className={`px-4 py-1 text-[10px] font-main font-bold transition-all ${selectedLang === lang ? 'bg-[var(--accent)] text-white' : 'text-[#adaaad] hover:text-white'}`}
                   >
                     {lang}
                   </button>
@@ -119,7 +119,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
 
             {/* Filter Patterns Input */}
             <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#adaaad] group-focus-within:text-[#e60000] transition-colors">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#adaaad] group-focus-within:text-[var(--accent)] transition-colors">
                 <Search size={16} />
               </div>
               <input 
@@ -127,7 +127,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                 placeholder="FILTER_PATTERNS..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-[#131313] border border-[#353534]/50 p-4 pl-12 text-[12px] font-mono text-white outline-none focus:border-[#e60000] transition-all uppercase placeholder:opacity-30"
+                className="w-full bg-[#131313] border border-[#353534]/50 p-4 pl-12 text-[12px] font-mono text-white outline-none focus:border-[var(--accent)] transition-all uppercase placeholder:opacity-30"
               />
             </div>
 
@@ -137,7 +137,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                 <button
                   key={t.id}
                   onClick={() => setSelectedTemplateId(t.id)}
-                  className={`relative text-left p-6 bg-[#131313] border transition-all flex flex-col gap-4 group ${selectedTemplateId === t.id ? 'border-[#e60000] shadow-[0_0_20px_rgba(230,0,0,0.1)]' : 'border-[#353534]/30 hover:border-[#adaaad]/50'}`}
+                  className={`relative text-left p-6 bg-[#131313] border transition-all flex flex-col gap-4 group ${selectedTemplateId === t.id ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(230,0,0,0.1)]' : 'border-[#353534]/30 hover:border-[#adaaad]/50'}`}
                 >
                   <div className="flex justify-between items-start">
                     {getIcon(t.tag)}
@@ -149,7 +149,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                       {t.description}
                     </p>
                   </div>
-                  <div className={`h-1 w-8 transition-all ${selectedTemplateId === t.id ? 'bg-[#e60000] w-full' : 'bg-[#e60000]/20'}`} />
+                  <div className={`h-1 w-8 transition-all ${selectedTemplateId === t.id ? 'bg-[var(--accent)] w-full' : 'bg-[var(--accent)]/20'}`} />
                 </button>
               ))}
             </div>
@@ -159,7 +159,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
           {/* Recommendations Sidebar */}
           <aside className="w-[380px] border-l border-[#353534]/30 bg-[#0e0e0e] flex flex-col p-8 overflow-y-auto custom-scrollbar">
              <div className="flex items-center gap-3 mb-8">
-               <div className="w-2 h-2 bg-[#e60000]" />
+               <div className="w-2 h-2 bg-[var(--accent)]" />
                <h3 className="text-[12px] font-main font-bold text-white tracking-[2px] uppercase">SMART_RECOMMENDATIONS</h3>
              </div>
 
@@ -167,10 +167,10 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                 {recommendations.map(r => (
                   <div key={r.id} className="flex flex-col gap-4">
                      <div className="flex justify-between items-start">
-                        <span className="text-[9px] font-mono text-[#e60000] uppercase font-bold">{r.id.toUpperCase()}</span>
+                        <span className="text-[9px] font-mono text-[var(--accent)] uppercase font-bold">{r.id.toUpperCase()}</span>
                         <div className="flex flex-col items-end">
-                           <span className="text-[10px] text-[#e60000] font-bold">{r.match_percent}% MATCH</span>
-                           <div className="w-12 h-[1px] bg-[#e60000] opacity-30 mt-1" />
+                           <span className="text-[10px] text-[var(--accent)] font-bold">{r.match_percent}% MATCH</span>
+                           <div className="w-12 h-[1px] bg-[var(--accent)] opacity-30 mt-1" />
                         </div>
                      </div>
                      <p className="text-[11px] text-[#adaaad] font-main leading-relaxed italic border-l border-[#353534] pl-4">
@@ -179,13 +179,13 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                      
                      <div className="flex flex-col gap-2">
                         <span className="text-[10px] text-white font-bold uppercase font-main">{r.title}</span>
-                        <div className="bg-[#131313] p-3 text-[10px] font-mono text-[#e60000]/80 border border-[#353534]/20 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <div className="bg-[#131313] p-3 text-[10px] font-mono text-[var(--accent)]/80 border border-[#353534]/20 overflow-hidden text-ellipsis whitespace-nowrap">
                            {r.content}
                         </div>
                      </div>
 
                      <div className="flex gap-4">
-                        <button className="text-[9px] font-bold text-[#e60000] uppercase tracking-[1px] hover:underline" onClick={() => onSelect(r.content)}>Preview</button>
+                        <button className="text-[9px] font-bold text-[var(--accent)] uppercase tracking-[1px] hover:underline" onClick={() => onSelect(r.content)}>Preview</button>
                         <button className="text-[9px] font-bold text-[#adaaad] uppercase tracking-[1px] hover:underline">Ignore</button>
                      </div>
                   </div>
@@ -208,10 +208,10 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                 </div>
                 <div className="text-[8px] font-mono text-[#adaaad] uppercase mb-1">SYSTEM_DATA_STREAM</div>
                 <div className="flex gap-1 h-[3px] w-full">
-                   <div className="h-full flex-1 bg-[#e60000]/20" />
-                   <div className="h-full flex-1 bg-[#e60000]/20" />
-                   <div className="h-full flex-1 bg-[#e60000]/20" />
-                   <div className="h-full flex-1 bg-[#e60000]" />
+                   <div className="h-full flex-1 bg-[var(--accent)]/20" />
+                   <div className="h-full flex-1 bg-[var(--accent)]/20" />
+                   <div className="h-full flex-1 bg-[var(--accent)]/20" />
+                   <div className="h-full flex-1 bg-[var(--accent)]" />
                 </div>
              </div>
           </aside>
@@ -220,8 +220,8 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
         {/* Modal Footer */}
         <footer className="h-20 bg-[#161618] border-t border-[#353534]/30 flex items-center justify-between px-8">
            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full border border-[#e60000] flex items-center justify-center animate-pulse">
-                 <div className="w-1.5 h-1.5 bg-[#e60000] rounded-full" />
+              <div className="w-4 h-4 rounded-full border border-[var(--accent)] flex items-center justify-center animate-pulse">
+                 <div className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full" />
               </div>
               <span className="text-[10px] font-main text-[#adaaad] tracking-[1px]">Select a pattern to overwrite editor buffer</span>
            </div>
@@ -235,7 +235,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
               <button 
                 onClick={handleMerge}
                 disabled={!selectedTemplateId}
-                className="px-8 py-3 bg-[#e60000] text-white text-[11px] font-main font-bold tracking-[2px] uppercase hover:bg-[#ff0000] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-8 py-3 bg-[var(--accent)] text-white text-[11px] font-main font-bold tracking-[2px] uppercase hover:bg-[#ff0000] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Execute_Merge
               </button>

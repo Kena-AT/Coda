@@ -103,17 +103,17 @@ export const IntelligenceDashboard: React.FC = () => {
 
       <div className="mb-12">
         <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 bg-[#222226]/50 rounded text-[#e60000]"><Activity size={18} /></div>
+          <div className="p-2 bg-[#222226]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
           <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Active Projects</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {sections.projScores.map(p => p && (
-            <div key={p.id} className="bg-[#151515] border border-[#222226] p-5 hover:border-[#e60000]/50 transition-colors cursor-pointer group">
+            <div key={p.id} className="bg-[#151515] border border-[#222226] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group">
               <div className="flex justify-between items-start mb-4">
-                <Folder className="w-5 h-5 text-[#e60000]" />
+                <Folder className="w-5 h-5 text-[var(--accent)]" />
                 <span className="text-[#adaaad] text-[9px] font-mono tracking-widest">{p.snippetCount} ITEMS</span>
               </div>
-              <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[#e60000] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
+              <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[var(--accent)] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
               <p className="text-[10px] text-[#adaaad] font-mono mt-2">ACTIVITY SCORE: {p.score}</p>
             </div>
           ))}
@@ -121,7 +121,7 @@ export const IntelligenceDashboard: React.FC = () => {
       </div>
 
       {renderSnippetRow('Continue Working', <Clock size={18} />, sections.continueWorking, 'No recent edits found')}
-      {renderSnippetRow('Top Snippets', <Flame size={18} className="text-[#e60000]" />, sections.topSnippets, 'Use snippets to build analytics')}
+      {renderSnippetRow('Top Snippets', <Flame size={18} className="text-[var(--accent)]" />, sections.topSnippets, 'Use snippets to build analytics')}
       {renderSnippetRow('Needs Cleanup', <Archive size={18} />, sections.stale, 'Vault is entirely clean')}
     </div>
   );

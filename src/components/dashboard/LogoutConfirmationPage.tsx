@@ -57,9 +57,9 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
         
         <div className="flex justify-center">
             <div className="w-24 h-24 bg-[#1f1f22] border border-[#353534] flex items-center justify-center relative shadow-[0_0_50px_rgba(230,0,0,0.1)]">
-                <Power className="w-12 h-12 text-[#e60000]" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#e60000]" />
-                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-[#e60000]" />
+                <Power className="w-12 h-12 text-[var(--accent)]" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[var(--accent)]" />
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-[var(--accent)]" />
             </div>
         </div>
 
@@ -67,8 +67,8 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
           <h2 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase">
             TERMINATE_SESSION?
           </h2>
-          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#e60000]/50 to-transparent" />
-          <p className="text-[#e60000] font-mono text-[10px] tracking-[2px] uppercase">
+          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[var(--accent)]/50 to-transparent" />
+          <p className="text-[var(--accent)] font-mono text-[10px] tracking-[2px] uppercase">
              All uncommitted buffers will be persisted to local storage.
           </p>
         </div>
@@ -77,7 +77,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
           <button 
             onClick={() => { playSound('click'); handleLogout(); }}
             onMouseEnter={() => playSound('hover')}
-            className="group relative flex flex-col items-start p-8 bg-[#e60000] hover:bg-[#ff0000] transition-all text-left overflow-hidden"
+            className="group relative flex flex-col items-start p-8 bg-[var(--accent)] hover:bg-[#ff0000] transition-all text-left overflow-hidden"
           >
             <div className="mb-8 w-10 h-10 border border-white/30 flex items-center justify-center bg-white/10 group-hover:scale-110 transition-transform">
                 <Monitor className="w-5 h-5 text-white" />

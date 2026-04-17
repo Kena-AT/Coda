@@ -107,16 +107,16 @@ export const HardwareVisualization: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full aspect-square bg-transparent border border-[#e60000] relative grid grid-cols-2 grid-rows-2">
+      <div className="w-full aspect-square bg-transparent border border-[var(--accent)] relative grid grid-cols-2 grid-rows-2">
         {/* Grid Lines */}
-        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#e60000]/30" />
-        <div className="absolute top-0 left-1/2 w-[1px] h-full bg-[#e60000]/30" />
+        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[var(--accent)]/30" />
+        <div className="absolute top-0 left-1/2 w-[1px] h-full bg-[var(--accent)]/30" />
 
         {/* TOP LEFT: RAM & CPU */}
-        <div className="relative p-4 flex flex-col gap-4 border-r border-b border-[#e60000]/10">
+        <div className="relative p-4 flex flex-col gap-4 border-r border-b border-[var(--accent)]/10">
           <div className="flex gap-4 items-start">
             <div 
-              className="w-12 h-12 bg-[#e60000] shadow-[0_0_20px_rgba(230,0,0,0.5)] transition-all duration-500"
+              className="w-12 h-12 bg-[var(--accent)] shadow-[0_0_20px_rgba(230,0,0,0.5)] transition-all duration-500"
               style={{ opacity: 0.2 + glowOpacity, boxShadow: `0 0 ${20 + glowOpacity * 30}px rgba(230,0,0,${0.3 + glowOpacity})` }}
             />
             <div className="flex flex-col">
@@ -127,27 +127,27 @@ export const HardwareVisualization: React.FC = () => {
           
           <div className="flex gap-4 items-center mt-2">
             <div className="relative w-10 h-10 flex items-center justify-center">
-               <div className="absolute w-full h-full border-2 border-[#e60000]/20 rounded-full" />
+               <div className="absolute w-full h-full border-2 border-[var(--accent)]/20 rounded-full" />
                <div 
-                 className="absolute w-full h-full border-2 border-t-[#e60000] rounded-full animate-spin"
+                 className="absolute w-full h-full border-2 border-t-[var(--accent)] rounded-full animate-spin"
                  style={{ animationDuration: pulseDuration }}
                />
                <div className="text-[8px] text-white font-bold">{cpuVal.toFixed(0)}%</div>
             </div>
             <div className="flex flex-col">
                <span className="text-[8px] text-[#adaaad] uppercase leading-tight">Coda CPU %</span>
-               <span className="text-[7px] text-[#e60000] uppercase tracking-tighter opacity-70">Faster pulse %</span>
-               <span className="text-[7px] text-[#e60000] uppercase tracking-tighter opacity-70">a brighter</span>
+               <span className="text-[7px] text-[var(--accent)] uppercase tracking-tighter opacity-70">Faster pulse %</span>
+               <span className="text-[7px] text-[var(--accent)] uppercase tracking-tighter opacity-70">a brighter</span>
             </div>
           </div>
         </div>
 
         {/* TOP RIGHT: DB HEALTH & CACHE */}
-        <div className="relative p-4 flex flex-col gap-6 border-b border-[#e60000]/10">
+        <div className="relative p-4 flex flex-col gap-6 border-b border-[var(--accent)]/10">
           <div className="flex gap-3 items-start">
-             <div className="w-10 h-10 bg-[#e60000]/10 border border-[#e60000]/40 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[#e60000] animate-pulse opacity-20" />
-                <div className="absolute bottom-0 left-0 w-full bg-[#e60000] transition-all duration-1000" style={{ height: `${Math.min(parseFloat(dbQueryTime) * 2, 100)}%` }} />
+             <div className="w-10 h-10 bg-[var(--accent)]/10 border border-[var(--accent)]/40 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[var(--accent)] animate-pulse opacity-20" />
+                <div className="absolute bottom-0 left-0 w-full bg-[var(--accent)] transition-all duration-1000" style={{ height: `${Math.min(parseFloat(dbQueryTime) * 2, 100)}%` }} />
              </div>
              <div className="flex flex-col">
                 <span className="text-[9px] text-[#adaaad] uppercase font-bold">Database Health:</span>
@@ -157,24 +157,24 @@ export const HardwareVisualization: React.FC = () => {
           </div>
 
           <div className="flex gap-3 items-center">
-             <div className="w-8 h-8 rounded-full border border-[#e60000] flex items-center justify-center relative">
-                <div className="absolute inset-1 rounded-full border border-dashed border-[#e60000]/40 animate-[spin_10s_linear_infinite]" />
+             <div className="w-8 h-8 rounded-full border border-[var(--accent)] flex items-center justify-center relative">
+                <div className="absolute inset-1 rounded-full border border-dashed border-[var(--accent)]/40 animate-[spin_10s_linear_infinite]" />
                 <span className="text-[8px] text-white font-bold">{res?.cache_entries || 0}</span>
              </div>
              <div className="flex flex-col">
                 <span className="text-[8px] text-[#adaaad] uppercase leading-tight">Cache size:</span>
-                <span className="text-[7px] text-[#e60000] font-bold">Cache size</span>
+                <span className="text-[7px] text-[var(--accent)] font-bold">Cache size</span>
              </div>
           </div>
         </div>
 
         {/* BOTTOM LEFT: RADAR & IMPORT */}
-        <div className="relative p-4 flex flex-col justify-end border-r border-[#e60000]/10">
+        <div className="relative p-4 flex flex-col justify-end border-r border-[var(--accent)]/10">
           <div className="absolute top-2 right-2 w-16 h-16 opacity-30">
-             <div className="w-full h-full rounded-full border border-[#e60000] relative overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 w-full h-[1px] bg-[#e60000] -translate-y-1/2 -translate-x-1/2 opacity-20" />
-                <div className="absolute top-1/2 left-1/2 w-[1px] h-full bg-[#e60000] -translate-y-1/2 -translate-x-1/2 opacity-20" />
-                <div className="absolute inset-0 bg-[conic-gradient(from_0deg,#e60000_0%,transparent_25%)] animate-[spin_3s_linear_infinite]" />
+             <div className="w-full h-full rounded-full border border-[var(--accent)] relative overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 w-full h-[1px] bg-[var(--accent)] -translate-y-1/2 -translate-x-1/2 opacity-20" />
+                <div className="absolute top-1/2 left-1/2 w-[1px] h-full bg-[var(--accent)] -translate-y-1/2 -translate-x-1/2 opacity-20" />
+                <div className="absolute inset-0 bg-[conic-gradient(from_0deg,var(--accent)_0%,transparent_25%)] animate-[spin_3s_linear_infinite]" />
              </div>
           </div>
           
@@ -235,14 +235,14 @@ export const HardwareVisualization: React.FC = () => {
                <button 
                  onClick={handleRunMaintenance}
                  disabled={isRunning}
-                 className="bg-[#e60000] text-white px-3 py-1 flex items-center gap-1 group overflow-hidden relative disabled:opacity-50"
+                 className="bg-[var(--accent)] text-white px-3 py-1 flex items-center gap-1 group overflow-hidden relative disabled:opacity-50"
                >
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
                   <span className="text-[8px] font-bold">{isRunning ? '...' : 'RUN'}</span>
                </button>
                <button 
                  onClick={handleAddMonitor}
-                 className="bg-[#222226] border border-[#e60000] text-[#e60000] px-3 py-1 flex items-center gap-1 group overflow-hidden relative hover:bg-[#e60000] hover:text-white transition-colors"
+                 className="bg-[#222226] border border-[var(--accent)] text-[var(--accent)] px-3 py-1 flex items-center gap-1 group overflow-hidden relative hover:bg-[var(--accent)] hover:text-white transition-colors"
                >
                   <span className="text-[8px] font-bold">+</span>
                   <span className="text-[8px] font-bold uppercase tracking-tighter">Add Monitor</span>
