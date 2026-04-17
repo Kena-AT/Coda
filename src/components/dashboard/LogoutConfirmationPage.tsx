@@ -56,7 +56,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
       <div className="max-w-2xl w-full text-center space-y-12 relative z-10">
         
         <div className="flex justify-center">
-            <div className="w-24 h-24 bg-[#1f1f22] border border-[var(--border)] flex items-center justify-center relative shadow-[0_0_50px_rgba(230,0,0,0.1)]">
+            <div className="w-24 h-24 bg-[#1f1f22] border border-[var(--border)] flex items-center justify-center relative shadow-[0_0_50px_var(--accent-glow)0.1)]">
                 <Power className="w-12 h-12 text-[var(--accent)]" />
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-[var(--accent)]" />
                 <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-[var(--accent)]" />

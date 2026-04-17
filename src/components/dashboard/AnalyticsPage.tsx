@@ -335,7 +335,7 @@ export const AnalyticsPage: React.FC = () => {
                     Encrypted database node localized in application data.
                   </p>
                </div>
-               <button className="w-fit px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors shadow-[0_0_15px_rgba(230,0,0,0.2)]">
+               <button className="w-fit px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors shadow-[0_0_15px_var(--accent-glow)0.2)]">
                   Purge Cache
                </button>
             </div>

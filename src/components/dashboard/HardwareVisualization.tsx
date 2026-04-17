@@ -116,8 +116,8 @@ export const HardwareVisualization: React.FC = () => {
         <div className="relative p-4 flex flex-col gap-4 border-r border-b border-[var(--accent)]/10">
           <div className="flex gap-4 items-start">
             <div 
-              className="w-12 h-12 bg-[var(--accent)] shadow-[0_0_20px_rgba(230,0,0,0.5)] transition-all duration-500"
-              style={{ opacity: 0.2 + glowOpacity, boxShadow: `0 0 ${20 + glowOpacity * 30}px rgba(230,0,0,${0.3 + glowOpacity})` }}
+              className="w-12 h-12 bg-[var(--accent)] shadow-[0_0_20px_var(--accent-glow)0.5)] transition-all duration-500"
+              style={{ opacity: 0.2 + glowOpacity, boxShadow: `0 0 ${20 + glowOpacity * 30}px var(--accent-glow)${0.3 + glowOpacity})` }}
             />
             <div className="flex flex-col">
                <span className="text-[9px] text-[#adaaad] uppercase">Coda RAM MB</span>

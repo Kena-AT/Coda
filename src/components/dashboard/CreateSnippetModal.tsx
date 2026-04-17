@@ -85,7 +85,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-      <div className="w-full max-w-2xl bg-[#0e0e10] border border-[var(--border)] shadow-[0_0_100px_rgba(230,0,0,0.15)] relative overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-2xl bg-[#0e0e10] border border-[var(--border)] shadow-[0_0_100px_var(--accent-glow)0.15)] relative overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
@@ -230,7 +230,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 disabled={loading}
                 onMouseEnter={() => playSound('hover')}
                 onClick={() => playSound('click')}
-                className="bg-[var(--accent)] text-white flex items-center gap-3 px-8 py-3 font-main font-bold text-xs tracking-[2px] uppercase hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
+                className="bg-[var(--accent)] text-white flex items-center gap-3 px-8 py-3 font-main font-bold text-xs tracking-[2px] uppercase hover:shadow-[0_0_20px_var(--accent-glow)0.3)] transition-all"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'STORING...' : 'STORE_SNIPPET'}</span>

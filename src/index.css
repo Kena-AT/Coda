@@ -17,7 +17,7 @@
   --bg-secondary: #121214;
   --bg-tertiary: #1a1a1d;
   --accent: var(--accent);
-  --accent-glow: rgba(230, 0, 0, 0.4);
+  --accent-glow: var(--accent-glow) 0.4);
   --border: var(--border);
   --accent-secondary: #ff3333;
 }

@@ -200,7 +200,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                 onClick={() => setRememberMe(!rememberMe)}
                 className={`w-5 h-5 rounded flex items-center justify-center transition-all ${
                   rememberMe
-                    ? 'bg-[var(--accent)] border-2 border-[var(--accent)] shadow-[0_0_10px_rgba(230,0,0,0.4)]'
+                    ? 'bg-[var(--accent)] border-2 border-[var(--accent)] shadow-[0_0_10px_var(--accent-glow)0.4)]'
                     : 'bg-[var(--border)] border-2 border-[var(--accent)]/60 hover:border-[var(--accent)] hover:bg-[#2a2a2e]'
                 }`}
               >

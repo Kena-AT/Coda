@@ -137,7 +137,7 @@ export const BoilerplateSelector: React.FC<BoilerplateSelectorProps> = ({ onClos
                 <button
                   key={t.id}
                   onClick={() => setSelectedTemplateId(t.id)}
-                  className={`relative text-left p-6 bg-[#131313] border transition-all flex flex-col gap-4 group ${selectedTemplateId === t.id ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(230,0,0,0.1)]' : 'border-[var(--border)]/30 hover:border-[#adaaad]/50'}`}
+                  className={`relative text-left p-6 bg-[#131313] border transition-all flex flex-col gap-4 group ${selectedTemplateId === t.id ? 'border-[var(--accent)] shadow-[0_0_20px_var(--accent-glow)0.1)]' : 'border-[var(--border)]/30 hover:border-[#adaaad]/50'}`}
                 >
                   <div className="flex justify-between items-start">
                     {getIcon(t.tag)}

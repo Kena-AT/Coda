@@ -25,7 +25,7 @@ export const GlobalErrorModal: React.FC = () => {
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative w-full max-w-2xl bg-[var(--bg-primary)ff] border border-red-500/30 overflow-hidden shadow-[0_0_50px_rgba(230,0,0,0.1)]"
+          className="relative w-full max-w-2xl bg-[var(--bg-primary)ff] border border-red-500/30 overflow-hidden shadow-[0_0_50px_var(--accent-glow)0.1)]"
         >
           {/* Scanline Effect */}
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] z-10 bg-[length:100%_2px,3px_100%]" />

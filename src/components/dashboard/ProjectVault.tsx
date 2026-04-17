@@ -361,7 +361,7 @@ export const ProjectVault: React.FC = () => {
                     setSelectedSnippetId(-1);
                   }}
                   onMouseEnter={() => playSound('hover')}
-                  className="flex items-center gap-2 px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase hover:bg-[#ff0000] hover:shadow-[0_0_20px_rgba(230,0,0,0.3)] transition-all"
+                  className="flex items-center gap-2 px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase hover:bg-[#ff0000] hover:shadow-[0_0_20px_var(--accent-glow)0.3)] transition-all"
                 >
                   <Plus size={14} /> INITIALISE_SNIPPET
                 </button>
@@ -617,7 +617,7 @@ export const ProjectVault: React.FC = () => {
       {/* Floating Action Button for Creating Projects */}
       <button
         onClick={() => setShowCreateModal(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 bg-[var(--accent)] flex items-center justify-center hover:bg-[#ff0000] hover:scale-105 transition-all shadow-[0_0_20px_rgba(230,0,0,0.3)] z-50"
+        className="fixed bottom-8 right-8 w-14 h-14 bg-[var(--accent)] flex items-center justify-center hover:bg-[#ff0000] hover:scale-105 transition-all shadow-[0_0_20px_var(--accent-glow)0.3)] z-50"
         title="Create New Project"
       >
         <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
