@@ -13,12 +13,12 @@
 }
 
 [data-theme='crimson'], :root:not([data-theme]) {
-  --bg-primary: var(--bg-primary);
+  --bg-primary: #0a0a0c;
   --bg-secondary: #121214;
   --bg-tertiary: #1a1a1d;
-  --accent: var(--accent);
-  --accent-glow: var(--accent-glow) 0.4);
-  --border: var(--border);
+  --accent: #e60000;
+  --accent-glow: rgba(230, 0, 0, 0.4);
+  --border: #222226;
   --accent-secondary: #ff3333;
 }
 
