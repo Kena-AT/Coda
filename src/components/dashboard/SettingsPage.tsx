@@ -225,7 +225,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                   </div>
                   <div className="h-0.5 w-full bg-[var(--border)] relative">
                     <div 
-                      className="absolute top-[-4px] h-3 w-3 bg-[var(--accent)] rounded-full shadow-[0_0_10px_var(--accent-glow)0.5)] cursor-pointer" 
+                      className="absolute top-[-4px] h-3 w-3 bg-[var(--accent)] rounded-full shadow-[0_0_10px_var(--accent-glow)] cursor-pointer" 
                       style={{ left: `${((settings.fontSize - 80) / 70) * 100}%` }}
                     />
                     <input 
