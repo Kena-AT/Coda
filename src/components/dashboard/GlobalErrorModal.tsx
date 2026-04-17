@@ -16,7 +16,7 @@ export const GlobalErrorModal: React.FC = () => {
            initial={{ opacity: 0 }}
            animate={{ opacity: 1 }}
            exit={{ opacity: 0 }}
-           className="absolute inset-0 bg-[#0e0e0ecc] backdrop-blur-md"
+           className="absolute inset-0 bg-[var(--bg-primary)cc] backdrop-blur-md"
            onClick={() => setGlobalError(null)}
         />
 
@@ -25,13 +25,13 @@ export const GlobalErrorModal: React.FC = () => {
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative w-full max-w-2xl bg-[#0e0e0eff] border border-red-500/30 overflow-hidden shadow-[0_0_50px_rgba(230,0,0,0.1)]"
+          className="relative w-full max-w-2xl bg-[var(--bg-primary)ff] border border-red-500/30 overflow-hidden shadow-[0_0_50px_rgba(230,0,0,0.1)]"
         >
           {/* Scanline Effect */}
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] z-10 bg-[length:100%_2px,3px_100%]" />
 
           {/* Top Bar */}
-          <div className="h-8 bg-[#353534ff] border-b border-red-500/20 flex items-center justify-between px-4">
+          <div className="h-8 bg-[var(--border)ff] border-b border-red-500/20 flex items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-red-500 animate-pulse" />
               <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">

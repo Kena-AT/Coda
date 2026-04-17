@@ -45,7 +45,7 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[#111111] border border-[#222226] w-full max-w-md shadow-2xl relative overflow-hidden">
+      <div className="bg-[var(--bg-primary)] border border-[var(--border)] w-full max-w-md shadow-2xl relative overflow-hidden">
         <div className="h-1 bg-[var(--accent)] w-full" />
         
         <div className="p-6">
@@ -85,12 +85,12 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
                 <input 
                   type="number" min="0" 
                   value={minCopyThreshold} onChange={(e) => setMinCopyThreshold(Number(e.target.value))}
-                  className="bg-[#151515] border border-[#222226] p-3 text-white font-mono text-[14px] focus:outline-none focus:border-[var(--accent)] transition-colors"
+                  className="bg-[#151515] border border-[var(--border)] p-3 text-white font-mono text-[14px] focus:outline-none focus:border-[var(--accent)] transition-colors"
                 />
                 <span className="text-[10px] text-[#adaaad] font-mono">Archive immunity for highly-used snippets</span>
              </div>
 
-             <div className="flex items-center gap-4 bg-[#151515] p-4 border border-[#222226] cursor-pointer" onClick={() => setExcludeFavorites(!excludeFavorites)}>
+             <div className="flex items-center gap-4 bg-[#151515] p-4 border border-[var(--border)] cursor-pointer" onClick={() => setExcludeFavorites(!excludeFavorites)}>
                <div className={`w-4 h-4 border ${excludeFavorites ? 'bg-[var(--accent)] border-[var(--accent)]' : 'bg-transparent border-[#adaaad]'} flex items-center justify-center transition-colors`}>
                  {excludeFavorites && <div className="w-2 h-2 bg-white" />}
                </div>
@@ -99,7 +99,7 @@ export const MaintenanceSettingsModal: React.FC<Props> = ({ isOpen, onClose }) =
           </div>
         </div>
 
-        <div className="border-t border-[#222226] bg-[#151515] p-5 flex justify-end gap-6">
+        <div className="border-t border-[var(--border)] bg-[#151515] p-5 flex justify-end gap-6">
           <button onClick={onClose} className="text-[11px] font-main font-bold text-[#adaaad] hover:text-white uppercase tracking-[1.5px] transition-colors">
             Cancel
           </button>

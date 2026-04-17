@@ -74,10 +74,10 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
   }, [currentLanguage, currentTags, selectedSnippetId, activeSubTab]);
 
   return (
-    <aside className="w-[300px] bg-[#0e0e0e] border-l border-[#222226] flex flex-col pt-10">
+    <aside className="w-[300px] bg-[var(--bg-primary)] border-l border-[var(--border)] flex flex-col pt-10">
       
       {/* Sidebar Header */}
-      <div className="px-6 py-4 border-b border-[#222226] flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between">
         <div className="flex flex-col">
           <h3 className="font-main font-bold text-[10px] text-white tracking-[2px] uppercase">Smart_Intelligence</h3>
           <span className="text-[9px] text-[var(--accent)] font-mono mt-1">Rule-Based v1.1.0</span>
@@ -87,7 +87,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
             onClick={() => setActiveSubTab('smart')}
             className={cn(
               "px-2 py-0.5 text-[8px] font-bold tracking-[1px] uppercase border",
-              activeSubTab === 'smart' ? "bg-[var(--accent)] border-[var(--accent)] text-white" : "border-[#222226] text-[#adaaad]"
+              activeSubTab === 'smart' ? "bg-[var(--accent)] border-[var(--accent)] text-white" : "border-[var(--border)] text-[#adaaad]"
             )}
           >
             SMART
@@ -96,7 +96,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
             onClick={() => setActiveSubTab('stale')}
             className={cn(
               "px-2 py-0.5 text-[8px] font-bold tracking-[1px] uppercase border",
-              activeSubTab === 'stale' ? "bg-[var(--accent)] border-[var(--accent)] text-white" : "border-[#222226] text-[#adaaad]"
+              activeSubTab === 'stale' ? "bg-[var(--accent)] border-[var(--accent)] text-white" : "border-[var(--border)] text-[#adaaad]"
             )}
           >
             STALE
@@ -123,7 +123,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                  </div>
                  
                  <div 
-                    className="bg-[#131313] border border-[#222226] p-4 flex flex-col gap-3 group-hover:border-[var(--accent)]/50 transition-all cursor-pointer" 
+                    className="bg-[#131313] border border-[var(--border)] p-4 flex flex-col gap-3 group-hover:border-[var(--accent)]/50 transition-all cursor-pointer" 
                     onClick={async () => {
                       onPreview(rec.content);
                       try {
@@ -134,7 +134,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                     }}
                   >
                     <h4 className="text-[11px] font-main font-bold text-white uppercase tracking-[0.5px] truncate">{rec.title}</h4>
-                    <div className="bg-[#0a0a0a] p-3 text-[10px] font-mono text-[#adaaad]/60 overflow-hidden text-ellipsis whitespace-nowrap border border-[#222226]/50">
+                    <div className="bg-[#0a0a0a] p-3 text-[10px] font-mono text-[#adaaad]/60 overflow-hidden text-ellipsis whitespace-nowrap border border-[var(--border)]/50">
                        {rec.content}
                     </div>
 
@@ -147,7 +147,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
                         {rec.breakdown.ctr_penalty > 0 && <span className="text-[7px] font-mono text-[var(--accent)]">CTR_ADJ-{Math.round(rec.breakdown.ctr_penalty)}</span>}
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 mt-2 border-t border-[#222226]/50">
+                    <div className="flex justify-between items-center pt-2 mt-2 border-t border-[var(--border)]/50">
                        <span className="text-[10px] text-[var(--accent)] font-bold">{rec.match_score}% Match</span>
                        <div className="flex items-center gap-1 text-[9px] text-[#adaaad] group-hover:text-white transition-colors">
                           <span>Preview & Sync</span>
@@ -165,7 +165,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
       </div>
 
       {/* Footer Info */}
-      <div className="p-6 bg-[#0a0a0a] border-t border-[#222226] flex flex-col gap-3 text-[8px] font-mono text-[#adaaad] uppercase tracking-[1px]">
+      <div className="p-6 bg-[#0a0a0a] border-t border-[var(--border)] flex flex-col gap-3 text-[8px] font-mono text-[#adaaad] uppercase tracking-[1px]">
           <div className="flex justify-between">
             <span>ENGINE:</span>
             <span className="text-white">{metadata?.heuristics_engine || 'STABLE'}</span>
@@ -181,7 +181,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
          
          <button 
            onClick={fetchData}
-           className="mt-4 w-full bg-[#1c1b1b] border border-[#222226] text-[#adaaad] py-2.5 text-[9px] font-bold uppercase tracking-[2px] flex items-center justify-center gap-2 hover:bg-[#222226] hover:text-white transition-all shadow-inner"
+           className="mt-4 w-full bg-[#1c1b1b] border border-[var(--border)] text-[#adaaad] py-2.5 text-[9px] font-bold uppercase tracking-[2px] flex items-center justify-center gap-2 hover:bg-[var(--border)] hover:text-white transition-all shadow-inner"
          >
            Analyze Current Buffer
            <RefreshCcw size={10} className={loading ? 'animate-spin' : ''} />

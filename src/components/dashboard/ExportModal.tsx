@@ -100,10 +100,10 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
          ))}
       </div>
 
-      <div className="bg-[#0e0e0e] border border-[#222226] w-full max-w-[1024px] shadow-[20px_20px_0px_#00000080] relative flex flex-col overflow-hidden">
+      <div className="bg-[var(--bg-primary)] border border-[var(--border)] w-full max-w-[1024px] shadow-[20px_20px_0px_#00000080] relative flex flex-col overflow-hidden">
         
         {/* Title Bar */}
-        <div className="h-10 bg-[#353534] border-b border-[#5f3f3a33] flex items-center justify-between px-4 shrink-0">
+        <div className="h-10 bg-[var(--border)] border-b border-[#5f3f3a33] flex items-center justify-between px-4 shrink-0">
           <div className="flex items-center gap-6">
              <div className="flex gap-1.5">
                 <div className="w-1.5 h-1.5 bg-[var(--accent)]/40" />
@@ -131,7 +131,7 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                    <div className="grid grid-cols-2 gap-4">
                       <div 
                         onClick={() => setExportFormat('json')}
-                        className={`p-6 border cursor-pointer transition-all relative group ${exportFormat === 'json' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[#222226] hover:border-[#adaaad]/30'}`}
+                        className={`p-6 border cursor-pointer transition-all relative group ${exportFormat === 'json' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[var(--border)] hover:border-[#adaaad]/30'}`}
                       >
                          <FileJson className={`w-10 h-10 mb-4 transition-colors ${exportFormat === 'json' ? 'text-[var(--accent)]' : 'text-[#adaaad]'}`} strokeWidth={1.5} />
                          <h4 className={`text-[11px] font-main font-bold uppercase mb-1 ${exportFormat === 'json' ? 'text-white' : 'text-[#adaaad]'}`}>JSON_BUNDLE</h4>
@@ -141,7 +141,7 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
                       <div 
                         onClick={() => setExportFormat('module')}
-                        className={`p-6 border cursor-pointer transition-all relative group ${exportFormat === 'module' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[#222226] hover:border-[#adaaad]/30'}`}
+                        className={`p-6 border cursor-pointer transition-all relative group ${exportFormat === 'module' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[var(--border)] hover:border-[#adaaad]/30'}`}
                       >
                          <FileCode className={`w-10 h-10 mb-4 transition-colors ${exportFormat === 'module' ? 'text-[var(--accent)]' : 'text-[#adaaad]'}`} strokeWidth={1.5} />
                          <h4 className={`text-[11px] font-main font-bold uppercase mb-1 ${exportFormat === 'module' ? 'text-white' : 'text-[#adaaad]'}`}>LANGUAGE_MODULES</h4>
@@ -172,7 +172,7 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
                    <div className="flex flex-col gap-4">
                       <h3 className="text-white font-main font-bold text-[10px] uppercase tracking-[2px]">SCHEMA_VERSION</h3>
-                      <div className="bg-[#151515] border border-[#222226] p-4 text-[#adaaad] font-mono text-[11px] flex justify-between items-center">
+                      <div className="bg-[#151515] border border-[var(--border)] p-4 text-[#adaaad] font-mono text-[11px] flex justify-between items-center">
                          <span className="text-white">V3.4.0 (CURRENT_STABLE)</span>
                          <div className="flex gap-1">
                             <div className="w-1 h-1 bg-[#15ff00]" />
@@ -186,7 +186,7 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Snippet List Column */}
-          <div className="w-[380px] bg-[#111111] flex flex-col shrink-0">
+          <div className="w-[380px] bg-[var(--bg-primary)] flex flex-col shrink-0">
              <div className="p-6 border-b border-[#5f3f3a1a]">
                 <h3 className="text-white font-main font-bold text-[11px] uppercase tracking-[2px] mb-2">SELECTED_SNIPPETS_FOR_EXPORT</h3>
                 <p className="text-[#adaaad] text-[9px] font-mono uppercase">Buffer selection: {selectedIds.length} / {snippets.length}</p>
@@ -194,7 +194,7 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
                 {selectedSnippets.map(s => (
-                  <div key={s.id} className="bg-[#151515] border border-[#222226] p-4 flex justify-between items-center group hover:border-[var(--accent)]/40 transition-colors">
+                  <div key={s.id} className="bg-[#151515] border border-[var(--border)] p-4 flex justify-between items-center group hover:border-[var(--accent)]/40 transition-colors">
                      <div className="flex flex-col gap-1 overflow-hidden">
                         <span className="text-white font-main font-bold text-[11px] uppercase truncate tracking-[0.5px]">{s.title || 'UNTITLED'}</span>
                         <div className="flex items-center gap-2">
@@ -254,7 +254,7 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer info line */}
-        <div className="bg-[#0e0e0e] border-t border-[#5f3f3a1a] px-8 py-4 flex justify-between items-center shrink-0">
+        <div className="bg-[var(--bg-primary)] border-t border-[#5f3f3a1a] px-8 py-4 flex justify-between items-center shrink-0">
            <div className="flex items-center gap-4 text-[9px] font-mono text-[#adaaad] uppercase">
               <span className="text-[var(--accent)]">Encryption: AES-256-GCM</span>
               <span>Model: CODA-P9</span>

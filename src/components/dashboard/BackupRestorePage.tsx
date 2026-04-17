@@ -144,7 +144,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-4">
           
           {/* Create Backup */}
-          <div className="bg-[#131313] border border-[#353534]/30 p-10 space-y-10 relative overflow-hidden group">
+          <div className="bg-[#131313] border border-[var(--border)]/30 p-10 space-y-10 relative overflow-hidden group">
              {/* Decor */}
              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Database size={80} className="text-[var(--accent)]" />
@@ -158,7 +158,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
              </div>
 
               <div className="space-y-6">
-                <div className="bg-[#1f1f22]/30 border border-[#353534]/50 p-6 rounded-sm">
+                <div className="bg-[#1f1f22]/30 border border-[var(--border)]/50 p-6 rounded-sm">
                    <p className="text-[9px] font-mono text-[#737373] uppercase mb-4">Last backup point</p>
                    <p className="text-xl font-main font-bold text-white">{lastBackup}</p>
                 </div>
@@ -176,7 +176,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           </div>
 
           {/* Metrics */}
-          <div className="bg-[#131313] border border-[#353534]/30 rounded-sm p-8 space-y-12">
+          <div className="bg-[#131313] border border-[var(--border)]/30 rounded-sm p-8 space-y-12">
             <div className="flex items-center gap-2 text-[var(--accent)]">
                <Activity size={18} />
                <span className="text-[10px] font-mono uppercase tracking-[1px]">Vault Metrics</span>
@@ -199,14 +199,14 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                </div>
             </div>
 
-            <div className="pt-12 border-t border-[#353534]/20 space-y-2">
+            <div className="pt-12 border-t border-[var(--border)]/20 space-y-2">
                <p className="text-[8px] font-mono text-[#4a4a4d] uppercase truncate">SHA-256 Checksum: 8f92-bd0a-5f33-1c21...</p>
                <p className="text-[8px] font-mono text-[#4a4a4d] uppercase">Indexing: Optimized</p>
             </div>
           </div>
 
           {/* Restore */}
-          <div className="lg:col-span-2 bg-[#131313] border border-[#353534]/30 rounded-sm overflow-hidden p-8 flex flex-col md:flex-row gap-12">
+          <div className="lg:col-span-2 bg-[#131313] border border-[var(--border)]/30 rounded-sm overflow-hidden p-8 flex flex-col md:flex-row gap-12">
             <div className="flex-1 space-y-8">
                <h3 className="text-lg font-main font-bold text-white uppercase">Vault_Reconstruction</h3>
                <p className="text-[12px] font-main text-[#737373] leading-relaxed">
@@ -229,9 +229,9 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                  onClick={() => { playSound('click'); handleRestore(); }}
                  onMouseEnter={() => playSound('hover')}
                  disabled={loading}
-                 className="w-full aspect-square bg-[#1f1f22] border-2 border-dashed border-[#353534]/50 hover:border-[var(--accent)]/50 hover:bg-[#1f1111]/10 transition-all flex flex-col items-center justify-center gap-4 group"
+                 className="w-full aspect-square bg-[#1f1f22] border-2 border-dashed border-[var(--border)]/50 hover:border-[var(--accent)]/50 hover:bg-[#1f1111]/10 transition-all flex flex-col items-center justify-center gap-4 group"
                >
-                 <div className="w-16 h-16 bg-[#0a0a0c] border border-[#353534] flex items-center justify-center group-hover:scale-110 transition-transform">
+                 <div className="w-16 h-16 bg-[var(--bg-primary)] border border-[var(--border)] flex items-center justify-center group-hover:scale-110 transition-transform">
                     <FileUp className="w-8 h-8 text-[#737373] group-hover:text-red-600 transition-colors" />
                  </div>
                  <span className="text-[11px] font-mono text-[#737373] uppercase tracking-[1px] group-hover:text-white transition-colors">Select_Archive_Point</span>
@@ -240,8 +240,8 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           </div>
 
           {/* Terminal Log Output */}
-          <div className="lg:col-span-2 bg-[#0a0a0c] border border-[#353534]/30 rounded-sm overflow-hidden">
-            <div className="bg-[#1f1f22]/50 p-2 px-4 border-b border-[#353534]/30 flex justify-between items-center">
+          <div className="lg:col-span-2 bg-[var(--bg-primary)] border border-[var(--border)]/30 rounded-sm overflow-hidden">
+            <div className="bg-[#1f1f22]/50 p-2 px-4 border-b border-[var(--border)]/30 flex justify-between items-center">
                <span className="text-[9px] font-mono text-red-600 font-black uppercase tracking-[1px]">Terminal_Feed_Log</span>
                <span className="text-[8px] font-mono text-[#4a4a4d] uppercase">Session_ID: 9X-212-ALPHA</span>
             </div>

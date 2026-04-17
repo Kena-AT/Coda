@@ -39,7 +39,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onBack, onSuccess, onNav
     <div className="min-h-screen flex items-center justify-center bg-[#0e0e10] p-6 selection:bg-[#00f5ff] selection:text-black overflow-hidden relative text-white">
       <ParallaxBackground />
 
-      <main className="w-full max-w-md relative z-10 mx-auto bg-[#0e0e10]/80 backdrop-blur-xl border border-[#222226] p-10 flex flex-col items-center">
+      <main className="w-full max-w-md relative z-10 mx-auto bg-[#0e0e10]/80 backdrop-blur-xl border border-[var(--border)] p-10 flex flex-col items-center">
         {/* Back Button */}
         <button 
           onClick={onBack}

@@ -13,7 +13,7 @@ class SearchErrorBoundary extends Component<{ children: ReactNode }, { hasError:
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex-1 flex flex-col items-center justify-center bg-[#111111] p-10 text-center">
+        <div className="flex-1 flex flex-col items-center justify-center bg-[var(--bg-primary)] p-10 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--accent)] mb-4" />
           <h2 className="text-xl font-main font-bold text-white uppercase mb-2">SEARCH_ENGINE_FAULT</h2>
           <p className="text-[#adaaad] font-mono text-[10px] uppercase mb-8">A fatal error occurred while rendering the results matrix.</p>
@@ -88,7 +88,7 @@ export const GlobalSearchResults: React.FC = () => {
   if (snippetResults.length === 0 && projectResults.length === 0 && searchQuery) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="w-20 h-20 bg-[#222226] flex items-center justify-center rounded-full mb-8">
+        <div className="w-20 h-20 bg-[var(--border)] flex items-center justify-center rounded-full mb-8">
           <Search className="w-10 h-10 text-[#adaaad]" />
         </div>
         <h2 className="text-2xl font-main font-bold text-white uppercase mb-4">No results for "{searchQuery}"</h2>
@@ -101,8 +101,8 @@ export const GlobalSearchResults: React.FC = () => {
 
   return (
     <SearchErrorBoundary>
-      <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#111111] animate-in fade-in duration-300">
-        <div className="mb-12 flex justify-between items-end border-b border-[#222226] pb-8">
+      <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)] animate-in fade-in duration-300">
+        <div className="mb-12 flex justify-between items-end border-b border-[var(--border)] pb-8">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-main font-bold text-white tracking-[-1.5px] uppercase">
               Search Results
@@ -113,7 +113,7 @@ export const GlobalSearchResults: React.FC = () => {
           </div>
           
           <div className="flex gap-4 items-center h-fit">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-[#151515] border border-[#222226] rounded-sm text-[10px] font-mono text-[#adaaad]">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-[#151515] border border-[var(--border)] rounded-sm text-[10px] font-mono text-[#adaaad]">
                <Info size={12} className="text-[var(--accent)]" />
                <span>RELEVANCE_SORT_ACTIVE</span>
             </div>
@@ -138,10 +138,10 @@ export const GlobalSearchResults: React.FC = () => {
                     setActiveTab('projects');
                     setSearchQuery('');
                   }}
-                  className="bg-[#151515] border border-[#222226] p-6 hover:border-[var(--accent)] transition-all cursor-pointer group animate-in zoom-in-95 duration-300"
+                  className="bg-[#151515] border border-[var(--border)] p-6 hover:border-[var(--accent)] transition-all cursor-pointer group animate-in zoom-in-95 duration-300"
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <div className="p-2 bg-[#222226] text-[#adaaad] group-hover:text-[var(--accent)] transition-colors">
+                    <div className="p-2 bg-[var(--border)] text-[#adaaad] group-hover:text-[var(--accent)] transition-colors">
                       <FolderGit2 size={16} />
                     </div>
                     <ChevronRight size={14} className="text-[#333] group-hover:text-[var(--accent)] transition-all transform group-hover:translate-x-1" />
@@ -158,7 +158,7 @@ export const GlobalSearchResults: React.FC = () => {
         {snippetResults.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-[#222226]/50 rounded text-[#adaaad]">
+              <div className="p-2 bg-[var(--border)]/50 rounded text-[#adaaad]">
                 <Activity size={18} />
               </div>
               <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Snippet Fragments</h2>

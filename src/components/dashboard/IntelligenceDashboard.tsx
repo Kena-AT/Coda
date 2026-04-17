@@ -70,11 +70,11 @@ export const IntelligenceDashboard: React.FC = () => {
   const renderSnippetRow = (title: string, icon: React.ReactNode, list: Snippet[], emptyText: string) => (
     <div className="mb-12">
       <div className="flex items-center gap-2 mb-6">
-        <div className="p-2 bg-[#222226]/50 rounded text-[#adaaad]">{icon}</div>
+        <div className="p-2 bg-[var(--border)]/50 rounded text-[#adaaad]">{icon}</div>
         <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">{title}</h2>
       </div>
       {list.length === 0 ? (
-        <div className="p-8 border border-dashed border-[#222226] text-center text-[#adaaad] font-mono text-[11px] uppercase rounded-lg">
+        <div className="p-8 border border-dashed border-[var(--border)] text-center text-[#adaaad] font-mono text-[11px] uppercase rounded-lg">
           {emptyText}
         </div>
       ) : (
@@ -95,7 +95,7 @@ export const IntelligenceDashboard: React.FC = () => {
   );
 
   return (
-    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#111111]">
+    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)]">
       <div className="mb-12 flex flex-col gap-2">
         <h1 className="text-3xl font-main font-bold text-white tracking-[-1.5px] uppercase">Library Intelligence</h1>
         <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">Prioritization & Asset Discovery Layer</p>
@@ -103,12 +103,12 @@ export const IntelligenceDashboard: React.FC = () => {
 
       <div className="mb-12">
         <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 bg-[#222226]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
+          <div className="p-2 bg-[var(--border)]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
           <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Active Projects</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {sections.projScores.map(p => p && (
-            <div key={p.id} className="bg-[#151515] border border-[#222226] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group">
+            <div key={p.id} className="bg-[#151515] border border-[var(--border)] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group">
               <div className="flex justify-between items-start mb-4">
                 <Folder className="w-5 h-5 text-[var(--accent)]" />
                 <span className="text-[#adaaad] text-[9px] font-mono tracking-widest">{p.snippetCount} ITEMS</span>

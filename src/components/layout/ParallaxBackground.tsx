@@ -251,7 +251,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
       {glow && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-[800px] h-[800px] bg-[var(--accent)] blur-[250px] rounded-full opacity-[0.15]" />
-          <div className="absolute w-[500px] h-[500px] bg-[#ff3333] blur-[120px] rounded-full opacity-[0.1]" />
+          <div className="absolute w-[500px] h-[500px] bg-[var(--accent-secondary)] blur-[120px] rounded-full opacity-[0.1]" />
         </div>
       )}
 
@@ -277,9 +277,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
           const size = point.ringIndex === -1 ? 1.2 : 1.5 + depth * 1;
           
           const isSpiral = point.ringIndex === -1;
-          const color = isSpiral 
-            ? `rgba(255, 51, 51, ${opacity})` 
-            : `rgba(230, 0, 0, ${opacity})`;
+          const color = isSpiral ? "var(--accent-secondary)" : "var(--accent)";
 
           return (
             <circle
@@ -288,6 +286,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
               cy={point.y}
               r={size}
               fill={color}
+              fillOpacity={opacity}
             />
           );
         })}
@@ -297,7 +296,7 @@ export const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ classNam
           cx={dimensions.centerX}
           cy={dimensions.centerY}
           r="3"
-          fill="#ff0000"
+          fill="var(--accent)"
           opacity="0.8"
         />
         <circle

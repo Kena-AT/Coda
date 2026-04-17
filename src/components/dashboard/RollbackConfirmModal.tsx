@@ -20,7 +20,7 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="w-[420px] bg-[#0e0e0e] border border-[var(--accent)]/50 shadow-2xl shadow-[var(--accent)]/20">
+      <div className="w-[420px] bg-[var(--bg-primary)] border border-[var(--accent)]/50 shadow-2xl shadow-[var(--accent)]/20">
         {/* Header */}
         <div className="bg-[var(--accent)] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
           </div>
 
           {versionDate && (
-            <div className="bg-[#1c1b1b] border border-[#353534] p-4">
+            <div className="bg-[#1c1b1b] border border-[var(--border)] p-4">
               <div className="text-[9px] font-mono text-[#adaaad] uppercase tracking-[1px] mb-2">
                 Target Sequence
               </div>
@@ -76,7 +76,7 @@ export const RollbackConfirmModal: React.FC<RollbackConfirmModalProps> = ({
         <div className="px-6 pb-6 flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 border border-[#353534] text-[#adaaad] text-[10px] font-bold tracking-[1.5px] uppercase hover:border-[#adaaad] hover:text-white transition-all"
+            className="flex-1 py-3 border border-[var(--border)] text-[#adaaad] text-[10px] font-bold tracking-[1.5px] uppercase hover:border-[#adaaad] hover:text-white transition-all"
           >
             ABORT
           </button>

@@ -178,7 +178,7 @@ export const HardwareVisualization: React.FC = () => {
              </div>
           </div>
           
-          <div className="flex flex-col gap-1 z-10 bg-[#111111]/80 p-1">
+          <div className="flex flex-col gap-1 z-10 bg-[var(--bg-primary)]/80 p-1">
              <span className="text-[8px] text-[#adaaad] uppercase font-bold">Query Operations</span>
              
              <div className="flex flex-col mt-2 gap-1">
@@ -242,7 +242,7 @@ export const HardwareVisualization: React.FC = () => {
                </button>
                <button 
                  onClick={handleAddMonitor}
-                 className="bg-[#222226] border border-[var(--accent)] text-[var(--accent)] px-3 py-1 flex items-center gap-1 group overflow-hidden relative hover:bg-[var(--accent)] hover:text-white transition-colors"
+                 className="bg-[var(--border)] border border-[var(--accent)] text-[var(--accent)] px-3 py-1 flex items-center gap-1 group overflow-hidden relative hover:bg-[var(--accent)] hover:text-white transition-colors"
                >
                   <span className="text-[8px] font-bold">+</span>
                   <span className="text-[8px] font-bold uppercase tracking-tighter">Add Monitor</span>

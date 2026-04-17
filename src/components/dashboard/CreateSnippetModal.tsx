@@ -85,10 +85,10 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-      <div className="w-full max-w-2xl bg-[#0e0e10] border border-[#222226] shadow-[0_0_100px_rgba(230,0,0,0.15)] relative overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-2xl bg-[#0e0e10] border border-[var(--border)] shadow-[0_0_100px_rgba(230,0,0,0.15)] relative overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#222226]">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
           <div className="flex flex-col gap-1">
              <div className="flex items-center gap-3">
                <Terminal className="text-[var(--accent)] w-5 h-5" />
@@ -128,7 +128,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 onChange={(e) => setTitle(e.target.value)}
                 onFocus={() => playSound('hover')}
                 placeholder="Database Logic Cluster..."
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm"
+                className="w-full bg-[#19191c]/60 border border-[var(--border)] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm"
                 required
               />
             </div>
@@ -143,7 +143,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 value={language}
                 onChange={(e) => { playSound('click'); setLanguage(e.target.value); }}
                 onMouseEnter={() => playSound('hover')}
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm appearance-none"
+                className="w-full bg-[#19191c]/60 border border-[var(--border)] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm appearance-none"
               >
                 <option value="javascript">JavaScript</option>
                 <option value="typescript">TypeScript</option>
@@ -168,7 +168,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 onChange={(e) => setTags(e.target.value)}
                 onFocus={() => playSound('hover')}
                 placeholder="API, Utility, Auth..."
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm"
+                className="w-full bg-[#19191c]/60 border border-[var(--border)] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm"
               />
             </div>
 
@@ -182,7 +182,7 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
                 value={projectId || ''}
                 onChange={(e) => { playSound('click'); setProjectId(e.target.value ? parseInt(e.target.value) : null); }}
                 onMouseEnter={() => playSound('hover')}
-                className="w-full bg-[#19191c]/60 border border-[#222226] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm appearance-none"
+                className="w-full bg-[#19191c]/60 border border-[var(--border)] p-3 text-white outline-none focus:border-[var(--accent)] transition-colors font-main text-sm appearance-none"
               >
                 <option value="">NO_PROJECT_ASSIGNED (INBOX)</option>
                 {projects.map((p) => (
@@ -205,13 +205,13 @@ export const CreateSnippetModal: React.FC<CreateSnippetModalProps> = ({ isOpen, 
               onChange={(e) => setContent(e.target.value)}
               onFocus={() => playSound('hover')}
               placeholder="export const connect = () => { ... }"
-              className="flex-1 bg-[#0a0a0c] border border-[#222226] p-4 text-[#f3ffca] font-mono text-xs outline-none focus:border-[var(--accent)] transition-colors resize-none overflow-y-auto custom-scrollbar"
+              className="flex-1 bg-[var(--bg-primary)] border border-[var(--border)] p-4 text-[#f3ffca] font-mono text-xs outline-none focus:border-[var(--accent)] transition-colors resize-none overflow-y-auto custom-scrollbar"
               required
             />
           </div>
 
           {/* Action Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-[#222226]/50">
+          <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]/50">
             <div className="text-[9px] text-[#adaaad] uppercase font-main opacity-50 tracking-[1px]">
               Memory_Buffer: Allocated 4.02kb
             </div>

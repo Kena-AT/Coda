@@ -39,7 +39,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-[#0a0a0c] p-6 relative overflow-hidden">
+    <div className="flex-1 flex flex-col items-center justify-center bg-[var(--bg-primary)] p-6 relative overflow-hidden">
       
       {/* Background Decor */}
       <div className="absolute top-12 left-12 font-mono text-[10px] text-[#2a2a2e] space-y-1">
@@ -56,7 +56,7 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
       <div className="max-w-2xl w-full text-center space-y-12 relative z-10">
         
         <div className="flex justify-center">
-            <div className="w-24 h-24 bg-[#1f1f22] border border-[#353534] flex items-center justify-center relative shadow-[0_0_50px_rgba(230,0,0,0.1)]">
+            <div className="w-24 h-24 bg-[#1f1f22] border border-[var(--border)] flex items-center justify-center relative shadow-[0_0_50px_rgba(230,0,0,0.1)]">
                 <Power className="w-12 h-12 text-[var(--accent)]" />
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-[var(--accent)]" />
                 <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-[var(--accent)]" />
@@ -91,9 +91,9 @@ export const LogoutConfirmationPage: React.FC<LogoutConfirmationPageProps> = ({ 
           <button 
             onClick={() => { playSound('transition'); onCancel(); }}
             onMouseEnter={() => playSound('hover')}
-            className="group relative flex flex-col items-start p-8 bg-[#1f1f22] hover:bg-[#252529] border border-[#353534] transition-all text-left"
+            className="group relative flex flex-col items-start p-8 bg-[#1f1f22] hover:bg-[#252529] border border-[var(--border)] transition-all text-left"
           >
-             <div className="mb-8 w-10 h-10 border border-[#353534] flex items-center justify-center group-hover:bg-[#353534]/30 transition-all">
+             <div className="mb-8 w-10 h-10 border border-[var(--border)] flex items-center justify-center group-hover:bg-[var(--border)]/30 transition-all">
                 <ShieldAlert className="w-5 h-5 text-[#adaaad]" />
             </div>
             <div className="space-y-1">

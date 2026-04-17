@@ -67,7 +67,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
     <div className="min-h-screen flex items-center justify-center bg-[#0e0e10] p-6 selection:bg-[var(--accent)] selection:text-white overflow-hidden relative">
       <ParallaxBackground />
 
-      <main className="w-full max-w-[896px] h-[741px] flex bg-[#19191c]/80 backdrop-blur-xl border border-[#222226] shadow-[0_25px_43px_-12px_rgba(0,0,0,0.25)] relative z-10 overflow-hidden">
+      <main className="w-full max-w-[896px] h-[741px] flex bg-[#19191c]/80 backdrop-blur-xl border border-[var(--border)] shadow-[0_25px_43px_-12px_rgba(0,0,0,0.25)] relative z-10 overflow-hidden">
         
         {/* Left Side: Visual Anchor */}
         <div className="hidden md:flex w-[373px] bg-[#1f1f22] p-10 flex-col justify-between relative overflow-hidden">
@@ -201,7 +201,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
                 className={`w-5 h-5 rounded flex items-center justify-center transition-all ${
                   rememberMe
                     ? 'bg-[var(--accent)] border-2 border-[var(--accent)] shadow-[0_0_10px_rgba(230,0,0,0.4)]'
-                    : 'bg-[#222226] border-2 border-[var(--accent)]/60 hover:border-[var(--accent)] hover:bg-[#2a2a2e]'
+                    : 'bg-[var(--border)] border-2 border-[var(--accent)]/60 hover:border-[var(--accent)] hover:bg-[#2a2a2e]'
                 }`}
               >
                 {rememberMe && <Check className="w-3.5 h-3.5 text-white" />}

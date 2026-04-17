@@ -285,9 +285,9 @@ export const ProjectVault: React.FC = () => {
 
   if (selectedProjectId !== null && activeProject) {
     return (
-      <div className="flex-1 flex flex-col bg-[#111111] overflow-hidden">
+      <div className="flex-1 flex flex-col bg-[var(--bg-primary)] overflow-hidden">
         {/* Scoped Header */}
-        <div className="p-8 border-b border-[#222226] bg-[#0e0e0e]">
+        <div className="p-8 border-b border-[var(--border)] bg-[var(--bg-primary)]">
           <div className="flex items-center gap-2 text-[#adaaad] text-[10px] font-mono tracking-widest uppercase mb-4">
             <button 
               onClick={() => { playSound('click'); setSelectedProjectId(null); }}
@@ -309,7 +309,7 @@ export const ProjectVault: React.FC = () => {
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
                     onFocus={() => playSound('hover')}
-                    className="text-3xl font-main font-bold bg-[#151515] border border-[#222226] text-white px-3 py-1 outline-none uppercase tracking-[-1.5px]"
+                    className="text-3xl font-main font-bold bg-[#151515] border border-[var(--border)] text-white px-3 py-1 outline-none uppercase tracking-[-1.5px]"
                   />
                   <input 
                     type="text" 
@@ -317,13 +317,13 @@ export const ProjectVault: React.FC = () => {
                     onChange={e => setEditDesc(e.target.value)}
                     onFocus={() => playSound('hover')}
                     placeholder="ENTER_DESCRIPTION..."
-                    className="text-[#adaaad] font-mono text-[11px] bg-[#151515] border border-[#222226] px-3 py-1 outline-none uppercase"
+                    className="text-[#adaaad] font-mono text-[11px] bg-[#151515] border border-[var(--border)] px-3 py-1 outline-none uppercase"
                   />
                   <div className="flex gap-2">
                     <button onClick={() => { playSound('click'); handleUpdateActiveProject(); }} className="flex items-center gap-2 px-4 py-1.5 bg-[var(--accent)] text-white text-[10px] font-bold uppercase transition-colors hover:bg-[#ff0000]">
                       <Check size={14} /> SAVE_METADATA
                     </button>
-                    <button onClick={() => { playSound('click'); setIsEditing(false); }} className="px-4 py-1.5 border border-[#222226] text-[#adaaad] text-[10px] font-bold uppercase hover:text-white transition-colors">
+                    <button onClick={() => { playSound('click'); setIsEditing(false); }} className="px-4 py-1.5 border border-[var(--border)] text-[#adaaad] text-[10px] font-bold uppercase hover:text-white transition-colors">
                       <X size={14} /> CANCEL
                     </button>
                   </div>
@@ -334,7 +334,7 @@ export const ProjectVault: React.FC = () => {
                     <button
                       onClick={() => { playSound('click'); setSelectedProjectId(null); }}
                       onMouseEnter={() => playSound('hover')}
-                      className="p-2 border border-[#222226] text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors"
+                      className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors"
                       title="Back to Projects"
                     >
                       <ArrowLeft className="w-4 h-4" />
@@ -374,15 +374,15 @@ export const ProjectVault: React.FC = () => {
                   onChange={e => setLocalSearch(e.target.value)}
                   onFocus={() => playSound('hover')}
                   placeholder="FILTER_SCOPED_VAULT..."
-                  className="w-full bg-[#151515] border border-[#222226] pl-9 pr-4 py-2 text-[#adaaad] text-[10px] uppercase font-mono outline-none focus:border-[var(--accent)] transition-colors"
+                  className="w-full bg-[#151515] border border-[var(--border)] pl-9 pr-4 py-2 text-[#adaaad] text-[10px] uppercase font-mono outline-none focus:border-[var(--accent)] transition-colors"
                 />
               </div>
               {activeProject.id !== -1 && (
                 <>
-                   <button onClick={() => { playSound('click'); setIsEditing(true); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[#222226] text-[#adaaad] hover:text-white transition-colors" title="Edit Metadata">
+                   <button onClick={() => { playSound('click'); setIsEditing(true); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-white transition-colors" title="Edit Metadata">
                     <Edit2 size={16} />
                   </button>
-                  <button onClick={() => { playSound('click'); openDeleteModal(activeProject.id!); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[#222226] text-[#adaaad] hover:text-[var(--accent)] transition-colors" title="Purge Project">
+                  <button onClick={() => { playSound('click'); openDeleteModal(activeProject.id!); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-[var(--accent)] transition-colors" title="Purge Project">
                     <Trash2 size={16} />
                   </button>
                 </>
@@ -394,7 +394,7 @@ export const ProjectVault: React.FC = () => {
         {/* Content */}
         <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
           {scopedSnippets.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-[#222226] rounded-xl text-[#adaaad] uppercase font-mono text-[11px]">
+            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[11px]">
               {localSearch || searchQuery ? 'NO_MATCHING_CODE_ENTRIES' : 'PROJECT_VAULT_EMPTY'}
             </div>
           ) : (
@@ -424,8 +424,8 @@ export const ProjectVault: React.FC = () => {
 
   // Overview Tier
   return (
-    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#111111]">
-      <div className="mb-10 flex justify-between items-end gap-2 border-b border-[#222226] pb-8">
+    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)]">
+      <div className="mb-10 flex justify-between items-end gap-2 border-b border-[var(--border)] pb-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-main font-bold text-white tracking-[-1.5px] uppercase">Project Vault</h1>
           <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">Organizational & Contextual Scoping Layer</p>
@@ -445,7 +445,7 @@ export const ProjectVault: React.FC = () => {
             return (
               <div 
                 key={p.id} 
-                className="bg-[#151515] border border-[#222226] p-6 hover:border-[var(--accent)]/50 transition-all group cursor-pointer relative flex flex-col h-full"
+                className="bg-[#151515] border border-[var(--border)] p-6 hover:border-[var(--accent)]/50 transition-all group cursor-pointer relative flex flex-col h-full"
                 onClick={() => { playSound('transition'); setSelectedProjectId(p.id); }}
                 onMouseEnter={() => playSound('hover')}
               >
@@ -456,7 +456,7 @@ export const ProjectVault: React.FC = () => {
                         type="text"
                         value={inlineEditName}
                         onChange={(e) => setInlineEditName(e.target.value)}
-                        className="font-main font-bold text-white bg-[#0e0e0e] border border-[#222226] px-2 py-1 text-sm outline-none focus:border-[var(--accent)] uppercase tracking-[0.5px] w-full"
+                        className="font-main font-bold text-white bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 text-sm outline-none focus:border-[var(--accent)] uppercase tracking-[0.5px] w-full"
                         placeholder="PROJECT_NAME..."
                         autoFocus
                       />
@@ -464,7 +464,7 @@ export const ProjectVault: React.FC = () => {
                         type="text"
                         value={inlineEditDesc}
                         onChange={(e) => setInlineEditDesc(e.target.value)}
-                        className="text-[#adaaad] font-mono text-[9px] bg-[#0e0e0e] border border-[#222226] px-2 py-1 outline-none focus:border-[var(--accent)] w-full"
+                        className="text-[#adaaad] font-mono text-[9px] bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 outline-none focus:border-[var(--accent)] w-full"
                         placeholder="Description..."
                       />
                       <div className="flex gap-2 mt-1">
@@ -476,7 +476,7 @@ export const ProjectVault: React.FC = () => {
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); cancelInlineEdit(); }}
-                          className="px-2 py-1 border border-[#222226] text-[#adaaad] text-[9px] font-bold uppercase"
+                          className="px-2 py-1 border border-[var(--border)] text-[#adaaad] text-[9px] font-bold uppercase"
                         >
                           <X size={12} />
                         </button>
@@ -523,7 +523,7 @@ export const ProjectVault: React.FC = () => {
                 </div>
                 
                 {s ? (
-                  <div className="grid grid-cols-2 gap-y-6 gap-x-4 pb-6 border-b border-[#222226] flex-1">
+                  <div className="grid grid-cols-2 gap-y-6 gap-x-4 pb-6 border-b border-[var(--border)] flex-1">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-black/40 rounded text-[#3b82f6]"><PieChart size={14} /></div>
                       <div className="flex flex-col">
@@ -570,7 +570,7 @@ export const ProjectVault: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]">
-          <div className="bg-[#111111] border border-[var(--accent)]/30 p-8 w-full max-w-md shadow-2xl">
+          <div className="bg-[var(--bg-primary)] border border-[var(--accent)]/30 p-8 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6 border-b border-[var(--accent)]/20 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[var(--accent)] animate-pulse" />
@@ -595,7 +595,7 @@ export const ProjectVault: React.FC = () => {
                 WARNING: All snippets within this sector will be relocated to INBOX.
               </p>
               
-              <div className="flex gap-3 mt-4 pt-4 border-t border-[#222226]">
+              <div className="flex gap-3 mt-4 pt-4 border-t border-[var(--border)]">
                 <button
                   onClick={confirmDeleteProject}
                   className="flex-1 bg-[var(--accent)] text-white py-3 text-[11px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors"
@@ -604,7 +604,7 @@ export const ProjectVault: React.FC = () => {
                 </button>
                 <button
                   onClick={closeDeleteModal}
-                  className="px-6 py-3 border border-[#222226] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors"
+                  className="px-6 py-3 border border-[var(--border)] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors"
                 >
                   ABORT
                 </button>
@@ -626,8 +626,8 @@ export const ProjectVault: React.FC = () => {
       {/* Create Project Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]">
-          <div className="bg-[#111111] border border-[#222226] p-8 w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between mb-6 border-b border-[#222226] pb-4">
+          <div className="bg-[var(--bg-primary)] border border-[var(--border)] p-8 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between mb-6 border-b border-[var(--border)] pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[var(--accent)]" />
                 <h2 className="text-lg font-main font-bold text-white tracking-[1px] uppercase">
@@ -653,7 +653,7 @@ export const ProjectVault: React.FC = () => {
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   placeholder="ENTER_SECTOR_NAME..."
-                  className="bg-[#0e0e0e] border border-[#222226] text-white px-4 py-3 text-sm font-mono outline-none focus:border-[var(--accent)] transition-colors uppercase"
+                  className="bg-[var(--bg-primary)] border border-[var(--border)] text-white px-4 py-3 text-sm font-mono outline-none focus:border-[var(--accent)] transition-colors uppercase"
                   autoFocus
                   required
                 />
@@ -667,11 +667,11 @@ export const ProjectVault: React.FC = () => {
                   value={newProjectDesc}
                   onChange={(e) => setNewProjectDesc(e.target.value)}
                   placeholder="OPTIONAL_CONTEXT..."
-                  className="bg-[#0e0e0e] border border-[#222226] text-white px-4 py-3 text-sm font-mono outline-none focus:border-[var(--accent)] transition-colors resize-none h-24"
+                  className="bg-[var(--bg-primary)] border border-[var(--border)] text-white px-4 py-3 text-sm font-mono outline-none focus:border-[var(--accent)] transition-colors resize-none h-24"
                 />
               </div>
               
-              <div className="flex gap-3 mt-4 pt-4 border-t border-[#222226]">
+              <div className="flex gap-3 mt-4 pt-4 border-t border-[var(--border)]">
                 <button
                   type="submit"
                   disabled={isCreating || !newProjectName.trim()}
@@ -686,7 +686,7 @@ export const ProjectVault: React.FC = () => {
                     setNewProjectName('');
                     setNewProjectDesc('');
                   }}
-                  className="px-6 py-3 border border-[#222226] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors"
+                  className="px-6 py-3 border border-[var(--border)] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors"
                 >
                   ABORT
                 </button>

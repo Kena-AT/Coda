@@ -87,27 +87,27 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
           
           {/* Left Panel: Context Card */}
           <div className="lg:w-80 flex-shrink-0 space-y-8">
-             <div className="bg-[#131313] border border-[#353534] relative">
-               <div className="bg-[#1f1f22] p-2 border-b border-[#353534] flex items-center justify-between">
+             <div className="bg-[#131313] border border-[var(--border)] relative">
+               <div className="bg-[#1f1f22] p-2 border-b border-[var(--border)] flex items-center justify-between">
                  <span className="text-[10px] font-mono text-[#737373]">Security_Token_V4</span>
                  <div className="flex gap-1">
                    <div className="w-1 h-1 bg-[var(--accent)]" />
                    <div className="w-1 h-3 bg-[var(--accent)]" />
                  </div>
                </div>
-               <div className="p-8 aspect-square flex items-center justify-center bg-[#0a0a0c]">
-                  <div className="w-40 h-40 bg-[#1f1f22] border border-[#353534] flex items-center justify-center relative">
+               <div className="p-8 aspect-square flex items-center justify-center bg-[var(--bg-primary)]">
+                  <div className="w-40 h-40 bg-[#1f1f22] border border-[var(--border)] flex items-center justify-center relative">
                     <Shield className="w-12 h-12 text-[var(--accent)]" />
                     <div className="absolute inset-0 border-[8px] border-black/80" />
                   </div>
                </div>
-               <div className="p-8 bg-[#131313] border-t border-[#353534] space-y-4">
+               <div className="p-8 bg-[#131313] border-t border-[var(--border)] space-y-4">
                  <h4 className="text-md font-main font-bold text-white uppercase">Vault Access</h4>
                  <p className="text-[9px] font-mono text-[#737373] leading-relaxed uppercase">
                    CRITICAL: Re-keying the vault requires full synchronization. Failure to maintain key integrity may result in permanent data redaction.
                  </p>
                </div>
-               <div className="p-4 bg-[#0a0a0c] border-t border-[#353534]/50 grid grid-cols-2 gap-4">
+               <div className="p-4 bg-[var(--bg-primary)] border-t border-[var(--border)]/50 grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <span className="text-[8px] font-mono text-[#4a4a4d] uppercase block">Encryption</span>
                     <span className="text-[9px] font-mono text-[#adaaad] uppercase">AES-256-GCM</span>
@@ -230,7 +230,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                 <button 
                   onClick={() => { playSound('transition'); onBack(); }}
                   onMouseEnter={() => playSound('hover')}
-                  className="px-10 py-5 bg-[#1f1f22] border border-[#353534] hover:bg-[#252529] text-[#adaaad] font-main font-bold uppercase text-[13px] tracking-[1px] transition-all"
+                  className="px-10 py-5 bg-[#1f1f22] border border-[var(--border)] hover:bg-[#252529] text-[#adaaad] font-main font-bold uppercase text-[13px] tracking-[1px] transition-all"
                 >
                    CANCEL
                 </button>
@@ -242,7 +242,7 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
         </div>
 
         {/* Footer info Decor */}
-        <div className="mt-24 pt-12 border-t border-[#353534]/10 flex justify-between items-end">
+        <div className="mt-24 pt-12 border-t border-[var(--border)]/10 flex justify-between items-end">
            <div className="space-y-1 font-mono text-[9px] text-[#2a2a2e] uppercase">
              <p>SYSTEM_AUTH: REDACTED_NODE_09</p>
              <p>PROTOCOL: CRIMSON_LAYER_SECURE</p>

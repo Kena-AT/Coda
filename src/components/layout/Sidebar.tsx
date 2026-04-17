@@ -39,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-[256px] bg-[#0e0e0e] border-r border-[#222226] flex flex-col justify-between py-8 z-50">
+    <aside className="fixed left-0 top-0 h-full w-[256px] bg-[var(--bg-primary)] border-r border-[var(--border)] flex flex-col justify-between py-8 z-50">
       
       {/* Logo Section */}
       <div className="px-6 mb-12">

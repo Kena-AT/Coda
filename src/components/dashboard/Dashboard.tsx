@@ -189,13 +189,13 @@ export const Dashboard: React.FC = () => {
   }, [selectedSnippetId]);
 
   return (
-    <div className="flex min-h-screen bg-[#111111] text-white">
+    <div className="flex min-h-screen bg-[var(--bg-primary)] text-white">
       <Sidebar onNewSnippet={() => setSelectedSnippetId(-1)} />
 
       <main className="flex-1 ml-[0px] lg:ml-[256px] flex flex-col relative overflow-hidden">
         
         {/* Global Navbar Header */}
-        <header className="h-[64px] bg-[#111111] border-b border-[#222226] px-8 flex items-center justify-between z-40 shrink-0">
+        <header className="h-[64px] bg-[var(--bg-primary)] border-b border-[var(--border)] px-8 flex items-center justify-between z-40 shrink-0">
           <div className="flex items-center gap-8">
             <h2 className="text-lg font-main font-bold text-[var(--accent)] tracking-[-1px] uppercase cursor-pointer" onClick={() => setSearchQuery('')}>
               CODA
@@ -207,7 +207,7 @@ export const Dashboard: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="GLOBAL_SEARCH_CMD..."
-                className="w-full bg-[#0e0e0e] border border-[#222226] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[var(--accent)] transition-colors font-main text-[11px] tracking-[1px]"
+                className="w-full bg-[var(--bg-primary)] border border-[var(--border)] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[var(--accent)] transition-colors font-main text-[11px] tracking-[1px]"
               />
               {searchQuery && (
                  <button 
@@ -241,7 +241,7 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-6 border-l border-[#222226] pl-8">
+            <div className="flex items-center gap-6 border-l border-[var(--border)] pl-8">
               <button 
                 onClick={() => setIsImportModalOpen(true)} 
                 className="text-[#adaaad] hover:text-white transition-colors"
@@ -298,11 +298,11 @@ export const Dashboard: React.FC = () => {
               <IntelligenceDashboard />
 
               {/* Right Panel: Assets & Hardware Intelligence */}
-              <aside className="w-[360px] bg-[#111111] border-l border-[#222226] p-8 flex-col gap-12 hidden xl:flex overflow-y-auto custom-scrollbar relative">
+              <aside className="w-[360px] bg-[var(--bg-primary)] border-l border-[var(--border)] p-8 flex-col gap-12 hidden xl:flex overflow-y-auto custom-scrollbar relative">
                 
                 {/* Section: Usage Analytics */}
                 <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-3 border-b border-[#222226] pb-4">
+                    <div className="flex items-center gap-3 border-b border-[var(--border)] pb-4">
                       <div className="w-2 h-2 bg-[var(--accent)]" />
                       <h3 className="text-[11px] font-main font-bold text-white tracking-[1.5px] uppercase">
                           USAGE_ANALYTICS
@@ -336,13 +336,13 @@ export const Dashboard: React.FC = () => {
 
                 {/* Section: System Status */}
                 <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-3 border-b border-[#222226] pb-4">
+                    <div className="flex items-center gap-3 border-b border-[var(--border)] pb-4">
                       <div className="w-2 h-2 bg-[var(--accent)]" />
                       <h3 className="text-[11px] font-main font-bold text-white tracking-[1.5px] uppercase">
                           SYSTEM_STATUS
                       </h3>
                     </div>
-                    <div className="bg-[#151515] p-6 border border-[#222226] relative overflow-hidden flex flex-col font-mono text-[10px] text-[#adaaad] leading-loose">
+                    <div className="bg-[#151515] p-6 border border-[var(--border)] relative overflow-hidden flex flex-col font-mono text-[10px] text-[#adaaad] leading-loose">
                       <div className="absolute top-0 left-0 w-1 h-full bg-[var(--accent)]" />
                       <div className="grid grid-cols-[100px_1fr] gap-x-2">
                         <span className="uppercase tracking-[1px] opacity-70">ENCRYPTION:</span>
@@ -365,7 +365,7 @@ export const Dashboard: React.FC = () => {
 
                 {/* Section: Hardware Visualization */}
                 <div className="flex flex-col gap-6 mt-auto">
-                    <div className="flex items-center gap-3 border-b border-[#222226] pb-4">
+                    <div className="flex items-center gap-3 border-b border-[var(--border)] pb-4">
                       <div className="w-2 h-2 bg-[var(--accent)]" />
                       <h3 className="text-[11px] font-main font-bold text-white tracking-[1.5px] uppercase">
                           HARDWARE_VISUALIZATION

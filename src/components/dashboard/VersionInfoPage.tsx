@@ -115,9 +115,9 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1">
           <div 
             onMouseEnter={() => playSound('hover')}
-            className="bg-[#131313] p-8 border border-[#353534]/30 space-y-6 hover:border-[var(--accent)]/50 transition-colors cursor-default"
+            className="bg-[#131313] p-8 border border-[var(--border)]/30 space-y-6 hover:border-[var(--accent)]/50 transition-colors cursor-default"
           >
-            <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[#353534]/50 pb-2">App Version</p>
+            <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[var(--border)]/50 pb-2">App Version</p>
             <h2 className="text-lg font-main font-bold text-white uppercase tracking-[-1px]">V.2.0.4-STABLE</h2>
             <div className="flex items-center gap-2 text-[#737373]">
                <ShieldCheck size={14} className="text-[var(--accent)]" />
@@ -127,7 +127,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
 
           <div 
             onMouseEnter={() => playSound('hover')}
-            className="bg-[#131313] p-8 border border-[#353534]/30 space-y-6 lg:col-span-2 relative overflow-hidden hover:border-[var(--accent)]/50 transition-colors cursor-default"
+            className="bg-[#131313] p-8 border border-[var(--border)]/30 space-y-6 lg:col-span-2 relative overflow-hidden hover:border-[var(--accent)]/50 transition-colors cursor-default"
           >
             <div className="absolute top-0 right-0 p-8 h-full flex flex-col justify-between">
                <div className="flex gap-1 justify-end">
@@ -139,7 +139,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                   <span className="px-2 py-0.5 bg-red-600 border border-red-600 text-white text-[8px] font-mono uppercase">CI/CD_Active</span>
                </div>
             </div>
-            <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[#353534]/50 pb-2">Resource Utilization</p>
+            <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[var(--border)]/50 pb-2">Resource Utilization</p>
             <div className="flex items-end gap-4">
               <h2 className="text-xl font-main font-bold text-white uppercase tracking-[-1px]">{telemetry?.latest_resource?.ram_mb.toFixed(1) || '0.0'}MB</h2>
               <span className="text-[10px] font-mono text-[#737373] pb-1 uppercase">RAM_ALLOC</span>
@@ -148,7 +148,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
 
           <div 
             onMouseEnter={() => playSound('hover')}
-            className="bg-[#131313] p-8 border border-[#353534]/30 space-y-8 hover:border-[var(--accent)]/50 transition-colors cursor-default"
+            className="bg-[#131313] p-8 border border-[var(--border)]/30 space-y-8 hover:border-[var(--accent)]/50 transition-colors cursor-default"
           >
              <div className="flex items-center justify-between">
                 <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">System Health</p>
@@ -186,10 +186,10 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                 <div 
                   key={i} 
                   onMouseEnter={() => playSound('hover')}
-                  className="flex items-center justify-between p-4 bg-[#131313] border border-[#353534]/30 hover:border-[var(--accent)]/30 transition-all cursor-default group"
+                  className="flex items-center justify-between p-4 bg-[#131313] border border-[var(--border)]/30 hover:border-[var(--accent)]/30 transition-all cursor-default group"
                 >
                    <div className="flex gap-4 items-center">
-                      <div className={`w-1.5 h-1.5 ${task.state === 'running' ? 'bg-red-600 animate-pulse' : 'bg-[#353534]'} shrink-0`} />
+                      <div className={`w-1.5 h-1.5 ${task.state === 'running' ? 'bg-red-600 animate-pulse' : 'bg-[var(--border)]'} shrink-0`} />
                       <div className="space-y-1">
                         <p className="text-[11px] font-main font-bold text-white uppercase tracking-[1px]">{task.name}</p>
                         <p className="text-[9px] font-mono text-[#737373] uppercase">{task.last_error || 'No active exceptions'}</p>
@@ -200,7 +200,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                         {task.state}
                       </p>
                       {task.duration_ms && (
-                        <p className="text-[9px] font-mono text-[#353534] uppercase">{task.duration_ms.toFixed(0)}ms_elapsed</p>
+                        <p className="text-[9px] font-mono text-[var(--border)] uppercase">{task.duration_ms.toFixed(0)}ms_elapsed</p>
                       )}
                    </div>
                 </div>
@@ -211,7 +211,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
           {/* Operational Params */}
           <div className="space-y-8">
             <h3 className="text-xl font-main font-bold text-white uppercase tracking-tight">OPERATIONAL_PARAMS</h3>
-            <div className="bg-[#131313] border border-[#353534]/50 p-8 space-y-6">
+            <div className="bg-[#131313] border border-[var(--border)]/50 p-8 space-y-6">
                {[
                  { label: 'DB_Pool_Size', val: `${dbSizeMb} MB` },
                  { label: 'Cache_Heads', val: telemetry?.latest_resource?.cache_entries.toString() || '0' },
@@ -221,7 +221,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                  <div 
                   key={i} 
                   onMouseEnter={() => playSound('hover')}
-                  className="flex justify-between items-center border-b border-[#353534]/20 pb-4 group"
+                  className="flex justify-between items-center border-b border-[var(--border)]/20 pb-4 group"
                  >
                     <span className="text-[10px] font-mono text-[#737373] uppercase group-hover:text-[var(--accent)] transition-colors">{p.label}</span>
                     <span className="text-[11px] font-main font-black text-white uppercase">{p.val}</span>
@@ -238,7 +238,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
         </div>
 
         {/* Architecture Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-12 border-t border-[#353534]/20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-12 border-t border-[var(--border)]/20">
            <div onMouseEnter={() => playSound('hover')} className="space-y-3 p-4 -m-4 hover:bg-white/5 transition-colors cursor-default">
               <span className="text-[40px] font-main font-black text-[#1f1f22] leading-none">01</span>
               <p className="text-[11px] font-main font-bold text-red-600 uppercase">Architecture</p>
@@ -258,7 +258,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
 
         {/* Reboot Hero Section */}
         <div className="pt-24 pb-12">
-           <div className="bg-[#131313] border border-[#353534] p-12 relative overflow-hidden text-center group">
+           <div className="bg-[#131313] border border-[var(--border)] p-12 relative overflow-hidden text-center group">
               {/* Scanline decor */}
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--accent)]/5 to-transparent h-20 w-full animate-scanline pointer-events-none" />
               

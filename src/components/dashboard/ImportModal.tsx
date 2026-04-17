@@ -218,10 +218,10 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
         </div>
       </div>
 
-      <div className="bg-[#0e0e0e] border border-[#222226] w-full max-w-[1024px] h-[720px] shadow-[20px_20px_0px_#00000080] relative flex flex-col overflow-hidden">
+      <div className="bg-[var(--bg-primary)] border border-[var(--border)] w-full max-w-[1024px] h-[720px] shadow-[20px_20px_0px_#00000080] relative flex flex-col overflow-hidden">
         
         {/* Modal Header */}
-        <div className="h-14 bg-[#1a1a1a] border-b border-[#353534]/50 flex items-center justify-between px-6 shrink-0 mr-1 mt-1">
+        <div className="h-14 bg-[#1a1a1a] border-b border-[var(--border)]/50 flex items-center justify-between px-6 shrink-0 mr-1 mt-1">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-[var(--accent)]" />
             <h2 className="text-white font-main font-bold text-[12px] tracking-[2px] uppercase">IMPORT_PROTOCOL_v2.0</h2>
@@ -234,7 +234,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
         <div className="flex-1 flex overflow-hidden">
           
           {/* Sidebar Nav */}
-          <aside className="w-64 border-r border-[#353534]/30 bg-[#111111] flex flex-col justify-between">
+          <aside className="w-64 border-r border-[var(--border)]/30 bg-[var(--bg-primary)] flex flex-col justify-between">
             <div className="flex flex-col p-4 gap-1">
               <div className="px-2 mb-6">
                  <p className="text-[#adaaad] text-[9px] font-mono tracking-widest uppercase opacity-40">System_Access</p>
@@ -257,7 +257,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
               </button>
             </div>
 
-            <div className="p-6 border-t border-[#353534]/20">
+            <div className="p-6 border-t border-[var(--border)]/20">
                <div className="flex items-center gap-2 text-[#15ff00] animate-pulse">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#15ff00]" />
                   <span className="text-[9px] font-mono uppercase tracking-[1px]">Uplink_Stable</span>
@@ -266,7 +266,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
           </aside>
 
           {/* Main Content Area */}
-          <main className="flex-1 flex flex-col bg-[#0e0e0e] overflow-hidden">
+          <main className="flex-1 flex flex-col bg-[var(--bg-primary)] overflow-hidden">
             {activeTab === 'PASTE_CODE' ? (
               <div className="flex-1 flex flex-col p-8 overflow-y-auto custom-scrollbar">
                 
@@ -275,13 +275,13 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
                       <h3 className="text-white font-main font-bold text-lg uppercase tracking-[-0.5px]">Source Input</h3>
                       <p className="text-[#adaaad] text-[10px] font-mono uppercase">Enter raw logic for indexing</p>
                    </div>
-                   <div className="bg-[#1a1a1a] border border-[#353534] px-4 py-1 flex items-center gap-2">
+                   <div className="bg-[#1a1a1a] border border-[var(--border)] px-4 py-1 flex items-center gap-2">
                        <span className="text-[9px] font-mono text-[#adaaad] uppercase">LANG:</span>
                        <span className="text-[10px] font-mono text-[var(--accent)] font-bold uppercase">{predictedLang}</span>
                    </div>
                 </div>
 
-                <div className="h-[280px] border border-[#353534] relative bg-[#0a0a0a]">
+                <div className="h-[280px] border border-[var(--border)] relative bg-[#0a0a0a]">
                    <Editor 
                      height="100%"
                      theme="vs-dark"
@@ -303,13 +303,13 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
                    <div className="flex-1 flex flex-col gap-4">
                       <button 
                         onClick={handleGenerateMetadata}
-                        className="w-full py-3 border border-[#353534] bg-[#1a1a1a] text-white text-[10px] font-main font-bold uppercase tracking-[1.5px] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 border border-[var(--border)] bg-[#1a1a1a] text-white text-[10px] font-main font-bold uppercase tracking-[1.5px] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors flex items-center justify-center gap-2"
                       >
                         <Cpu size={14} />
                         GENERATE_METADATA
                       </button>
 
-                      <div className="bg-[#151515] border border-[#222226] p-4 min-h-[100px]">
+                      <div className="bg-[#151515] border border-[var(--border)] p-4 min-h-[100px]">
                          <span className="text-[9px] font-mono text-[#adaaad] uppercase block mb-3">Predicted_Context</span>
                          <div className="flex flex-wrap gap-2">
                             {predictedTags.length > 0 ? predictedTags.map(tag => (
@@ -321,7 +321,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
                       </div>
                    </div>
 
-                   <div className="flex-1 bg-[#151515] border border-[#222226] p-4 flex flex-col relative overflow-hidden">
+                   <div className="flex-1 bg-[#151515] border border-[var(--border)] p-4 flex flex-col relative overflow-hidden">
                       {/* Decorative Element */}
                       <div className="absolute -bottom-4 -right-4 w-20 h-20 border border-[var(--accent)]/10 rounded-full" />
                       
@@ -353,7 +353,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
               <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
                  <div 
                    onClick={handleNativeOpen}
-                   className="w-full max-w-lg aspect-square border-2 border-dashed border-[#353534] hover:border-[var(--accent)] bg-[#111111]/50 flex flex-col items-center justify-center gap-6 cursor-pointer transition-all group"
+                   className="w-full max-w-lg aspect-square border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] bg-[var(--bg-primary)]/50 flex flex-col items-center justify-center gap-6 cursor-pointer transition-all group"
                  >
                     <UploadCloud size={48} className="text-[#adaaad] group-hover:text-[var(--accent)] transition-colors" />
                     <div className="text-center">
@@ -366,7 +366,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
             )}
 
             {/* Modal Footer Actions */}
-            <div className="h-20 border-t border-[#353534]/30 bg-[#161616] flex items-center justify-between px-8 shrink-0">
+            <div className="h-20 border-t border-[var(--border)]/30 bg-[#161616] flex items-center justify-between px-8 shrink-0">
                <div className="flex flex-col">
                   <p className="text-[#adaaad] text-[9px] font-mono uppercase tracking-[1px]">Coda Platforms // Copyright 2026</p>
                   <p className="text-[var(--accent)] text-[8px] font-mono uppercase opacity-60 mt-1">Authorized personnel only</p>

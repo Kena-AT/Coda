@@ -83,7 +83,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
   };
 
   return (
-    <div className={`group bg-[#151515] border ${snippet.is_archived ? 'border-dashed border-[#353534]/50' : 'border-[#222226]'} p-5 hover:bg-[#19191c] hover:border-[var(--accent)]/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-lg`}>
+    <div className={`group bg-[#151515] border ${snippet.is_archived ? 'border-dashed border-[var(--border)]/50' : 'border-[var(--border)]'} p-5 hover:bg-[#19191c] hover:border-[var(--accent)]/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-lg`}>
       
       {/* Header */}
       <div className="flex justify-between items-start mb-4 relative z-10">
@@ -152,7 +152,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
           <select 
             value={tempProjectId || ''}
             onChange={e => setTempProjectId(e.target.value ? parseInt(e.target.value) : null)}
-            className="w-full bg-[#111111] border border-[#222226] text-white text-[10px] font-mono p-2 outline-none"
+            className="w-full bg-[var(--bg-primary)] border border-[var(--border)] text-white text-[10px] font-mono p-2 outline-none"
           >
             <option value="">INBOX (UNSORTED)</option>
             {projects.map(p => (
@@ -168,7 +168,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
             </button>
             <button 
               onClick={() => setIsMoving(false)}
-              className="px-4 border border-[#222226] text-[#adaaad] hover:text-white transition-colors"
+              className="px-4 border border-[var(--border)] text-[#adaaad] hover:text-white transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -185,10 +185,10 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
       )}
 
       {/* Footer */}
-      <div className="flex justify-between items-center pt-3 border-t border-[#222226]/50 relative z-10">
+      <div className="flex justify-between items-center pt-3 border-t border-[var(--border)]/50 relative z-10">
         <div className="flex items-center gap-2 overflow-hidden max-w-[70%]">
           {snippet.tags && snippet.tags.split(',').slice(0, 2).map((tag, i) => (
-            <span key={i} className="text-[8px] text-[#adaaad] py-0.5 px-1.5 bg-[#222226] border border-white/5 truncate">
+            <span key={i} className="text-[8px] text-[#adaaad] py-0.5 px-1.5 bg-[var(--border)] border border-white/5 truncate">
               {tag.trim().toUpperCase()}
             </span>
           ))}

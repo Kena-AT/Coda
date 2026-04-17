@@ -118,7 +118,7 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-12 gap-6 mb-12">
         
         {/* Traffic Velocity Chart */}
-        <div className="col-span-8 bg-[#111111] border border-[#222226] p-8 flex flex-col gap-6 relative overflow-hidden">
+        <div className="col-span-8 bg-[var(--bg-primary)] border border-[var(--border)] p-8 flex flex-col gap-6 relative overflow-hidden">
            <div className="flex items-center justify-between z-10">
               <div className="flex flex-col gap-1">
                  <h3 className="text-white text-[16px] font-main font-bold uppercase tracking-[1px]">Traffic Velocity</h3>
@@ -160,7 +160,7 @@ export const AnalyticsPage: React.FC = () => {
 
         {/* Global Copies Info Card */}
         <div className="col-span-4 flex flex-col gap-6">
-           <div className="flex-1 bg-[#111111] border border-[#222226] p-8 flex flex-col gap-4 group hover:border-[var(--accent)]/50 transition-all">
+           <div className="flex-1 bg-[var(--bg-primary)] border border-[var(--border)] p-8 flex flex-col gap-4 group hover:border-[var(--accent)]/50 transition-all">
               <div className="flex justify-between items-start">
                   <Copy size={20} className="text-[var(--accent)]" />
                   <span className="text-[10px] text-[#adaaad] font-mono uppercase">Global Copies</span>
@@ -176,7 +176,7 @@ export const AnalyticsPage: React.FC = () => {
               </div>
            </div>
 
-           <div className="flex-1 bg-[#111111] border border-[#222226] p-8 flex flex-col gap-4 group hover:border-[var(--accent)]/50 transition-all">
+           <div className="flex-1 bg-[var(--bg-primary)] border border-[var(--border)] p-8 flex flex-col gap-4 group hover:border-[var(--accent)]/50 transition-all">
               <div className="flex justify-between items-start">
                   <Clock size={20} className="text-[var(--accent)]" />
                   <span className="text-[10px] text-[#adaaad] font-mono uppercase">Last Entry</span>
@@ -201,7 +201,7 @@ export const AnalyticsPage: React.FC = () => {
         </div>
         <div className="grid grid-cols-5 gap-4">
            {popularSnippets.map((s, i) => (
-             <div key={i} className="bg-[#111111] border border-[#222226] p-5 flex flex-col gap-3 group hover:border-[var(--accent)]/50 transition-all">
+             <div key={i} className="bg-[var(--bg-primary)] border border-[var(--border)] p-5 flex flex-col gap-3 group hover:border-[var(--accent)]/50 transition-all">
                 <div className="flex justify-between items-start">
                    <div className="px-2 py-0.5 bg-[var(--accent)] text-white text-[8px] font-bold uppercase tracking-[1px]">RANK_{i+1}</div>
                    <Activity size={12} className="text-[var(--accent)]/50" />
@@ -214,7 +214,7 @@ export const AnalyticsPage: React.FC = () => {
              </div>
            ))}
            {popularSnippets.length === 0 && (
-             <div className="col-span-5 py-12 text-center text-[#adaaad] font-mono text-[10px] uppercase opacity-40 border border-dashed border-[#222226]">
+             <div className="col-span-5 py-12 text-center text-[#adaaad] font-mono text-[10px] uppercase opacity-40 border border-dashed border-[var(--border)]">
                 Establishing trend intelligence... Continue usage to populate velocity metrics.
              </div>
            )}
@@ -223,7 +223,7 @@ export const AnalyticsPage: React.FC = () => {
 
       {/* Snippet Performance Ledger */}
       <div className="mb-12">
-        <div className="flex items-center justify-between border-b border-[#222226] pb-6 mb-8">
+        <div className="flex items-center justify-between border-b border-[var(--border)] pb-6 mb-8">
            <div className="flex items-center gap-4">
               <div className="w-8 h-[2px] bg-[var(--accent)]" />
               <h3 className="text-xl font-main font-bold text-white uppercase tracking-[1px]">Snippet Performance Ledger</h3>
@@ -234,15 +234,15 @@ export const AnalyticsPage: React.FC = () => {
                  <input 
                     type="text" 
                     placeholder="search_index..."
-                    className="bg-[#0e0e0e] border border-[#222226] pl-9 pr-4 py-2 text-[10px] font-mono text-white outline-none focus:border-[var(--accent)]"
+                    className="bg-[var(--bg-primary)] border border-[var(--border)] pl-9 pr-4 py-2 text-[10px] font-mono text-white outline-none focus:border-[var(--accent)]"
                  />
               </div>
-              <button className="px-6 py-2 bg-[#1c1b1b] border border-[#353534] text-[#adaaad] text-[10px] font-bold uppercase transition-all hover:text-white hover:border-[var(--accent)]">Export.CSV</button>
+              <button className="px-6 py-2 bg-[#1c1b1b] border border-[var(--border)] text-[#adaaad] text-[10px] font-bold uppercase transition-all hover:text-white hover:border-[var(--accent)]">Export.CSV</button>
            </div>
         </div>
 
         <div className="w-full">
-           <div className="grid grid-cols-12 px-6 py-4 text-[9px] font-mono text-[#adaaad] uppercase tracking-[2px] border-b border-[#222226]/50">
+           <div className="grid grid-cols-12 px-6 py-4 text-[9px] font-mono text-[#adaaad] uppercase tracking-[2px] border-b border-[var(--border)]/50">
               <div className="col-span-4">Snippet Name</div>
               <div className="col-span-2">Language</div>
               <div className="col-span-2">Access Count</div>
@@ -252,13 +252,13 @@ export const AnalyticsPage: React.FC = () => {
            
            <div className="flex flex-col">
               {summary?.ledger.map((s, idx) => (
-                <div key={idx} className="grid grid-cols-12 px-6 py-5 border-b border-[#222226]/30 hover:bg-[#111111] transition-colors group">
+                <div key={idx} className="grid grid-cols-12 px-6 py-5 border-b border-[var(--border)]/30 hover:bg-[var(--bg-primary)] transition-colors group">
                    <div className="col-span-4 flex items-center gap-3">
                       <div className={`w-1.5 h-1.5 rounded-full ${s.copy_count > 10 ? 'bg-[var(--accent)]' : 'bg-[#adaaad]'}`} />
                       <span className="text-[12px] font-main font-bold text-white uppercase">{s.title}</span>
                    </div>
                    <div className="col-span-2 flex items-center">
-                      <span className={`px-2 py-0.5 text-[9px] font-mono uppercase bg-[#1c1b1b] border border-[#222226] text-[#adaaad]`}>
+                      <span className={`px-2 py-0.5 text-[9px] font-mono uppercase bg-[#1c1b1b] border border-[var(--border)] text-[#adaaad]`}>
                          {s.language}
                       </span>
                    </div>
@@ -285,7 +285,7 @@ export const AnalyticsPage: React.FC = () => {
 
       {/* Footer System Health and Storage */}
       <div className="grid grid-cols-2 gap-8 mt-12 pb-12">
-         <div className="bg-[#111111] border border-[#222226] p-8 flex flex-col gap-6">
+         <div className="bg-[var(--bg-primary)] border border-[var(--border)] p-8 flex flex-col gap-6">
             <h4 className="text-[14px] font-main font-bold text-white uppercase tracking-[1px]">System Health</h4>
             <div className="flex flex-col gap-4">
                {[
@@ -306,7 +306,7 @@ export const AnalyticsPage: React.FC = () => {
             </div>
          </div>
 
-         <div className="bg-[#111111] border border-[#222226] p-8 flex items-center gap-10">
+         <div className="bg-[var(--bg-primary)] border border-[var(--border)] p-8 flex items-center gap-10">
             <div className="relative w-32 h-32 flex items-center justify-center">
                <svg className="w-full h-full rotate-[-90deg]" viewBox="0 0 100 100">
                   <circle className="text-[#19191c]" strokeWidth="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
