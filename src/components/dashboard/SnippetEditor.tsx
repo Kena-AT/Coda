@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Editor, DiffEditor } from '@monaco-editor/react';
 import { useStore, Snippet } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
@@ -57,17 +57,18 @@ export const SnippetEditor: React.FC = () => {
   const [monacoInstance, setMonacoInstance] = useState<any>(null);
   const { setGlobalError } = useStore();
   const playSound = useSoundEffect();
+  const saveRef = useRef<(() => void) | null>(null);
 
   // Handle global save shortcut event
   useEffect(() => {
     const handleSaveShortcut = () => {
-      if (selectedSnippetId !== null) {
-        handleSave();
+      if (selectedSnippetId !== null && saveRef.current) {
+        saveRef.current();
       }
     };
     window.addEventListener('save-snippet', handleSaveShortcut);
     return () => window.removeEventListener('save-snippet', handleSaveShortcut);
-  }, [selectedSnippetId, snippet, handleSave]);
+  }, [selectedSnippetId]);
 
   // Debounced title check
   useEffect(() => {
@@ -221,7 +222,7 @@ export const SnippetEditor: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!snippet.title || !snippet.content) {
       playSound('error');
       toast.error('Title and content are required');
@@ -280,7 +281,12 @@ export const SnippetEditor: React.FC = () => {
     } finally {
       setSaving(false);
     }
-  };
+  }, [snippet, titleError, selectedSnippetId, user, playSound]);
+
+  // Keep saveRef in sync so the keyboard shortcut always calls the latest handleSave
+  useEffect(() => {
+    saveRef.current = handleSave;
+  }, [handleSave]);
 
   const handleRollback = async () => {
     if (!selectedVersion) return;
