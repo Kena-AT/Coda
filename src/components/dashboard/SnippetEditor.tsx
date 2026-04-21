@@ -58,20 +58,6 @@ export const SnippetEditor: React.FC = () => {
   const { setGlobalError } = useStore();
 
   const playSound = useSoundEffect();
-  const { settings } = useStore();
-
-  // Save shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMod = e.ctrlKey || e.metaKey;
-      if (isMod && e.key.toUpperCase() === settings.shortcuts.save.toUpperCase()) {
-        e.preventDefault();
-        handleSave();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [settings.shortcuts.save, handleSave]);
 
   // Debounced title check
   useEffect(() => {

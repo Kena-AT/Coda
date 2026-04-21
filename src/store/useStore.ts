@@ -44,7 +44,7 @@ export interface Settings {
   theme: 'crimson' | 'void' | 'matrix' | 'glacier';
   fontSize: number;
   shortcuts: {
-    save: string;
+    copy: string;
     newSnippet: string;
     search: string;
   };
@@ -134,7 +134,7 @@ export const useStore = create<AppState>()(
         theme: 'crimson',
         fontSize: 100,
         shortcuts: {
-          save: 'S',
+          copy: 'C',
           newSnippet: 'N',
           search: 'F'
         }
