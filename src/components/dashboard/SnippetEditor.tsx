@@ -49,7 +49,7 @@ export const SnippetEditor: React.FC = () => {
   const [isDiffMode, setIsDiffMode] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
-  const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs' | 'links' | 'validation'>('validation');
+  const [rightSidebarTab, setRightSidebarTab] = useState<'history' | 'recs' | 'validation'>('validation');
   const [showRollbackModal, setShowRollbackModal] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [validationIssues, setValidationIssues] = useState<{ line: number; message: string; severity: 'error' | 'warning' }[]>([]);
@@ -536,16 +536,7 @@ export const SnippetEditor: React.FC = () => {
             <History size={14} />
             LOG
           </button>
-          {selectedSnippetId !== -1 && (
-            <button 
-              onClick={() => { playSound('click'); setRightSidebarTab('links'); }}
-              onMouseEnter={() => playSound('hover')}
-              className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'links' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
-            >
-              <Network size={14} />
-              LINKS
-            </button>
-          )}
+
         </div>
 
         {rightSidebarTab === 'validation' ? (
@@ -636,10 +627,6 @@ export const SnippetEditor: React.FC = () => {
                  SYNC_TO_MAINFRAME
                </button>
             </div>
-          </div>
-        ) : rightSidebarTab === 'links' && selectedSnippetId !== -1 ? (
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <ProjectLinkingPanel snippetId={selectedSnippetId!} />
           </div>
         ) : rightSidebarTab === 'recs' ? (
           <div className="flex-1 flex flex-col overflow-hidden">

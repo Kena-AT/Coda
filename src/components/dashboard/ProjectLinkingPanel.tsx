@@ -29,27 +29,35 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchRelated = async () => {
       if (!user) return;
       setLoading(true);
       try {
-        // Trigger background recomputation first (in real prod, this might be debounced or partial)
-        await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user.id });
+        // Trigger background recomputation first
+        await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user.id }).catch(() => {});
         
         // Fetch the precomputed links
         const data = await invoke<RelatedSnippet[]>('get_related_snippets', { 
           snippetId: snippetId, 
           userId: user.id 
         });
-        setRelated(data);
+        if (!cancelled) {
+          setRelated(Array.isArray(data) ? data : []);
+        }
       } catch (error) {
         console.error('Failed to fetch related snippets:', error);
+        // Keep previous results on error — don't clear them
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchRelated();
+    return () => { cancelled = true; };
   }, [snippetId, user]);
 
   const getLinkIcon = (type: string) => {
