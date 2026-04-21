@@ -44,45 +44,57 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
   const [loading, setLoading] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'smart' | 'stale'>('smart');
 
+  const FALLBACK_KEY = 'AIzaSyD-eW4TcBJUoxF1DerjG1bLS-ee3xUMqVY';
+  const apiKey = settings.geminiApiKey || FALLBACK_KEY;
+
   const fetchGeminiInsight = async (currentSnippet: any) => {
-    if (!settings.geminiApiKey) {
-      setAiStatus('idle');
-      return;
-    }
     if (!currentSnippet?.content) return;
     
     setAiStatus('syncing');
     setLastError(null);
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${settings.geminiApiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Analyze this ${currentSnippet.language} code and provide one brief (max 15 words) architectural improvement or security tip. Code: ${currentSnippet.content.substring(0, 1000)}`
-            }]
-          }]
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'API_RESPONSE_ERROR');
-      }
 
-      const data = await response.json();
-      const insight = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (insight) {
-        setAiInsight(insight);
-        setAiStatus('online');
-      } else {
-        throw new Error('EMPTY_AI_RESPONSE');
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+
+    for (const model of models) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Analyze this ${currentSnippet.language} code and provide one brief (max 15 words) architectural improvement or security tip. Code: ${currentSnippet.content.substring(0, 1000)}`
+              }]
+            }]
+          })
+        });
+      
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const errMsg = errorData.error?.message || '';
+          // If model not found, try next model
+          if (response.status === 404 || errMsg.includes('not found')) continue;
+          throw new Error(errMsg || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const insight = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (insight) {
+          setAiInsight(insight);
+          setAiStatus('online');
+          return; // Success — stop trying
+        } else {
+          throw new Error('EMPTY_AI_RESPONSE');
+        }
+      } catch (e: any) {
+        // If this is the last model, report the error
+        if (model === models[models.length - 1]) {
+          console.error("Gemini failed:", e);
+          setAiStatus('error');
+          setLastError(e.message || 'CONNECTION_FAILURE');
+        }
+        // Otherwise continue to next model
       }
-    } catch (e: any) {
-      console.error("Gemini failed:", e);
-      setAiStatus('error');
-      setLastError(e.message || 'CONNECTION_FAILURE');
     }
   };
 
