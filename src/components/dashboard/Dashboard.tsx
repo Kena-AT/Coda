@@ -149,21 +149,26 @@ export const Dashboard: React.FC = () => {
     checkArchivable();
   }, [user, activeTab, !!searchQuery]);
 
-  // Keyboard Shortcuts Support (Sprint 10)
+  // Keyboard Shortcuts Support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey) {
-        if (e.key.toUpperCase() === settings.shortcuts.copy.toUpperCase()) {
-          // If a snippet is selected, copy logic...
-        }
+      const isMod = e.ctrlKey || e.metaKey;
+      
+      if (isMod) {
+        // New Snippet
         if (e.key.toUpperCase() === settings.shortcuts.newSnippet.toUpperCase()) {
           e.preventDefault();
           setSelectedSnippetId(-1);
+          soundService.playTransition();
         }
+        // Search All
         if (e.key.toUpperCase() === settings.shortcuts.search.toUpperCase()) {
           e.preventDefault();
           const searchInput = document.querySelector('input[placeholder="GLOBAL_SEARCH_CMD..."]') as HTMLInputElement;
-          if (searchInput) searchInput.focus();
+          if (searchInput) {
+            searchInput.focus();
+            soundService.playClick();
+          }
         }
       }
     };
