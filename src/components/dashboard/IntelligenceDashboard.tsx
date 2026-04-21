@@ -85,7 +85,7 @@ export const IntelligenceDashboard: React.FC = () => {
             <div key={s.id} className="h-[200px]">
               <SnippetCard 
                 snippet={s} 
-                onEdit={() => setSelectedSnippetId(s.id!)}
+                onEdit={() => { playSound('transition'); setSelectedSnippetId(s.id!); }}
                 onDelete={() => handleDelete(s.id!)}
                 onArchive={() => handleArchive(s.id!)}
               />

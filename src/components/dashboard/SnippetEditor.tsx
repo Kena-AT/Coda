@@ -455,6 +455,12 @@ export const SnippetEditor: React.FC = () => {
                language={snippet.language?.toLowerCase()}
                theme="vs-dark"
                value={snippet.content}
+                loading={
+                  <div className="flex flex-col items-center justify-center h-full bg-[#0e0e10] gap-4">
+                    <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                    <span className="text-[#adaaad] font-mono text-[10px] uppercase tracking-widest">Initialising_Editor_Engine...</span>
+                  </div>
+                }
                onMount={(editor, monaco) => {
                  setEditorInstance(editor);
                  setMonacoInstance(monaco);
