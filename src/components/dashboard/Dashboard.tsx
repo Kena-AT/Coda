@@ -277,7 +277,9 @@ export const Dashboard: React.FC = () => {
 
         <div className="flex-1 flex overflow-hidden">
           {selectedSnippetId !== null ? (
-            <SnippetEditor />
+            <div className="flex-1 flex overflow-hidden animate-in slide-in-from-right-4 fade-in duration-300 bg-[var(--bg-primary)]">
+              <SnippetEditor />
+            </div>
           ) : searchQuery ? (
             <GlobalSearchResults />
           ) : activeTab === 'settings' ? (
@@ -293,7 +295,9 @@ export const Dashboard: React.FC = () => {
           ) : activeTab === 'analytics' ? (
             <AnalyticsPage />
           ) : activeTab === 'projects' ? (
-            <ProjectVault />
+            <div className="flex-1 flex overflow-hidden animate-in fade-in duration-500 bg-[var(--bg-primary)]">
+              <ProjectVault />
+            </div>
           ) : (
             <div className="flex-1 flex overflow-hidden">
               <IntelligenceDashboard />
