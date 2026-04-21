@@ -627,6 +627,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f88a43d011fc4a6876cb7344703e297c71dda42494fee094d5f7c76bf13f746"
 
 [[package]]
+name = "coda"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "chrono",
+ "dashmap",
+ "jsonwebtoken",
+ "jwt",
+ "password-hash 0.6.0",
+ "rpassword",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sysinfo",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-stronghold",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5030,30 +5054,6 @@ dependencies = [
  "webview2-com",
  "window-vibrancy",
  "windows 0.61.3",
-]
-
-[[package]]
-name = "tauri-app"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "chrono",
- "dashmap",
- "jsonwebtoken",
- "jwt",
- "password-hash 0.6.0",
- "rpassword",
- "rusqlite",
- "serde",
- "serde_json",
- "sysinfo",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-stronghold",
 ]
 
 [[package]]
