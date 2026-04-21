@@ -126,19 +126,19 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
             RE-SCAN
           </button>
           <div className="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] font-mono text-red-400">
-            {related.length} NODES_FOUND
+            {(related || []).length} NODES_FOUND
           </div>
         </div>
       </div>
 
-      {related.length === 0 ? (
+      {(related || []).length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-800 rounded-xl bg-slate-900/20">
           <Unlink className="w-8 h-8 text-slate-700 mb-3" />
           <p className="text-xs text-slate-500 font-mono">NO BEHAVIORAL CORRELATIONS DETECTED</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {related.map((link) => (
+          {(related || []).map((link) => (
             <div 
               key={link.id}
               className="group relative bg-slate-900/40 border border-slate-800 rounded-lg p-4 hover:border-red-500/50 transition-all duration-300"

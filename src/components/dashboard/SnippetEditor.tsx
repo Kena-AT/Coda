@@ -136,7 +136,15 @@ export const SnippetEditor: React.FC = () => {
           }
         }));
       
-      editorInstance.decorationsIds = editorInstance.deltaDecorations(editorInstance.decorationsIds || [], decorations);
+      if (editorInstance.deltaDecorations) {
+        editorInstance.decorationsIds = editorInstance.deltaDecorations(editorInstance.decorationsIds || [], decorations);
+      } else if (editorInstance.createDecorationsCollection) {
+        if (!editorInstance.decorationsCollection) {
+          editorInstance.decorationsCollection = editorInstance.createDecorationsCollection(decorations);
+        } else {
+          editorInstance.decorationsCollection.set(decorations);
+        }
+      }
     }
   }, [snippet.content, editorInstance, monacoInstance]);
 
@@ -432,9 +440,9 @@ export const SnippetEditor: React.FC = () => {
 
         {/* Scrollable Content Area: Editor + Linking Panel */}
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col min-h-0">
-          {/* The Monaco Editor - fixed height so linking panel is always reachable */}
-          <div className="h-[500px] shrink-0 relative">
-           {isDiffMode && selectedVersion ? (
+          {/* The Monaco Editor - flexible height so it fills the screen, min-height to keep linking panel reachable */}
+          <div className="flex-1 min-h-[500px] shrink-0 relative">
+            {isDiffMode && selectedVersion ? (
              <DiffEditor
                height="100%"
                language={snippet.language?.toLowerCase()}
