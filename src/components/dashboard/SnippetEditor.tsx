@@ -318,10 +318,10 @@ export const SnippetEditor: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex overflow-hidden">
+    <div className="flex-1 flex overflow-hidden min-h-0 w-full">
       
       {/* Center Code Workspace */}
-      <div className="flex-1 flex flex-col bg-[var(--bg-primary)] border-r border-[var(--border)] relative">
+      <div className="flex-1 flex flex-col bg-[var(--bg-primary)] border-r border-[var(--border)] relative min-h-0">
         
         {/* Editor Settings Header */}
         <div className="h-auto bg-[#131313]/80 backdrop-blur-md border-b border-[var(--border)]/20 p-8 flex flex-col gap-6">
@@ -441,7 +441,7 @@ export const SnippetEditor: React.FC = () => {
         {/* Scrollable Content Area: Editor + Linking Panel */}
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col min-h-0">
           {/* The Monaco Editor - flexible height so it fills the screen, min-height to keep linking panel reachable */}
-          <div className="flex-1 min-h-[500px] shrink-0 relative">
+          <div className="flex-1 min-h-[400px] relative">
             {isDiffMode && selectedVersion ? (
              <DiffEditor
                height="100%"
@@ -502,7 +502,7 @@ export const SnippetEditor: React.FC = () => {
       </div>
 
       {/* Right Sidebar */}
-      <aside className="w-[320px] bg-[var(--bg-primary)] border-l border-[var(--border)]/20 flex flex-col pt-14">
+      <aside className="w-[320px] bg-[var(--bg-primary)] border-l border-[var(--border)]/20 flex flex-col pt-14 min-h-0 overflow-hidden">
         
         {/* Tab Switcher */}
         <div className="flex border-b border-[var(--border)]/20">

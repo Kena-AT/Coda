@@ -193,7 +193,7 @@ export const Dashboard: React.FC = () => {
     <div className="flex min-h-screen bg-[var(--bg-primary)] text-white">
       <Sidebar onNewSnippet={() => setSelectedSnippetId(-1)} />
 
-      <main className="flex-1 ml-[0px] lg:ml-[256px] flex flex-col relative overflow-hidden">
+      <main className="flex-1 ml-[0px] lg:ml-[256px] flex flex-col relative overflow-hidden min-h-0">
         
         {/* Global Navbar Header */}
         <header className="h-[64px] bg-[var(--bg-primary)] border-b border-[var(--border)] px-8 flex items-center justify-between z-40 shrink-0">
@@ -275,9 +275,9 @@ export const Dashboard: React.FC = () => {
           </div>
         </header>
 
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-h-0">
           {selectedSnippetId !== null ? (
-            <div className="flex-1 flex overflow-hidden animate-in slide-in-from-right-4 fade-in duration-300 bg-[var(--bg-primary)]">
+            <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
               <SnippetEditor />
             </div>
           ) : searchQuery ? (
@@ -295,7 +295,7 @@ export const Dashboard: React.FC = () => {
           ) : activeTab === 'analytics' ? (
             <AnalyticsPage />
           ) : activeTab === 'projects' ? (
-            <div className="flex-1 flex overflow-hidden animate-in fade-in duration-500 bg-[var(--bg-primary)]">
+            <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
               <ProjectVault />
             </div>
           ) : (
