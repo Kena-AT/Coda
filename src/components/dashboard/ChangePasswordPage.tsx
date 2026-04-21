@@ -20,28 +20,50 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
   const [showNew, setShowNew] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Simple entropy calc
+  // Enhanced entropy & syntax validation
+  const getRequirements = (pwd: string) => {
+    return {
+      length: pwd.length >= 12,
+      uppercase: /[A-Z]/.test(pwd),
+      lowercase: /[a-z]/.test(pwd),
+      number: /[0-9]/.test(pwd),
+      symbol: /[^A-Za-z0-9]/.test(pwd)
+    };
+  };
+
+  const reqs = getRequirements(newPassword);
+
   const getEntropyStrength = (pwd: string) => {
     if (pwd.length === 0) return 0;
-    let strength = 0;
-    if (pwd.length > 8) strength += 25;
-    if (/[A-Z]/.test(pwd)) strength += 25;
-    if (/[0-9]/.test(pwd)) strength += 25;
-    if (/[^A-Za-z0-0]/.test(pwd)) strength += 25;
-    return strength;
+    let score = 0;
+    
+    // Length bonus
+    score += Math.min(pwd.length * 4, 40);
+    
+    // Variety bonuses
+    if (reqs.uppercase) score += 15;
+    if (reqs.lowercase) score += 15;
+    if (reqs.number) score += 15;
+    if (reqs.symbol) score += 15;
+
+    return Math.min(score, 100);
   };
 
   const strength = getEntropyStrength(newPassword);
 
   const handleUpdate = async () => {
-    if (newPassword !== confirmPassword) {
-      playSound('error');
-      toast.error('New passwords do not match');
+    if (!currentPassword) {
+      toast.error('Current Master Key required');
       return;
     }
-    if (newPassword.length < 8) {
+    if (newPassword !== confirmPassword) {
       playSound('error');
-      toast.error('Master key must be at least 8 segments');
+      toast.error('Key mismatch detected');
+      return;
+    }
+    if (strength < 60) {
+      playSound('error');
+      toast.error('Entropy strength below security threshold');
       return;
     }
 
@@ -55,15 +77,15 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
 
       if (response.success) {
         playSound('success');
-        toast.success(response.message);
+        toast.success('VAULT_REKEYED: Security protocols updated');
         onBack();
       } else {
         playSound('error');
-        toast.error(response.message);
+        toast.error(response.message || 'AUTH_FAILURE: Key rejected');
       }
     } catch (err) {
       playSound('error');
-      toast.error('System failure during re-key sequence');
+      toast.error('SYSTEM_CRITICAL: Re-key handshake failed');
     } finally {
       setLoading(false);
     }
@@ -163,14 +185,26 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                   <span className="text-[var(--accent)] font-mono text-[11px]">02</span>
                   <label className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">New Encryption Key</label>
                 </div>
-                <div className="relative">
+                 <div className="relative">
+                   {/* Syntax Highlighting Overlay (visible when showNew is true) */}
+                   {showNew && (
+                     <div className="absolute inset-0 py-3 font-main pointer-events-none tracking-[2px] flex whitespace-pre">
+                        {newPassword.split('').map((char, i) => {
+                          let color = 'text-white';
+                          if (/[0-9]/.test(char)) color = 'text-[var(--accent)]';
+                          if (/[^A-Za-z0-9]/.test(char)) color = 'text-[#ff5f5f]';
+                          if (/[A-Z]/.test(char)) color = 'text-[#ff9d9d]';
+                          return <span key={i} className={color}>{char}</span>;
+                        })}
+                     </div>
+                   )}
                    <input 
                      type={showNew ? "text" : "password"}
                      value={newPassword}
                      onChange={(e) => setNewPassword(e.target.value)}
                      onMouseEnter={() => playSound('hover')}
-                     className="w-full bg-transparent border-b border-[#2a2a2e] focus:border-white transition-all py-3 font-main text-white placeholder:text-[#2a2a2e] outline-none tracking-[2px]"
-                     placeholder="ENTER_SECURE_PHRASE"
+                     className={`w-full bg-transparent border-b border-[#2a2a2e] focus:border-white transition-all py-3 font-main placeholder:text-[#2a2a2e] outline-none tracking-[2px] ${showNew ? 'text-transparent caret-white' : 'text-white'}`}
+                     placeholder={showNew ? "" : "ENTER_SECURE_PHRASE"}
                    />
                    <button 
                      onClick={() => { playSound('click'); setShowNew(!showNew); }}
@@ -181,17 +215,37 @@ export const ChangePasswordPage: React.FC<ChangePasswordPageProps> = ({ onBack }
                    </button>
                 </div>
                 
+                {/* Syntax-Aware Enhancements */}
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2 py-4 border-y border-[var(--border)]/30">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1 h-1 rounded-full ${reqs.length ? 'bg-[var(--accent)] shadow-[0_0_5px_var(--accent)]' : 'bg-[#2a2a2e]'}`} />
+                    <span className={`text-[8px] font-mono uppercase tracking-widest ${reqs.length ? 'text-white' : 'text-[#4a4a4d]'}`}>LEN_GT_12</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1 h-1 rounded-full ${reqs.uppercase ? 'bg-[var(--accent)] shadow-[0_0_5px_var(--accent)]' : 'bg-[#2a2a2e]'}`} />
+                    <span className={`text-[8px] font-mono uppercase tracking-widest ${reqs.uppercase ? 'text-white' : 'text-[#4a4a4d]'}`}>ALPHA_CASE</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1 h-1 rounded-full ${reqs.number ? 'bg-[var(--accent)] shadow-[0_0_5px_var(--accent)]' : 'bg-[#2a2a2e]'}`} />
+                    <span className={`text-[8px] font-mono uppercase tracking-widest ${reqs.number ? 'text-white' : 'text-[#4a4a4d]'}`}>DIGIT_LINK</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1 h-1 rounded-full ${reqs.symbol ? 'bg-[var(--accent)] shadow-[0_0_5px_var(--accent)]' : 'bg-[#2a2a2e]'}`} />
+                    <span className={`text-[8px] font-mono uppercase tracking-widest ${reqs.symbol ? 'text-white' : 'text-[#4a4a4d]'}`}>SYM_BITRATE</span>
+                  </div>
+                </div>
+
                 {/* Strength Meter */}
-                <div className="space-y-2 pt-4">
+                <div className="space-y-2 pt-2">
                    <div className="flex justify-between items-end">
                       <span className="text-[9px] font-mono text-[#737373] uppercase">Entropy Strength</span>
-                      <span className={`text-[10px] font-mono font-bold uppercase transition-colors ${strength > 75 ? 'text-[var(--accent)]' : 'text-[#737373]'}`}>
-                         {strength === 100 ? 'OPTIMAL' : strength > 50 ? 'SECURE' : 'MINIMUM'}
+                      <span className={`text-[10px] font-mono font-bold uppercase transition-colors ${strength > 75 ? 'text-[var(--accent)] shadow-[0_0_10px_rgba(255,0,0,0.3)]' : 'text-[#737373]'}`}>
+                         {strength >= 100 ? 'OPTIMAL' : strength > 80 ? 'ENHANCED' : strength > 50 ? 'MODERATE' : 'UNSAFE'}
                       </span>
                    </div>
                    <div className="h-0.5 w-full bg-[#1f1f22] overflow-hidden relative">
                       <div 
-                        className="h-full bg-[var(--accent)] transition-all duration-500" 
+                        className="h-full bg-[var(--accent)] transition-all duration-500 shadow-[0_0_10px_var(--accent)]" 
                         style={{ width: `${strength}%` }} 
                       />
                       <div className="absolute top-0 right-1/4 h-full w-[1px] bg-red-950" />

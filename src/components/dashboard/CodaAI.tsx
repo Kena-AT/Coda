@@ -129,9 +129,20 @@ export const CodaAI: React.FC = () => {
         timestamp: Date.now()
       }]);
     } catch (e: any) {
+      const errMsg = e.message?.toUpperCase() || 'UNKNOWN_SYSTEM_FAULT';
+      let diagnosticMessage = `NEURAL_LINK_SEVERED: ${errMsg}`;
+      
+      if (errMsg.includes('429') || errMsg.includes('LIMIT')) {
+        diagnosticMessage = `RATE_LIMIT_EXCEEDED: Neural processors are cooling down. Please wait.`;
+      } else if (errMsg.includes('KEY') || errMsg.includes('401')) {
+        diagnosticMessage = `CREDENTIAL_AUTH_FAILED: Verify Gemini_API_Key in Intelligence_Layer.`;
+      } else if (errMsg.includes('CONNECTION') || errMsg.includes('FETCH')) {
+        diagnosticMessage = `UPLINK_TIMEOUT: Network handshake failed. Check your connection.`;
+      }
+
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: `CONNECTION_FAULT: ${e.message}`,
+        content: diagnosticMessage,
         timestamp: Date.now()
       }]);
     } finally {
@@ -180,7 +191,6 @@ export const CodaAI: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-[12px] font-main font-bold text-white tracking-[1.5px] uppercase">CODA_AI</h3>
-                <span className="text-[8px] font-mono text-[var(--accent)] tracking-widest">{activeModel.toUpperCase().replace('-', '_')} // ONLINE</span>
               </div>
             </div>
             <button
