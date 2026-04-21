@@ -36,14 +36,20 @@ THEMES: Crimson (red accent), Void (purple), Matrix (green), Glacier (blue)
 
 Be concise, helpful, and match the app's dark, technical, terminal-inspired aesthetic in your tone. Use short sentences. Be direct.`;
 
+const FALLBACK_API_KEY = 'AIzaSyD-eW4TcBJUoxF1DerjG1bLS-ee3xUMqVY';
+const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+
 export const CodaAI: React.FC = () => {
   const { settings } = useStore();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeModel, setActiveModel] = useState(MODELS[0]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const apiKey = settings.geminiApiKey || FALLBACK_API_KEY;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,6 +61,17 @@ export const CodaAI: React.FC = () => {
     }
   }, [isOpen]);
 
+  const callGemini = async (model: string, key: string, body: any): Promise<Response> => {
+    return fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }
+    );
+  };
+
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
@@ -64,16 +81,6 @@ export const CodaAI: React.FC = () => {
     setInput('');
     setIsLoading(true);
 
-    if (!settings.geminiApiKey) {
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: 'SYSTEM_ERROR: No Gemini API key configured. Go to Settings > Intelligence_Layer to add your key.',
-        timestamp: Date.now()
-      }]);
-      setIsLoading(false);
-      return;
-    }
-
     try {
       // Build conversation history for context
       const conversationHistory = messages.slice(-10).map(m => ({
@@ -81,24 +88,35 @@ export const CodaAI: React.FC = () => {
         parts: [{ text: m.content }]
       }));
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${settings.geminiApiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: CODA_SYSTEM_PROMPT }] },
-            contents: [
-              ...conversationHistory,
-              { role: 'user', parts: [{ text: trimmed }] }
-            ]
-          })
-        }
-      );
+      const requestBody = {
+        systemInstruction: { parts: [{ text: CODA_SYSTEM_PROMPT }] },
+        contents: [
+          ...conversationHistory,
+          { role: 'user', parts: [{ text: trimmed }] }
+        ]
+      };
+
+      // Try primary model first, fallback to secondary
+      let response = await callGemini(activeModel, apiKey, requestBody);
 
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error?.message || `HTTP ${response.status}`);
+        const errData = await response.json().catch(() => ({}));
+        const errMsg = errData.error?.message || '';
+        
+        // If model not found or not supported, try fallback
+        if (response.status === 404 || errMsg.includes('not found') || errMsg.includes('not supported')) {
+          const fallbackModel = MODELS.find(m => m !== activeModel) || MODELS[1];
+          console.log(`Model ${activeModel} unavailable, falling back to ${fallbackModel}`);
+          setActiveModel(fallbackModel);
+          
+          response = await callGemini(fallbackModel, apiKey, requestBody);
+          if (!response.ok) {
+            const fallbackErr = await response.json().catch(() => ({}));
+            throw new Error(fallbackErr.error?.message || `HTTP ${response.status}`);
+          }
+        } else {
+          throw new Error(errMsg || `HTTP ${response.status}`);
+        }
       }
 
       const data = await response.json();
@@ -161,7 +179,7 @@ export const CodaAI: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-[12px] font-main font-bold text-white tracking-[1.5px] uppercase">CODA_AI</h3>
-                <span className="text-[8px] font-mono text-[var(--accent)] tracking-widest">GEMINI_3_FLASH // ONLINE</span>
+                <span className="text-[8px] font-mono text-[var(--accent)] tracking-widest">{activeModel.toUpperCase().replace('-', '_')} // ONLINE</span>
               </div>
             </div>
             <button
@@ -255,7 +273,7 @@ export const CodaAI: React.FC = () => {
               </button>
             </div>
             <p className="text-[7px] font-mono text-[#adaaad]/30 text-center mt-2 tracking-widest uppercase">
-              Powered by Gemini 3 Flash
+              Powered by {activeModel}
             </p>
           </div>
         </div>
