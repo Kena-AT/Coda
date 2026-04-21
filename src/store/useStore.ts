@@ -48,6 +48,7 @@ export interface Settings {
     newSnippet: string;
     search: string;
   };
+  geminiApiKey: string | null;
 }
 
 interface AppError {
@@ -137,7 +138,8 @@ export const useStore = create<AppState>()(
           save: 'S',
           newSnippet: 'N',
           search: 'F'
-        }
+        },
+        geminiApiKey: 'AIzaSyD-eW4TcBJUoxF1DerjG1bLS-ee3xUMqVY'
       },
       setSettings: (newSettings) => set((state) => ({ 
         settings: { ...state.settings, ...newSettings } 

@@ -7,9 +7,13 @@ import {
   Unlink, 
   Network,
   Zap,
-  Tag
+  Tag,
+  Shield,
+  Activity,
+  Cpu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTelemetry } from '../../hooks/useTelemetry';
 
 interface RelatedSnippet {
   id: number;
@@ -24,11 +28,33 @@ interface ProjectLinkingPanelProps {
 }
 
 export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippetId }) => {
-  const { user, setSelectedSnippetId } = useStore();
+  const { user, setSelectedSnippetId, snippets } = useStore();
+  const { snapshot } = useTelemetry(3000);
   const [related, setRelated] = useState<RelatedSnippet[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const hasLoadedOnce = useRef(false);
+
+  const currentSnippet = snippets.find(s => s.id === snippetId);
+
+  const getIntegrityStatus = () => {
+    if (!snapshot) return { status: 'INITIALIZING', color: 'text-slate-500', icon: Activity };
+    
+    // Logic: Integrity is COMPROMISED if DB latency is too high or error detected
+    const dbLatency = snapshot.db_query_ms || 0;
+    const isHealthy = dbLatency < 500;
+    const hasProject = currentSnippet?.project_id !== null && currentSnippet?.project_id !== undefined;
+    
+    if (!isHealthy) return { status: 'COMPROMISED', color: 'text-red-500', icon: Shield };
+    if (!hasProject) return { status: 'ORPHANED', color: 'text-orange-500', icon: Unlink };
+    if (snapshot.global_cpu === 0) return { status: 'DEGRADED', color: 'text-yellow-500', icon: Cpu };
+    
+    return { status: 'STABLE', color: 'text-green-400', icon: Shield };
+  };
+
+  const integrity = getIntegrityStatus();
+  const nodeCount = related.length;
+  const nodesStatus = nodeCount > 0 ? 'ACTIVE' : 'ISOLATED';
 
   useEffect(() => {
     let cancelled = false;
@@ -102,15 +128,36 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
   return (
     <div className={`p-6 bg-slate-950/50 border-t border-slate-800/50 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-sm font-black tracking-[0.2em] text-red-500 flex items-center gap-2">
-            <Network className={`w-4 h-4 ${(loading || isSyncing) ? 'animate-spin' : ''}`} />
-            CROSS-PROJECT LINKS
-            {(loading || isSyncing) && <span className="text-[8px] bg-red-500 text-white px-1 rounded animate-pulse ml-2">SYNCING</span>}
-          </h2>
-          <p className="text-[10px] font-mono text-slate-500 mt-1 uppercase tracking-tighter">
-            {(loading || isSyncing) ? 'RECOMPUTING_NEURAL_PATHWAYS...' : 'SYSTEM_INTEGRITY: COMPROMISED // DATA_NODES: ACTIVE'}
-          </p>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3">
+            <h2 className="text-sm font-black tracking-[0.2em] text-red-500 flex items-center gap-2">
+              <Network className={`w-4 h-4 ${(loading || isSyncing) ? 'animate-spin' : ''}`} />
+              CROSS-PROJECT LINKS
+              {(loading || isSyncing) && <span className="text-[8px] bg-red-500 text-white px-1 rounded animate-pulse ml-2">SYNCING</span>}
+            </h2>
+            <div className="flex items-center gap-2 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded">
+              <div className={`w-1 h-1 rounded-full ${nodeCount > 0 ? 'bg-red-500 animate-pulse' : 'bg-slate-700'}`} />
+              <span className="text-[8px] font-mono text-slate-400 tracking-widest uppercase">
+                Density: {(nodeCount * 0.15).toFixed(2)}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 mt-1.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">SYSTEM_INTEGRITY:</span>
+              <div className={`flex items-center gap-1 ${integrity.color}`}>
+                <integrity.icon size={10} className={integrity.status === 'COMPROMISED' ? 'animate-pulse' : ''} />
+                <span className="text-[9px] font-mono font-bold tracking-tight">{integrity.status}</span>
+              </div>
+            </div>
+            <div className="w-[1px] h-2 bg-slate-800" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">DATA_NODES:</span>
+              <span className={`text-[9px] font-mono font-bold ${nodeCount > 0 ? 'text-red-400' : 'text-slate-600'}`}>
+                {nodesStatus} ({nodeCount.toString().padStart(2, '0')})
+              </span>
+            </div>
+          </div>
         </div>
         <div className="flex gap-2">
           <button 
