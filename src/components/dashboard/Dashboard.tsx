@@ -29,6 +29,7 @@ import { BackupRestorePage } from './BackupRestorePage';
 import { ChangePasswordPage } from './ChangePasswordPage';
 import { VersionInfoPage } from './VersionInfoPage';
 import { LogoutConfirmationPage } from './LogoutConfirmationPage';
+import { CodaAI } from './CodaAI';
 import { sessionManager, authApi } from '../../store/authStore';
 import { useAuthSession } from '../../hooks/useAuthSession';
 import { useAutoLock } from '../../hooks/useAutoLock';
@@ -399,6 +400,9 @@ export const Dashboard: React.FC = () => {
         onClose={() => setIsImportModalOpen(false)}
         onSuccess={fetchSnippets}
       />
+
+      {/* Floating Coda AI Assistant */}
+      <CodaAI />
     </div>
   );
 };

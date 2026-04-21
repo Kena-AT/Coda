@@ -35,11 +35,56 @@ interface SmartRecommendationsProps {
 const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
 export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ currentLanguage, currentTags, onPreview }) => {
-  const { user, selectedSnippetId } = useStore();
+  const { user, selectedSnippetId, settings, snippets } = useStore();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [aiStatus, setAiStatus] = useState<'idle' | 'syncing' | 'online' | 'error'>('idle');
+  const [lastError, setLastError] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<RecommendationMetadata | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'smart' | 'stale'>('smart');
+
+  const fetchGeminiInsight = async (currentSnippet: any) => {
+    if (!settings.geminiApiKey) {
+      setAiStatus('idle');
+      return;
+    }
+    if (!currentSnippet?.content) return;
+    
+    setAiStatus('syncing');
+    setLastError(null);
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${settings.geminiApiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Analyze this ${currentSnippet.language} code and provide one brief (max 15 words) architectural improvement or security tip. Code: ${currentSnippet.content.substring(0, 1000)}`
+            }]
+          }]
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'API_RESPONSE_ERROR');
+      }
+
+      const data = await response.json();
+      const insight = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (insight) {
+        setAiInsight(insight);
+        setAiStatus('online');
+      } else {
+        throw new Error('EMPTY_AI_RESPONSE');
+      }
+    } catch (e: any) {
+      console.error("Gemini failed:", e);
+      setAiStatus('error');
+      setLastError(e.message || 'CONNECTION_FAILURE');
+    }
+  };
 
   const fetchData = async () => {
     if (!user) return;
@@ -71,6 +116,10 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
 
   useEffect(() => {
     fetchData();
+    if (selectedSnippetId && selectedSnippetId !== -1) {
+      const snip = snippets.find(s => s.id === selectedSnippetId);
+      fetchGeminiInsight(snip);
+    }
   }, [currentLanguage, currentTags, selectedSnippetId, activeSubTab]);
 
   return (
@@ -79,8 +128,30 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
       {/* Sidebar Header */}
       <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between">
         <div className="flex flex-col">
-          <h3 className="font-main font-bold text-[10px] text-white tracking-[2px] uppercase">Smart_Intelligence</h3>
-          <span className="text-[9px] text-[var(--accent)] font-mono mt-1">Rule-Based v1.1.0</span>
+          <h3 className="font-main font-bold text-[10px] text-white tracking-[2px] uppercase">
+            {settings.geminiApiKey ? 'GEMINI_CO-PILOT' : 'Smart_Intelligence'}
+          </h3>
+          <span className="text-[9px] text-[var(--accent)] font-mono mt-1">
+            {settings.geminiApiKey ? 'GENERATIVE_V3.0' : 'Rule-Based v1.1.0'}
+          </span>
+          <div className="flex items-center gap-1.5 mt-2">
+            <div className={`w-1 h-1 rounded-full ${
+              aiStatus === 'online' ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 
+              aiStatus === 'syncing' ? 'bg-blue-500 animate-pulse' : 
+              aiStatus === 'error' ? 'bg-red-500 shadow-[0_0_8px_#ef4444]' : 
+              'bg-slate-700'
+            }`} />
+            <span className={`text-[8px] font-mono uppercase tracking-widest ${
+              aiStatus === 'online' ? 'text-green-500' : 
+              aiStatus === 'error' ? 'text-red-500' : 
+              'text-[#adaaad]'
+            }`}>
+              {aiStatus === 'online' ? 'Service: Operational' : 
+               aiStatus === 'syncing' ? 'Service: Syncing' : 
+               aiStatus === 'error' ? 'Service: Failed' : 
+               'Service: Offline'}
+            </span>
+          </div>
         </div>
         <div className="flex gap-2">
           <button 
@@ -103,6 +174,39 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
           </button>
         </div>
       </div>
+
+      {/* AI Insight Section */}
+      {settings.geminiApiKey && activeSubTab === 'smart' && (
+        <div className={`mx-4 mb-4 p-4 border rounded relative group overflow-hidden transition-all duration-500 ${
+          aiStatus === 'error' ? 'bg-red-500/5 border-red-500/20' : 'bg-[var(--accent)]/5 border-[var(--accent)]/20'
+        }`}>
+          <div className={`absolute top-0 left-0 w-1 h-full ${aiStatus === 'error' ? 'bg-red-500' : 'bg-[var(--accent)]'}`} />
+          
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+               <div className={`w-2 h-2 rounded-full ${
+                 aiStatus === 'syncing' ? 'bg-blue-500 animate-pulse' : 
+                 aiStatus === 'error' ? 'bg-red-500' : 
+                 'bg-[var(--accent)]'
+               }`} />
+               <span className={`text-[8px] font-mono uppercase font-bold tracking-widest ${aiStatus === 'error' ? 'text-red-500' : 'text-[var(--accent)]'}`}>
+                 {aiStatus === 'error' ? 'ENGINE_FAILURE' : 'AI_CONTEXT_INSIGHT'}
+               </span>
+            </div>
+            {aiStatus === 'syncing' && <span className="text-[7px] text-blue-400 font-mono animate-pulse">ANALYZING...</span>}
+          </div>
+
+          {aiStatus === 'error' ? (
+            <p className="text-[9px] text-red-400 font-mono leading-tight">
+              CRITICAL: {lastError?.toUpperCase() || 'UNKNOWN_BACKEND_FAULT'}
+            </p>
+          ) : aiInsight ? (
+            <p className="text-[10px] text-white leading-relaxed font-main italic">"{aiInsight}"</p>
+          ) : (
+            <p className="text-[10px] text-[#adaaad] font-mono animate-pulse">Awaiting neural input...</p>
+          )}
+        </div>
+      )}
 
       {/* Recs List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-6">

@@ -248,23 +248,67 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
             <div className="bg-[var(--border)] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
               04 // Control_Binding
             </div>
-            <div className="p-8 space-y-8 flex-1 pb-40">
-              <h3 className="text-xl font-bold tracking-tight uppercase">SHORTCUTS</h3>
-              <div className="space-y-2">
-                 {[
-                   { label: 'Save Snippet', keys: ['CTRL', 'S'] },
-                   { label: 'New Snippet', keys: ['CTRL', 'N'] },
-                   { label: 'Search All', keys: ['CTRL', 'F'] },
-                 ].map((s, idx) => (
-                   <div key={idx} className="flex items-center justify-between py-2 border-b border-[var(--border)]/20 group">
-                      <span className="text-[#e5e2e1]/60 text-[12px] uppercase font-mono group-hover:text-white transition-colors">{s.label}</span>
-                      <div className="flex gap-1">
-                        {s.keys.map((k, kidx) => (
-                          <span key={kidx} className="bg-[#131313] border border-[var(--border)] px-1.5 py-0.5 rounded-sm text-[10px] text-[#e5e2e1]/80 min-w-[20px] text-center">{k}</span>
-                        ))}
-                      </div>
-                   </div>
-                 ))}
+            <div className="p-8 space-y-6">
+              <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
+                <Shield className="text-[var(--accent)]" size={24} />
+                HOTKEY_MAP
+              </h3>
+              <div className="space-y-3 font-mono text-[11px]">
+                <div className="flex justify-between items-center p-3 bg-[#131313] border border-[var(--border)]/30">
+                  <span className="text-[#e5e2e1]/40 uppercase">SAVE_SNIPPET</span>
+                  <span className="text-[var(--accent)] font-bold">CTRL + {settings.shortcuts.save}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-[#131313] border border-[var(--border)]/30">
+                  <span className="text-[#e5e2e1]/40 uppercase">NEW_SNIPPET</span>
+                  <span className="text-[var(--accent)] font-bold">CTRL + {settings.shortcuts.newSnippet}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-[#131313] border border-[var(--border)]/30">
+                  <span className="text-[#e5e2e1]/40 uppercase">SEARCH_VAULT</span>
+                  <span className="text-[var(--accent)] font-bold">CTRL + {settings.shortcuts.search}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Section: Intelligence Layer */}
+          <section className="bg-[var(--bg-primary)] border border-[var(--border)] flex flex-col">
+            <div className="bg-[var(--border)] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
+              05 // Intelligence_Layer
+            </div>
+            <div className="p-8 space-y-6">
+              <h3 className="text-xl font-bold flex items-center gap-3 tracking-tight">
+                <Activity className="text-[var(--accent)]" size={24} />
+                AI_ENGINE_CONFIG
+              </h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-[13px] font-bold">GEMINI_API_KEY</p>
+                  <div className="relative">
+                    <input 
+                      type="password"
+                      value={settings.geminiApiKey || ''}
+                      onChange={(e) => handleUpdateSetting({ geminiApiKey: e.target.value })}
+                      placeholder="AIza..."
+                      className="w-full bg-[#131313] border border-[var(--border)] p-3 text-[11px] font-mono text-white focus:border-[var(--accent)]/50 outline-none transition-all pr-12"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--accent)] opacity-50">
+                      <Shield size={16} />
+                    </div>
+                  </div>
+                  <p className="text-[9px] font-mono text-[#e5e2e1]/30 uppercase tracking-tighter">
+                    {settings.geminiApiKey ? 'GENERATIVE_FEATURES_ENABLED' : 'AI_FEATURES_DISABLED - ENTER KEY TO ACTIVATE'}
+                  </p>
+                </div>
+
+                <div className="p-4 bg-[var(--accent)]/5 border border-[var(--accent)]/10 rounded-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-pulse" />
+                    <span className="text-[9px] font-mono font-bold text-[var(--accent)] uppercase">Engine Status: Stable</span>
+                  </div>
+                  <p className="text-[10px] text-[#adaaad] leading-relaxed italic">
+                    AI co-pilot utilizes semantic analysis for real-time architectural insights and pattern detection.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
@@ -272,7 +316,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
           {/* Section: Account */}
           <section className="bg-[var(--bg-primary)] border border-[var(--border)] flex flex-col">
             <div className="bg-[var(--border)] py-1 px-4 text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
-              05 // Authentication
+              06 // Authentication
             </div>
             <div className="p-8 space-y-4">
               <h3 className="text-xl font-bold tracking-tight uppercase">ACCOUNT</h3>
