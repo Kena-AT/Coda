@@ -56,8 +56,18 @@ export const SnippetEditor: React.FC = () => {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [monacoInstance, setMonacoInstance] = useState<any>(null);
   const { setGlobalError } = useStore();
-
   const playSound = useSoundEffect();
+
+  // Handle global save shortcut event
+  useEffect(() => {
+    const handleSaveShortcut = () => {
+      if (selectedSnippetId !== null) {
+        handleSave();
+      }
+    };
+    window.addEventListener('save-snippet', handleSaveShortcut);
+    return () => window.removeEventListener('save-snippet', handleSaveShortcut);
+  }, [selectedSnippetId, snippet, handleSave]);
 
   // Debounced title check
   useEffect(() => {

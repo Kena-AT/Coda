@@ -153,14 +153,16 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey) {
-        if (e.key.toUpperCase() === settings.shortcuts.copy.toUpperCase()) {
-          // If a snippet is selected, copy logic...
+        const key = e.key.toUpperCase();
+        if (key === settings.shortcuts.save.toUpperCase()) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('save-snippet'));
         }
-        if (e.key.toUpperCase() === settings.shortcuts.newSnippet.toUpperCase()) {
+        if (key === settings.shortcuts.newSnippet.toUpperCase()) {
           e.preventDefault();
           setSelectedSnippetId(-1);
         }
-        if (e.key.toUpperCase() === settings.shortcuts.search.toUpperCase()) {
+        if (key === settings.shortcuts.search.toUpperCase()) {
           e.preventDefault();
           const searchInput = document.querySelector('input[placeholder="GLOBAL_SEARCH_CMD..."]') as HTMLInputElement;
           if (searchInput) searchInput.focus();

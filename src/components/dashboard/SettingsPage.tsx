@@ -252,9 +252,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               <h3 className="text-xl font-bold tracking-tight uppercase">SHORTCUTS</h3>
               <div className="space-y-2">
                  {[
-                   { label: 'Save Snippet', keys: ['⌘', 'S'] },
-                   { label: 'New Snippet', keys: ['⌘', 'N'] },
-                   { label: 'Search All', keys: ['⌘', 'F'] },
+                   { label: 'Save Snippet', keys: ['CTRL', 'S'] },
+                   { label: 'New Snippet', keys: ['CTRL', 'N'] },
+                   { label: 'Search All', keys: ['CTRL', 'F'] },
                  ].map((s, idx) => (
                    <div key={idx} className="flex items-center justify-between py-2 border-b border-[var(--border)]/20 group">
                       <span className="text-[#e5e2e1]/60 text-[12px] uppercase font-mono group-hover:text-white transition-colors">{s.label}</span>
