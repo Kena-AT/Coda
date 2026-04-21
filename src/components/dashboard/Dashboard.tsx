@@ -295,7 +295,7 @@ export const Dashboard: React.FC = () => {
           ) : activeTab === 'projects' ? (
             <ProjectVault />
           ) : (
-            <>
+            <div className="flex-1 flex overflow-hidden">
               <IntelligenceDashboard />
 
               {/* Right Panel: Assets & Hardware Intelligence */}
@@ -375,7 +375,7 @@ export const Dashboard: React.FC = () => {
                     <HardwareVisualization />
                 </div>
               </aside>
-            </>
+            </div>
           )}
         </div>
 

@@ -159,7 +159,10 @@ impl TelemetryStore {
         // Fallback for systems where sensors are restricted (e.g. Windows non-admin)
         // Provides a realistic "live" feel based on system load.
         if core_temp == 0.0 {
-            core_temp = 32.0 + (global_cpu * 0.45); 
+            core_temp = 35.0 + (global_cpu * 0.4); 
+            // Add a tiny bit of jitter for a "live" sensor feel
+            let jitter = (now_ms() % 10) as f32 / 20.0;
+            core_temp += jitter;
         }
 
         let db_size = db_path

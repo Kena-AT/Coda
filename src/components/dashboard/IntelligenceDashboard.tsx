@@ -2,11 +2,13 @@ import React, { useMemo } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
 import { Flame, Clock, Archive, Activity, Folder } from 'lucide-react';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 
 export const IntelligenceDashboard: React.FC = () => {
-  const { user, snippets, projects, setSelectedSnippetId, setSnippets } = useStore();
+  const { user, snippets, projects, setSelectedSnippetId, setSnippets, setActiveTab, setSelectedProjectId } = useStore();
+  const playSound = useSoundEffect();
 
   const handleArchive = async (id: number) => {
     try {
@@ -108,7 +110,16 @@ export const IntelligenceDashboard: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {sections.projScores.map(p => p && (
-            <div key={p.id} className="bg-[#151515] border border-[var(--border)] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group">
+            <div 
+              key={p.id} 
+              onClick={() => {
+                playSound('transition');
+                setSelectedProjectId(p.id);
+                setActiveTab('projects');
+              }}
+              onMouseEnter={() => playSound('hover')}
+              className="bg-[#151515] border border-[var(--border)] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group"
+            >
               <div className="flex justify-between items-start mb-4">
                 <Folder className="w-5 h-5 text-[var(--accent)]" />
                 <span className="text-[#adaaad] text-[9px] font-mono tracking-widest">{p.snippetCount} ITEMS</span>
