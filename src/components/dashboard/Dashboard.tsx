@@ -283,7 +283,7 @@ export const Dashboard: React.FC = () => {
           ) : searchQuery ? (
             <GlobalSearchResults />
           ) : activeTab === 'settings' ? (
-            <SettingsPage onNavigate={(page) => setActiveTab(page)} />
+            <SettingsPage onBack={() => setActiveTab('library')} onNavigate={(page) => setActiveTab(page)} />
           ) : activeTab === 'backup' ? (
             <BackupRestorePage onBack={() => setActiveTab('settings')} />
           ) : activeTab === 'change-password' ? (

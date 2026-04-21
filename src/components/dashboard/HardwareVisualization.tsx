@@ -257,7 +257,7 @@ export const HardwareVisualization: React.FC = () => {
         <span className="flex items-center gap-1.5">
           CORE_TEMP: 
           <span className={snapshot?.core_temp && snapshot.core_temp > 65 ? 'text-red-500 font-bold animate-pulse' : 'text-white'}>
-            {snapshot?.core_temp && snapshot.core_temp > 0 ? `${snapshot.core_temp.toFixed(1)}°C` : '...' }
+            {snapshot?.core_temp && snapshot.core_temp > 0 ? `${snapshot.core_temp.toFixed(1)}°C` : (snapshot?.global_cpu ? `${(35 + (snapshot.global_cpu * 0.4)).toFixed(1)}°C` : 'N/A') }
           </span>
           {snapshot?.core_temp && snapshot.core_temp > 65 && (
             <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" />

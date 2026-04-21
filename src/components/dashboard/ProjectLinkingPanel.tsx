@@ -115,11 +115,11 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
         <div className="flex gap-2">
           <button 
             onClick={async () => {
-              if (loading || isSyncing) return;
+              if (loading || isSyncing || !user) return;
               setIsSyncing(true);
               try {
-                await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user!.id });
-                const data = await invoke<RelatedSnippet[]>('get_related_snippets', { snippetId: snippetId, userId: user!.id });
+                await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user.id });
+                const data = await invoke<RelatedSnippet[]>('get_related_snippets', { snippetId: snippetId, userId: user.id });
                 setRelated(Array.isArray(data) ? data : []);
                 toast.success('Relations recomputed', { style: { background: '#1a1a1a', color: '#fff', fontSize: '10px' } });
               } catch (e) {
