@@ -31,7 +31,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center relative z-10"
           >
-            <div className="border-l-2 border-[var(--accent)] bg-[#19191c]/80 px-4 py-1 mb-6 flex items-center justify-center backdrop-blur-sm">
+            <div className="border-l-2 border-[var(--accent)] bg-[var(--bg-secondary)]/80 px-4 py-1 mb-6 flex items-center justify-center backdrop-blur-sm">
               <span className="text-[var(--accent)] font-main text-[10px] tracking-[1.2px] uppercase">SYSTEM READY // V1.0.0-STABLE</span>
             </div>
 

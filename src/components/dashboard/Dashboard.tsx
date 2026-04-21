@@ -60,11 +60,6 @@ export const Dashboard: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
 
-  // Apply Font Scaling
-  useEffect(() => {
-    const scale = settings.fontSize / 100;
-    document.documentElement.style.setProperty('--font-scale', scale.toString());
-  }, [settings.fontSize]);
 
   useEffect(() => {
     // Auditory feedback loop

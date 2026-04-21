@@ -16,10 +16,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const { user, setUser, settings } = useStore();
 
-  // Theme Sync Protocol
+  // Theme & Scale Sync Protocol
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', settings.theme);
-  }, [settings.theme]);
+    const scale = settings.fontSize / 100;
+    document.documentElement.style.setProperty('--font-scale', scale.toString());
+  }, [settings.theme, settings.fontSize]);
 
   // Auto-login on app startup
   useEffect(() => {

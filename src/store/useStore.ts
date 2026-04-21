@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface Snippet {
   id?: number;
@@ -96,64 +97,72 @@ interface AppState {
   setGlobalError: (error: AppError | null) => void;
 }
 
-export const useStore = create<AppState>((set) => ({
-  user: null,
-  snippets: [],
-  loading: false,
-  activeTab: 'library',
-  setActiveTab: (activeTab) => set({ activeTab }),
-  selectedSnippetId: null,
+export const useStore = create<AppState>()(
+  persist(
+    (set) => ({
+      user: null,
+      snippets: [],
+      loading: false,
+      activeTab: 'library',
+      setActiveTab: (activeTab) => set({ activeTab }),
+      selectedSnippetId: null,
 
-  setUser: (user) => set({ user }),
-  setSnippets: (snippets) => set({ snippets }),
-  setLoading: (loading) => set({ loading }),
+      setUser: (user) => set({ user }),
+      setSnippets: (snippets) => set({ snippets }),
+      setLoading: (loading) => set({ loading }),
 
-  addSnippet: (snippet) => set((state) => ({ snippets: [snippet, ...state.snippets] })),
-  removeSnippet: (id) => set((state) => ({ 
-    snippets: state.snippets.filter((s) => s.id !== id) 
-  })),
-  updateSnippetInStore: (id, updates) => set((state) => ({
-    snippets: state.snippets.map((s) => s.id === id ? { ...s, ...updates } : s)
-  })),
+      addSnippet: (snippet) => set((state) => ({ snippets: [snippet, ...state.snippets] })),
+      removeSnippet: (id) => set((state) => ({ 
+        snippets: state.snippets.filter((s) => s.id !== id) 
+      })),
+      updateSnippetInStore: (id, updates) => set((state) => ({
+        snippets: state.snippets.map((s) => s.id === id ? { ...s, ...updates } : s)
+      })),
 
-  setSelectedSnippetId: (id) => set({ selectedSnippetId: id }),
-  selectedProjectId: null,
-  setSelectedProjectId: (id) => set({ selectedProjectId: id }),
+      setSelectedSnippetId: (id) => set({ selectedSnippetId: id }),
+      selectedProjectId: null,
+      setSelectedProjectId: (id) => set({ selectedProjectId: id }),
 
-  projects: [],
-  setProjects: (projects) => set({ projects }),
+      projects: [],
+      setProjects: (projects) => set({ projects }),
 
-  settings: {
-    lockoutThreshold: 3,
-    autoLockTimer: 15,
-    pushAlerts: true,
-    soundEffects: false,
-    theme: 'crimson',
-    fontSize: 100,
-    shortcuts: {
-      copy: 'C',
-      newSnippet: 'N',
-      search: 'F'
+      settings: {
+        lockoutThreshold: 3,
+        autoLockTimer: 15,
+        pushAlerts: true,
+        soundEffects: false,
+        theme: 'crimson',
+        fontSize: 100,
+        shortcuts: {
+          copy: 'C',
+          newSnippet: 'N',
+          search: 'F'
+        }
+      },
+      setSettings: (newSettings) => set((state) => ({ 
+        settings: { ...state.settings, ...newSettings } 
+      })),
+
+      searchQuery: '',
+      setSearchQuery: (query) => set({ searchQuery: query }),
+
+      preSelectedProjectId: null,
+      setPreSelectedProjectId: (id) => set({ preSelectedProjectId: id }),
+
+      globalError: null,
+      setGlobalError: (globalError) => set({ globalError }),
+
+      sessionCopies: {},
+      incrementCopy: (id) => set((state) => ({
+        sessionCopies: { 
+          ...state.sessionCopies, 
+          [id]: (state.sessionCopies[id] || 0) + 1 
+        }
+      }))
+    }),
+    {
+      name: 'coda-storage',
+      partialize: (state) => ({ settings: state.settings }),
     }
-  },
-  setSettings: (newSettings) => set((state) => ({ 
-    settings: { ...state.settings, ...newSettings } 
-  })),
-
-  searchQuery: '',
-  setSearchQuery: (query) => set({ searchQuery: query }),
-
-  preSelectedProjectId: null,
-  setPreSelectedProjectId: (id) => set({ preSelectedProjectId: id }),
-
-  globalError: null,
-  setGlobalError: (globalError) => set({ globalError }),
-
-  sessionCopies: {},
-  incrementCopy: (id) => set((state) => ({
-    sessionCopies: { 
-      ...state.sessionCopies, 
-      [id]: (state.sessionCopies[id] || 0) + 1 
-    }
-  }))
-}));
+  )
+);
