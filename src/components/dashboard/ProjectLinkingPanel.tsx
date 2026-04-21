@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useStore } from '../../store/useStore';
 import { 
@@ -27,31 +27,40 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
   const { user, setSelectedSnippetId } = useStore();
   const [related, setRelated] = useState<RelatedSnippet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const hasLoadedOnce = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
 
     const fetchRelated = async () => {
       if (!user) return;
-      setLoading(true);
+      
+      // Only show full loading state if we have no data yet
+      if (!hasLoadedOnce.current) {
+        setLoading(true);
+      } else {
+        setIsSyncing(true);
+      }
+      
       try {
-        // Trigger background recomputation first
         await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user.id }).catch(() => {});
         
-        // Fetch the precomputed links
         const data = await invoke<RelatedSnippet[]>('get_related_snippets', { 
           snippetId: snippetId, 
           userId: user.id 
         });
+        
         if (!cancelled) {
           setRelated(Array.isArray(data) ? data : []);
+          hasLoadedOnce.current = true;
         }
       } catch (error) {
         console.error('Failed to fetch related snippets:', error);
-        // Keep previous results on error — don't clear them
       } finally {
         if (!cancelled) {
           setLoading(false);
+          setIsSyncing(false);
         }
       }
     };
@@ -89,49 +98,40 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
     );
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 animate-pulse">
-        <div className="h-4 bg-slate-800 rounded w-48 mb-4"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="h-32 bg-slate-800 rounded-lg"></div>
-          <div className="h-32 bg-slate-800 rounded-lg"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="p-6 bg-slate-950/50 border-t border-slate-800/50">
+    <div className={`p-6 bg-slate-950/50 border-t border-slate-800/50 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-sm font-black tracking-[0.2em] text-red-500 flex items-center gap-2">
-            <Network className="w-4 h-4" />
+            <Network className={`w-4 h-4 ${(loading || isSyncing) ? 'animate-spin' : ''}`} />
             CROSS-PROJECT LINKS
+            {(loading || isSyncing) && <span className="text-[8px] bg-red-500 text-white px-1 rounded animate-pulse ml-2">SYNCING</span>}
           </h2>
           <p className="text-[10px] font-mono text-slate-500 mt-1 uppercase tracking-tighter">
-            SYSTEM_INTEGRITY: COMPROMISED // DATA_NODES: ACTIVE
+            {(loading || isSyncing) ? 'RECOMPUTING_NEURAL_PATHWAYS...' : 'SYSTEM_INTEGRITY: COMPROMISED // DATA_NODES: ACTIVE'}
           </p>
         </div>
         <div className="flex gap-2">
           <button 
-            onClick={() => {
-              setLoading(true);
-              setTimeout(() => {
-                // Re-triggering effect by setting loading true and letting dependencies do the work
-                // But we'll also manually trigger recompute here for instant gratification
-                invoke('recompute_snippet_links', { snippetId: snippetId, userId: user!.id })
-                  .then(() => invoke<RelatedSnippet[]>('get_related_snippets', { snippetId: snippetId, userId: user!.id }))
-                  .then(data => {
-                    setRelated(data);
-                    setLoading(false);
-                    toast.success('Relations recomputed', { style: { background: '#1a1a1a', color: '#fff', fontSize: '10px' } });
-                  });
-              }, 500);
+            onClick={async () => {
+              if (loading || isSyncing) return;
+              setIsSyncing(true);
+              try {
+                await invoke('recompute_snippet_links', { snippetId: snippetId, userId: user!.id });
+                const data = await invoke<RelatedSnippet[]>('get_related_snippets', { snippetId: snippetId, userId: user!.id });
+                setRelated(Array.isArray(data) ? data : []);
+                toast.success('Relations recomputed', { style: { background: '#1a1a1a', color: '#fff', fontSize: '10px' } });
+              } catch (e) {
+                console.error(e);
+              } finally {
+                setIsSyncing(false);
+              }
             }}
-            className="px-2 py-1 hover:bg-red-500/20 border border-slate-700/50 rounded text-[10px] font-mono text-slate-400 hover:text-red-400 transition-colors"
+            disabled={loading || isSyncing}
+            className={`px-2 py-1 border rounded text-[10px] font-mono transition-colors ${(loading || isSyncing) ? 'bg-slate-800 text-slate-600 border-slate-700 cursor-not-allowed' : 'hover:bg-red-500/20 border-slate-700/50 text-slate-400 hover:text-red-400'}`}
           >
-            RE-SCAN
+            {(loading || isSyncing) ? 'SCANNING...' : 'RE-SCAN'}
           </button>
           <div className="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] font-mono text-red-400">
             {(related || []).length} NODES_FOUND
@@ -139,7 +139,13 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
         </div>
       </div>
 
-      {(related || []).length === 0 ? (
+      {loading && related.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+          <div className="h-32 bg-slate-900/40 border border-slate-800 rounded-lg"></div>
+          <div className="h-32 bg-slate-900/40 border border-slate-800 rounded-lg"></div>
+          <div className="h-32 bg-slate-900/40 border border-slate-800 rounded-lg"></div>
+        </div>
+      ) : related.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-800 rounded-xl bg-slate-900/20">
           <Unlink className="w-8 h-8 text-slate-700 mb-3" />
           <p className="text-xs text-slate-500 font-mono">NO BEHAVIORAL CORRELATIONS DETECTED</p>
