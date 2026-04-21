@@ -44,11 +44,13 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
   const [loading, setLoading] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'smart' | 'stale'>('smart');
 
-  const FALLBACK_KEY = 'AIzaSyD-eW4TcBJUoxF1DerjG1bLS-ee3xUMqVY';
-  const apiKey = settings.geminiApiKey || FALLBACK_KEY;
+  const apiKey = settings.geminiApiKey;
 
   const fetchGeminiInsight = async (currentSnippet: any) => {
-    if (!currentSnippet?.content) return;
+    if (!currentSnippet?.content || !apiKey) {
+      setAiStatus('idle');
+      return;
+    }
     
     setAiStatus('syncing');
     setLastError(null);

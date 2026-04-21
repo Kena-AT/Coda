@@ -37,7 +37,6 @@ THEMES: Crimson (red accent), Void (purple), Matrix (green), Glacier (blue)
 
 Be concise, helpful, and match the app's dark, technical, terminal-inspired aesthetic in your tone. Use short sentences. Be direct.`;
 
-const FALLBACK_API_KEY = 'AIzaSyD-eW4TcBJUoxF1DerjG1bLS-ee3xUMqVY';
 const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
 export const CodaAI: React.FC = () => {
@@ -50,7 +49,7 @@ export const CodaAI: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const apiKey = settings.geminiApiKey || FALLBACK_API_KEY;
+  const apiKey = settings.geminiApiKey;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -76,6 +75,15 @@ export const CodaAI: React.FC = () => {
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
+
+    if (!apiKey) {
+      setMessages(prev => [...prev, 
+        { role: 'user', content: trimmed, timestamp: Date.now() },
+        { role: 'ai', content: 'SYSTEM_ERROR: No Gemini API key configured. Go to Settings > Intelligence_Layer to add your key.', timestamp: Date.now() }
+      ]);
+      setInput('');
+      return;
+    }
 
     const userMessage: ChatMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
     setMessages(prev => [...prev, userMessage]);

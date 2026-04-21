@@ -139,7 +139,7 @@ export const useStore = create<AppState>()(
           newSnippet: 'N',
           search: 'F'
         },
-        geminiApiKey: 'AIzaSyD-eW4TcBJUoxF1DerjG1bLS-ee3xUMqVY'
+        geminiApiKey: ''
       },
       setSettings: (newSettings) => set((state) => ({ 
         settings: { ...state.settings, ...newSettings } 
