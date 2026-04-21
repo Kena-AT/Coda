@@ -31,6 +31,7 @@ import { VersionInfoPage } from './VersionInfoPage';
 import { LogoutConfirmationPage } from './LogoutConfirmationPage';
 import { sessionManager, authApi } from '../../store/authStore';
 import { useAuthSession } from '../../hooks/useAuthSession';
+import { useAutoLock } from '../../hooks/useAutoLock';
 import { listen } from '@tauri-apps/api/event';
 
 export const Dashboard: React.FC = () => {
@@ -52,6 +53,9 @@ export const Dashboard: React.FC = () => {
 
   // Enable automatic token expiry tracking and refresh
   useAuthSession();
+  
+  // Enable inactivity auto-lock
+  useAutoLock();
 
 
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);

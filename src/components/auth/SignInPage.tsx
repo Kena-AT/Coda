@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Check, Copy, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
 import { authApi, sessionManager, type AuthResponse } from '../../store/authStore';
+import { useStore } from '../../store/useStore';
+import { soundService } from '../../utils/sounds';
 
 interface SignInPageProps {
   onBack: () => void;
@@ -18,6 +20,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [isConnected] = useState(true);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const { settings } = useStore();
 
   const localNodeAddress = '127.0.0.1:443';
 
@@ -35,6 +39,12 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (failedAttempts >= settings.lockoutThreshold) {
+      setError('System is locked due to multiple failed attempts.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response: AuthResponse = await authApi.login(username, password, rememberMe);
@@ -54,7 +64,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
         );
         onSuccess(response.user_id, response.username || username, response.token);
       } else {
-        setError(response.message);
+        const newAttempts = failedAttempts + 1;
+        setFailedAttempts(newAttempts);
+        soundService.playError();
+        
+        if (newAttempts >= settings.lockoutThreshold) {
+          setError('System locked: threshold exceeded.');
+        } else {
+          setError(response.message || `INVALID_CREDENTIALS [${newAttempts}/${settings.lockoutThreshold}]`);
+        }
       }
     } catch (err: any) {
       setError(err.toString());
