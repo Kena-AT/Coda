@@ -154,7 +154,7 @@ export const CodaAI: React.FC = () => {
         {isOpen ? (
           <X size={20} className="text-white" />
         ) : (
-          <img src={logo} className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" alt="Coda Logo" />
+          <img src={logo} className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform" alt="Coda Logo" />
         )}
         {/* Pulse ring when closed */}
         {!isOpen && (
@@ -174,8 +174,8 @@ export const CodaAI: React.FC = () => {
           {/* Header */}
           <div className="px-5 py-4 bg-[#111] border-b border-[var(--border)] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#1a1a1a] border border-[var(--border)] rounded-lg flex items-center justify-center relative overflow-hidden">
-                <img src={logo} className="w-5 h-5 object-contain" alt="Coda Logo" />
+              <div className="w-8 h-8 bg-[#1a1a1a] border border-[var(--border)] rounded-full flex items-center justify-center relative overflow-hidden">
+                <img src={logo} className="w-full h-full object-cover rounded-full" alt="Coda Logo" />
                 <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#111]" />
               </div>
               <div>
