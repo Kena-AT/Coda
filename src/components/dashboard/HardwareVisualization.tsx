@@ -254,7 +254,15 @@ export const HardwareVisualization: React.FC = () => {
 
       {/* Footer metrics */}
       <div className="flex gap-4 text-[9px] font-main text-[#adaaad] uppercase tracking-[1px]">
-        <span>CORE_TEMP: {snapshot?.core_temp ? `${snapshot.core_temp.toFixed(1)}°C` : 'N/A'}</span>
+        <span className="flex items-center gap-1.5">
+          CORE_TEMP: 
+          <span className={snapshot?.core_temp && snapshot.core_temp > 65 ? 'text-red-500 font-bold' : 'text-white'}>
+            {snapshot?.core_temp ? `${snapshot.core_temp.toFixed(1)}°C` : 'N/A'}
+          </span>
+          {snapshot?.core_temp && snapshot.core_temp > 65 && (
+            <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" />
+          )}
+        </span>
         <span>CPU_LOAD: {snapshot?.global_cpu ? `${snapshot.global_cpu.toFixed(1)}%` : '0%'}</span>
       </div>
     </div>
