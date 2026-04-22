@@ -35,6 +35,10 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
   const [isSyncing, setIsSyncing] = useState(false);
   const hasLoadedOnce = useRef(false);
 
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiPanel, setShowAiPanel] = useState(false);
+
   const currentSnippet = snippets.find(s => s.id === snippetId);
 
   const getIntegrityStatus = () => {
@@ -55,6 +59,43 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
   const integrity = getIntegrityStatus();
   const nodeCount = related.length;
   const nodesStatus = nodeCount > 0 ? 'ACTIVE' : 'ISOLATED';
+
+  const fetchAiAnalysis = async () => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey || !currentSnippet || related.length === 0) return;
+    
+    setAiLoading(true);
+    setShowAiPanel(true);
+    try {
+      const relatedContext = related.map(r => `- ${r.title} (Project: ${r.project_name || 'Root'}, Type: ${r.link_type}, Strength: ${r.strength}%)`).join('\n');
+      const prompt = `Analyze this code snippet titled "${currentSnippet.title}":
+${currentSnippet.content.substring(0, 1000)}
+
+It has behavioral cross-project links to these other snippets:
+${relatedContext}
+
+Analyze the cross-project synergy. Explain how these nodes fit together in a broader architectural workflow. Be concise, objective, and maintain a highly technical, dark terminal-inspired aesthetic. Max 3 sentences.`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        setAiAnalysis(text);
+      } else {
+        setAiAnalysis("ANALYSIS_FAILED: Unable to decode synergy vectors.");
+      }
+    } catch (e) {
+      setAiAnalysis("CONNECTION_FAILED: Neural link to Gemini interrupted.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -80,6 +121,9 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
         if (!cancelled) {
           setRelated(Array.isArray(data) ? data : []);
           hasLoadedOnce.current = true;
+          // Reset AI state when dependencies change
+          setAiAnalysis(null);
+          setShowAiPanel(false);
         }
       } catch (error) {
         console.error('Failed to fetch related snippets:', error);
@@ -160,6 +204,18 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
           </div>
         </div>
         <div className="flex gap-2">
+          {import.meta.env.VITE_GEMINI_API_KEY && related.length > 0 && (
+            <button
+              onClick={fetchAiAnalysis}
+              disabled={aiLoading}
+              className={`px-3 py-1 border rounded text-[10px] font-mono transition-all uppercase tracking-widest ${
+                aiLoading ? 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30 animate-pulse' :
+                'bg-[var(--accent)]/5 hover:bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/30'
+              }`}
+            >
+              {aiLoading ? 'ANALYZING...' : 'AI_SYNERGY_ANALYSIS'}
+            </button>
+          )}
           <button 
             onClick={async () => {
               if (loading || isSyncing || !user) return;
@@ -169,6 +225,8 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
                 const data = await invoke<RelatedSnippet[]>('get_related_snippets', { snippetId: snippetId, userId: user.id });
                 setRelated(Array.isArray(data) ? data : []);
                 toast.success('Relations recomputed', { style: { background: '#1a1a1a', color: '#fff', fontSize: '10px' } });
+                setAiAnalysis(null);
+                setShowAiPanel(false);
               } catch (e) {
                 console.error(e);
               } finally {
@@ -180,11 +238,30 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
           >
             {(loading || isSyncing) ? 'SCANNING...' : 'RE-SCAN'}
           </button>
-          <div className="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] font-mono text-red-400">
+          <div className="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] font-mono text-red-400 flex items-center justify-center">
             {(related || []).length} NODES_FOUND
           </div>
         </div>
       </div>
+
+      {/* AI Analysis Panel */}
+      {showAiPanel && (
+        <div className="mb-6 p-4 bg-[var(--accent)]/5 border border-[var(--accent)]/20 rounded-lg relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[var(--accent)]" />
+          <div className="flex items-center gap-2 mb-2">
+            <Zap size={12} className="text-[var(--accent)]" />
+            <span className="text-[9px] font-black tracking-widest text-[var(--accent)] uppercase">GEMINI_TOPOLOGY_REPORT</span>
+          </div>
+          {aiLoading ? (
+            <div className="flex flex-col gap-2">
+              <div className="h-2 bg-[var(--accent)]/20 rounded w-3/4 animate-pulse" />
+              <div className="h-2 bg-[var(--accent)]/20 rounded w-1/2 animate-pulse" />
+            </div>
+          ) : (
+            <p className="text-[11px] font-main text-slate-300 leading-relaxed italic">{aiAnalysis}</p>
+          )}
+        </div>
+      )}
 
       {loading && related.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">

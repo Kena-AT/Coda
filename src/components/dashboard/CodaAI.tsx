@@ -35,7 +35,7 @@ SHORTCUTS:
 
 THEMES: Crimson (red accent), Void (purple), Matrix (green), Glacier (blue)
 
-Be concise, helpful, and match the app's dark, technical, terminal-inspired aesthetic in your tone. Use short sentences. Be direct.`;
+Be conversational and approachable in your tone, while remaining highly objective, factual, and analytical. You should still match the app's dark, technical, terminal-inspired aesthetic, but speak naturally.`;
 
 const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
