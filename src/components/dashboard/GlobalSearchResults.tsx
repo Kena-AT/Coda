@@ -6,6 +6,9 @@ import { Search, Info, AlertTriangle, RefreshCcw, FolderGit2, ChevronRight, Acti
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 
+import { ConfirmationModal } from './ConfirmationModal';
+import { useSoundEffect } from '../../hooks/useSoundEffect';
+
 class SearchErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() { return { hasError: true }; }
@@ -44,6 +47,9 @@ export const GlobalSearchResults: React.FC = () => {
     user 
   } = useStore();
 
+  const playSound = useSoundEffect();
+  const [snippetToDelete, setSnippetToDelete] = React.useState<number | null>(null);
+
   const { snippetResults, projectResults } = useMemo(() => {
     try {
       if (!searchQuery) return { snippetResults: [], projectResults: [] };
@@ -62,26 +68,31 @@ export const GlobalSearchResults: React.FC = () => {
 
   const handleArchive = async (id: number) => {
     try {
+      playSound('click');
       const resp: any = await invoke('archive_snippet', { id, userId: user?.id });
       if (resp.success) {
         setSnippets(snippets.map(s => s.id === id ? { ...s, is_archived: !s.is_archived } : s));
         toast.success(snippets.find(s => s.id === id)?.is_archived ? 'Restored' : 'Archived');
+        playSound('success');
       }
     } catch (err) {
       toast.error('Action failed');
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Destroy item?')) return;
+  const confirmDelete = async () => {
+    if (snippetToDelete === null) return;
     try {
-      const resp: any = await invoke('delete_snippet', { id, userId: user?.id });
+      const resp: any = await invoke('delete_snippet', { id: snippetToDelete, userId: user?.id });
       if (resp.success) {
-        setSnippets(snippets.filter(s => s.id !== id));
+        setSnippets(snippets.filter(s => s.id !== snippetToDelete));
         toast.success('Purged from vault');
+        playSound('error');
       }
     } catch (err) {
       toast.error('Purge failed');
+    } finally {
+      setSnippetToDelete(null);
     }
   };
 
@@ -170,7 +181,7 @@ export const GlobalSearchResults: React.FC = () => {
                     <SnippetCard 
                       snippet={snippet}
                       onEdit={() => setSelectedSnippetId(snippet.id!)}
-                      onDelete={() => handleDelete(snippet.id!)}
+                      onDelete={() => { playSound('click'); setSnippetToDelete(snippet.id!); }}
                       onArchive={() => handleArchive(snippet.id!)}
                     />
                   )}
@@ -179,6 +190,14 @@ export const GlobalSearchResults: React.FC = () => {
             </div>
           </div>
         )}
+
+        <ConfirmationModal
+          isOpen={snippetToDelete !== null}
+          title="DESTROY_SNIPPET"
+          message="Are you sure you want to permanently delete this code fragment? This operation is terminal and will erase all metadata from the vault index."
+          onConfirm={confirmDelete}
+          onCancel={() => setSnippetToDelete(null)}
+        />
       </div>
     </SearchErrorBoundary>
   );

@@ -21,6 +21,7 @@ import { SnippetCard } from './SnippetCard';
 import toast from 'react-hot-toast';
 import { filterSnippets } from '../../utils/searchEngine';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
+import { ConfirmationModal } from './ConfirmationModal';
 
 export const ProjectVault: React.FC = () => {
   const { 
@@ -45,6 +46,7 @@ export const ProjectVault: React.FC = () => {
   const [localSearch, setLocalSearch] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
   
   // Edit State for detail view
   const [isEditing, setIsEditing] = useState(false);
@@ -162,8 +164,24 @@ export const ProjectVault: React.FC = () => {
     setProjectToDeleteName('');
   };
 
+  const confirmDeleteSnippet = async () => {
+    if (snippetToDelete === null || !user) return;
+    try {
+      const response: any = await invoke('delete_snippet', { id: snippetToDelete, userId: user.id });
+      if (response.success) {
+        setSnippets(snippets.filter(s => s.id !== snippetToDelete));
+        toast.success('Snippet purged');
+        playSound('error');
+      }
+    } catch (err: any) {
+      toast.error(err.toString());
+    } finally {
+      setSnippetToDelete(null);
+    }
+  };
+
   const confirmDeleteProject = async () => {
-    if (!projectToDelete || !user) return;
+    if (projectToDelete === null || !user) return;
     try {
       const resp = await invoke<any>('delete_project', { id: projectToDelete, userId: user.id });
       if (resp.success) {
@@ -406,7 +424,7 @@ export const ProjectVault: React.FC = () => {
                       onEdit={() => { playSound('transition'); setSelectedSnippetId(snippet.id!); }}
                       onDelete={() => {
                         playSound('click');
-                        if(confirm('Delete?')) invoke('delete_snippet', { id: snippet.id, userId: user?.id }).then(() => { playSound('success'); fetchSnippets(); });
+                        setSnippetToDelete(snippet.id!);
                       }}
                       onArchive={() => {
                         playSound('click');
@@ -418,6 +436,24 @@ export const ProjectVault: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Deletion Modals (Scoped View) */}
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          title="PURGE_PROJECT_SECTOR"
+          message={`Are you sure you want to destroy the project sector "${projectToDeleteName}"? All snippets currently indexed under this sector will be relocated to the global INBOX.`}
+          onConfirm={confirmDeleteProject}
+          onCancel={closeDeleteModal}
+          confirmLabel="CONFIRM_PURGE"
+        />
+
+        <ConfirmationModal
+          isOpen={snippetToDelete !== null}
+          title="DESTROY_SNIPPET"
+          message="Are you sure you want to permanently delete this code snippet? This operation is terminal and will erase all metadata from the vault."
+          onConfirm={confirmDeleteSnippet}
+          onCancel={() => setSnippetToDelete(null)}
+        />
       </div>
     );
   }
@@ -567,52 +603,23 @@ export const ProjectVault: React.FC = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]">
-          <div className="bg-[var(--bg-primary)] border border-[var(--accent)]/30 p-8 w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between mb-6 border-b border-[var(--accent)]/20 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-[var(--accent)] animate-pulse" />
-                <h2 className="text-lg font-main font-bold text-[var(--accent)] tracking-[1px] uppercase">
-                  PURGE_CONFIRMATION
-                </h2>
-              </div>
-              <button
-                onClick={closeDeleteModal}
-                className="p-1.5 text-[#adaaad] hover:text-white hover:bg-[var(--accent)]/10 transition-colors"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="flex flex-col gap-4">
-              <p className="text-white font-mono text-sm">
-                DESTROY PROJECT SECTOR: <span className="text-[var(--accent)] font-bold">{projectToDeleteName}</span>?
-              </p>
-              <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[0.5px]">
-                WARNING: All snippets within this sector will be relocated to INBOX.
-              </p>
-              
-              <div className="flex gap-3 mt-4 pt-4 border-t border-[var(--border)]">
-                <button
-                  onClick={confirmDeleteProject}
-                  className="flex-1 bg-[var(--accent)] text-white py-3 text-[11px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors"
-                >
-                  CONFIRM_PURGE
-                </button>
-                <button
-                  onClick={closeDeleteModal}
-                  className="px-6 py-3 border border-[var(--border)] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors"
-                >
-                  ABORT
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Deletion Modals */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        title="PURGE_PROJECT_SECTOR"
+        message={`Are you sure you want to destroy the project sector "${projectToDeleteName}"? All snippets currently indexed under this sector will be relocated to the global INBOX.`}
+        onConfirm={confirmDeleteProject}
+        onCancel={closeDeleteModal}
+        confirmLabel="CONFIRM_PURGE"
+      />
+
+      <ConfirmationModal
+        isOpen={snippetToDelete !== null}
+        title="DESTROY_SNIPPET"
+        message="Are you sure you want to permanently delete this code snippet? This operation is terminal and will erase all metadata from the vault."
+        onConfirm={confirmDeleteSnippet}
+        onCancel={() => setSnippetToDelete(null)}
+      />
 
       {/* Floating Action Button for Creating Projects */}
       <button

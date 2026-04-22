@@ -1,14 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
 import { Flame, Clock, Archive, Activity, Folder } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
+import { ConfirmationModal } from './ConfirmationModal';
 
 export const IntelligenceDashboard: React.FC = () => {
   const { user, snippets, projects, setSelectedSnippetId, setSnippets, setActiveTab, setSelectedProjectId } = useStore();
   const playSound = useSoundEffect();
+  const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
 
   const handleArchive = async (id: number) => {
     try {
@@ -22,15 +24,19 @@ export const IntelligenceDashboard: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Permanent deletion?')) return;
+  const confirmDelete = async () => {
+    if (snippetToDelete === null) return;
     try {
-      const response: any = await invoke('delete_snippet', { id, userId: user?.id });
+      const response: any = await invoke('delete_snippet', { id: snippetToDelete, userId: user?.id });
       if (response.success) {
-        setSnippets(snippets.filter(s => s.id !== id));
+        setSnippets(snippets.filter(s => s.id !== snippetToDelete));
+        toast.success('Snippet purged');
+        playSound('error');
       }
     } catch (err: any) {
       toast.error(err.toString());
+    } finally {
+      setSnippetToDelete(null);
     }
   };
 
@@ -86,7 +92,7 @@ export const IntelligenceDashboard: React.FC = () => {
               <SnippetCard 
                 snippet={s} 
                 onEdit={() => { playSound('transition'); setSelectedSnippetId(s.id!); }}
-                onDelete={() => handleDelete(s.id!)}
+                onDelete={() => { playSound('click'); setSnippetToDelete(s.id!); }}
                 onArchive={() => handleArchive(s.id!)}
               />
             </div>
@@ -141,6 +147,14 @@ export const IntelligenceDashboard: React.FC = () => {
       {renderSnippetRow('Continue Working', <Clock size={18} />, sections.continueWorking, 'No recent edits found')}
       {renderSnippetRow('Top Snippets', <Flame size={18} className="text-[var(--accent)]" />, sections.topSnippets, 'Use snippets to build analytics')}
       {renderSnippetRow('Needs Cleanup', <Archive size={18} />, sections.stale, 'Vault is entirely clean')}
+
+      <ConfirmationModal
+        isOpen={snippetToDelete !== null}
+        title="DESTROY_SNIPPET"
+        message="Are you sure you want to permanently delete this code snippet? This action will purge all metadata and version history from the local database."
+        onConfirm={confirmDelete}
+        onCancel={() => setSnippetToDelete(null)}
+      />
     </div>
   );
 };

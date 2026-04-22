@@ -1,15 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStore } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
 import { Archive, RotateCcw, Search } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
+import { ConfirmationModal } from './ConfirmationModal';
 
 export const ArchiveView: React.FC = () => {
   const { user, snippets, setSnippets, setSelectedSnippetId } = useStore();
   const playSound = useSoundEffect();
-  const [localSearch, setLocalSearch] = React.useState('');
+  const [localSearch, setLocalSearch] = useState('');
+  const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
 
   const archivedSnippets = useMemo(() => {
     return snippets.filter(s => s && s.is_archived && 
@@ -31,17 +33,19 @@ export const ArchiveView: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Destroy this data node permanently? This cannot be undone.')) return;
+  const confirmDelete = async () => {
+    if (snippetToDelete === null) return;
     try {
-      const response: any = await invoke('delete_snippet', { id, userId: user?.id });
+      const response: any = await invoke('delete_snippet', { id: snippetToDelete, userId: user?.id });
       if (response.success) {
-        setSnippets(snippets.filter(s => s.id !== id));
+        setSnippets(snippets.filter(s => s.id !== snippetToDelete));
         toast.success('Snippet purged from existence');
         playSound('error');
       }
     } catch (err: any) {
       toast.error(err.toString());
+    } finally {
+      setSnippetToDelete(null);
     }
   };
 
@@ -81,7 +85,7 @@ export const ArchiveView: React.FC = () => {
               <SnippetCard 
                 snippet={s} 
                 onEdit={() => { playSound('transition'); setSelectedSnippetId(s.id!); }}
-                onDelete={() => handleDelete(s.id!)}
+                onDelete={() => { playSound('click'); setSnippetToDelete(s.id!); }}
                 onArchive={() => handleUnarchive(s.id!)}
               />
               <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -111,6 +115,13 @@ export const ArchiveView: React.FC = () => {
           </p>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={snippetToDelete !== null}
+        title="PURGE_COLD_STORAGE"
+        message="This operation will permanently erase this data node from cold storage. This action is terminal and cannot be reversed."
+        onConfirm={confirmDelete}
+        onCancel={() => setSnippetToDelete(null)}
+      />
     </div>
   );
 };
