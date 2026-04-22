@@ -5,7 +5,7 @@ import {
   Star, 
   BarChart2, 
   Tag, 
-  XSquare
+  Archive
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -35,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
     { id: 'favorites', label: 'Favorites', icon: Star },
     { id: 'analytics', label: 'Analytics', icon: BarChart2 },
     { id: 'tags', label: 'Tags', icon: Tag },
-    { id: 'trash', label: 'Trash', icon: XSquare },
+    { id: 'archive', label: 'Archive', icon: Archive },
   ];
 
   return (

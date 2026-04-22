@@ -19,6 +19,7 @@ import { AnalyticsPage } from './AnalyticsPage';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import { ArchiveModal } from './ArchiveModal';
+import { ArchiveView } from './ArchiveView';
 import { ProjectVault } from './ProjectVault';
 import { IntelligenceDashboard } from './IntelligenceDashboard';
 import { GlobalSearchResults } from './GlobalSearchResults';
@@ -298,6 +299,10 @@ export const Dashboard: React.FC = () => {
           ) : activeTab === 'projects' ? (
             <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
               <ProjectVault />
+            </div>
+          ) : activeTab === 'archive' ? (
+            <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
+              <ArchiveView />
             </div>
           ) : (
             <div className="flex-1 flex overflow-hidden">
