@@ -32,6 +32,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
       await navigator.clipboard.writeText(snippet.content);
       if (snippet.id) {
         await invoke('record_snippet_usage', { snippetId: snippet.id });
+        updateSnippetInStore(snippet.id, { copy_count: (snippet.copy_count || 0) + 1 });
       }
       toast.success('Snippet copied to terminal buffer', {
         style: {

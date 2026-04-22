@@ -44,7 +44,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
   const [loading, setLoading] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'smart' | 'stale'>('smart');
 
-  const apiKey = settings.geminiApiKey;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   const fetchGeminiInsight = async (currentSnippet: any) => {
     if (!currentSnippet?.content || !apiKey) {
@@ -143,10 +143,10 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
       <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between">
         <div className="flex flex-col">
           <h3 className="font-main font-bold text-[10px] text-white tracking-[2px] uppercase">
-            {settings.geminiApiKey ? 'GEMINI_CO-PILOT' : 'Smart_Intelligence'}
+            {apiKey ? 'GEMINI_CO-PILOT' : 'Smart_Intelligence'}
           </h3>
           <span className="text-[9px] text-[var(--accent)] font-mono mt-1">
-            {settings.geminiApiKey ? 'GENERATIVE_V3.0' : 'Rule-Based v1.1.0'}
+            {apiKey ? 'GENERATIVE_V3.0' : 'Rule-Based v1.1.0'}
           </span>
           <div className="flex items-center gap-1.5 mt-2">
             <div className={`w-1 h-1 rounded-full ${
@@ -190,7 +190,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ curr
       </div>
 
       {/* AI Insight Section */}
-      {settings.geminiApiKey && activeSubTab === 'smart' && (
+      {apiKey && activeSubTab === 'smart' && (
         <div className={`mx-4 mb-4 p-4 border rounded relative group overflow-hidden transition-all duration-500 ${
           aiStatus === 'error' ? 'bg-red-500/5 border-red-500/20' : 'bg-[var(--accent)]/5 border-[var(--accent)]/20'
         }`}>

@@ -315,19 +315,26 @@ export const Dashboard: React.FC = () => {
                       </h3>
                     </div>
                     <div className="space-y-6">
-                      {snippets.slice(0, 3).sort((a,b) => (b.copy_count || 0) - (a.copy_count || 0)).map((snippet, idx) => {
+                      {snippets.slice(0, 5).sort((a,b) => (b.copy_count || 0) - (a.copy_count || 0)).map((snippet, idx) => {
                         const copies = snippet.copy_count || 0;
                         const contentLen = snippet.content?.length || 0;
                         const visualWidth = Math.min(100, Math.max(15, (copies * 10) + (contentLen % 20)));
                         return (
-                          <div key={idx} className="flex flex-col gap-2">
+                          <div 
+                            key={idx} 
+                            className="flex flex-col gap-2 group cursor-pointer"
+                            onClick={() => {
+                              soundService.playTransition();
+                              setSelectedSnippetId(snippet.id!);
+                            }}
+                          >
                               <div className="flex justify-between items-center text-[10px] font-mono">
-                                <span className="text-[#adaaad] truncate w-3/4">{snippet.title}</span>
-                                <span className="text-[#adaaad]">{copies} copies</span>
+                                <span className="text-[#adaaad] group-hover:text-white transition-colors truncate w-3/4">{snippet.title}</span>
+                                <span className="text-[#adaaad] group-hover:text-[var(--accent)] transition-colors">{copies} copies</span>
                               </div>
-                              <div className="h-[2px] bg-[#19191c] relative">
+                              <div className="h-[2px] bg-[#19191c] relative overflow-hidden">
                                 <div 
-                                  className="absolute top-0 left-0 h-full bg-[var(--accent)] transition-all duration-500" 
+                                  className="absolute top-0 left-0 h-full bg-[var(--accent)] transition-all duration-500 group-hover:bg-white" 
                                   style={{ width: `${visualWidth}%` }}
                                 />
                               </div>

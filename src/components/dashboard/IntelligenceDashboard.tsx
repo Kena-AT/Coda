@@ -40,7 +40,7 @@ export const IntelligenceDashboard: React.FC = () => {
     // Top Snippets (by copies)
     const topSnippets = [...unarchived]
       .sort((a, b) => (b.copy_count || 0) - (a.copy_count || 0))
-      .slice(0, 4);
+      .slice(0, 8);
 
     // Continue Working (by updated_at)
     const continueWorking = [...unarchived]
@@ -97,10 +97,17 @@ export const IntelligenceDashboard: React.FC = () => {
   );
 
   return (
-    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)]">
-      <div className="mb-12 flex flex-col gap-2">
-        <h1 className="text-3xl font-main font-bold text-white tracking-[-1.5px] uppercase">Library Intelligence</h1>
-        <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">Prioritization & Asset Discovery Layer</p>
+    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#0a0a0a] selection:bg-[var(--accent)] selection:text-white">
+      
+      {/* Header */}
+      <div className="flex justify-between items-end mb-12">
+        <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-[var(--accent)]" />
+                <span className="text-[10px] font-mono text-[var(--accent)] tracking-[2px] uppercase">Central Intelligence // Library.root</span>
+            </div>
+            <h1 className="text-[56px] font-main font-bold text-white tracking-[-3px] uppercase leading-none">Library</h1>
+        </div>
       </div>
 
       <div className="mb-12">

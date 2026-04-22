@@ -49,7 +49,7 @@ export const CodaAI: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const apiKey = settings.geminiApiKey;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -79,7 +79,7 @@ export const CodaAI: React.FC = () => {
     if (!apiKey) {
       setMessages(prev => [...prev, 
         { role: 'user', content: trimmed, timestamp: Date.now() },
-        { role: 'ai', content: 'SYSTEM_ERROR: No Gemini API key configured. Go to Settings > Intelligence_Layer to add your key.', timestamp: Date.now() }
+        { role: 'ai', content: 'SYSTEM_ERROR: No Gemini API key configured. Please add VITE_GEMINI_API_KEY to your .env file.', timestamp: Date.now() }
       ]);
       setInput('');
       return;
@@ -143,7 +143,7 @@ export const CodaAI: React.FC = () => {
       if (errMsg.includes('429') || errMsg.includes('LIMIT')) {
         diagnosticMessage = `RATE_LIMIT_EXCEEDED: Neural processors are cooling down. Please wait.`;
       } else if (errMsg.includes('KEY') || errMsg.includes('401')) {
-        diagnosticMessage = `CREDENTIAL_AUTH_FAILED: Verify Gemini_API_Key in Intelligence_Layer.`;
+        diagnosticMessage = `CREDENTIAL_AUTH_FAILED: Verify Gemini_API_Key in Intelligence_Layer. DETAILS: ${errMsg}`;
       } else if (errMsg.includes('CONNECTION') || errMsg.includes('FETCH')) {
         diagnosticMessage = `UPLINK_TIMEOUT: Network handshake failed. Check your connection.`;
       }

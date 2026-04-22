@@ -283,20 +283,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               <div className="space-y-4">
                 <div className="space-y-2">
                   <p className="text-[13px] font-bold">GEMINI_API_KEY</p>
-                  <div className="relative">
-                    <input 
-                      type="password"
-                      value={settings.geminiApiKey || ''}
-                      onChange={(e) => handleUpdateSetting({ geminiApiKey: e.target.value })}
-                      placeholder="AIza..."
-                      className="w-full bg-[#131313] border border-[var(--border)] p-3 text-[11px] font-mono text-white focus:border-[var(--accent)]/50 outline-none transition-all pr-12"
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--accent)] opacity-50">
-                      <Shield size={16} />
-                    </div>
+                  <div className="p-3 bg-[#131313] border border-[var(--border)] text-[11px] font-mono text-white opacity-80 flex justify-between items-center">
+                     <span>CONFIGURED VIA .ENV FILE</span>
+                     <Shield size={14} className="text-[var(--accent)]" />
                   </div>
                   <p className="text-[9px] font-mono text-[#e5e2e1]/30 uppercase tracking-tighter">
-                    {settings.geminiApiKey ? 'GENERATIVE_FEATURES_ENABLED' : 'AI_FEATURES_DISABLED - ENTER KEY TO ACTIVATE'}
+                    {import.meta.env.VITE_GEMINI_API_KEY ? 'GENERATIVE_FEATURES_ENABLED' : 'AI_FEATURES_DISABLED - ADD KEY TO .ENV FILE'}
                   </p>
                 </div>
 
