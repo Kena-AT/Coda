@@ -39,7 +39,7 @@ interface AnalyticsSummary {
 }
 
 export const AnalyticsPage: React.FC = () => {
-  const { user } = useStore();
+  const { user, snippets } = useStore();
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [popularSnippets, setPopularSnippets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ export const AnalyticsPage: React.FC = () => {
     fetchAnalytics();
     const interval = setInterval(fetchAnalytics, 10000); // 10s live feed
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, snippets.length]);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr || dateStr === "No entries") return "N/A";

@@ -315,7 +315,7 @@ export const Dashboard: React.FC = () => {
                       </h3>
                     </div>
                     <div className="space-y-6">
-                      {snippets.slice(0, 5).sort((a,b) => (b.copy_count || 0) - (a.copy_count || 0)).map((snippet, idx) => {
+                      {snippets.slice().sort((a,b) => (b.copy_count || 0) - (a.copy_count || 0)).slice(0, 5).map((snippet, idx) => {
                         const copies = snippet.copy_count || 0;
                         const contentLen = snippet.content?.length || 0;
                         const visualWidth = Math.min(100, Math.max(15, (copies * 10) + (contentLen % 20)));
