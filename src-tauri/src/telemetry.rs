@@ -266,12 +266,14 @@ pub struct SystemStatus {
 #[tauri::command]
 pub fn get_system_status(app_handle: tauri::AppHandle, state: State<'_, AppState>) -> Result<SystemStatus, String> {
     let db_healthy = crate::db::get_db_connection(&app_handle).is_ok();
-    let telemetry_active = {
-        let store = state.telemetry.lock().map_err(|e| e.to_string())?;
-        store.diagnostics_enabled
-    };
-    // For now, if we have a user in store it's valid
-    let session_valid = true; 
+    
+    let store = state.telemetry.lock().map_err(|e| e.to_string())?;
+    
+    // SYNC is active if any long-running task is currently in progress
+    let telemetry_active = store.tasks.iter().any(|t| t.state == TaskState::Running);
+    
+    // Session is valid if there are any active sessions in the store
+    let session_valid = !state.session_store.is_empty();
 
     Ok(SystemStatus {
         db_healthy,

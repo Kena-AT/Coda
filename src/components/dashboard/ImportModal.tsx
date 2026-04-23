@@ -7,6 +7,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { readTextFile } from '@tauri-apps/plugin-fs';
 import toast from 'react-hot-toast';
 import { metadataEngine } from '../../utils/metadataEngine';
+import { updateTaskState } from '../../hooks/useTelemetry';
 
 interface Props {
   isOpen: boolean;
@@ -60,6 +61,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
       return;
     }
     setIsProcessing(true);
+    updateTaskState('import_processing', 'running');
     try {
       await invoke('create_snippet', {
         userId: user?.id,
@@ -99,6 +101,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
       // If single file, load it for review
       if (filePaths.length === 1) {
         setIsProcessing(true);
+        updateTaskState('import_processing', 'running');
         try {
           const path = filePaths[0];
           const content = await readTextFile(path);
@@ -129,12 +132,14 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
           toast.error('Load failed: ' + err.toString());
         } finally {
           setIsProcessing(false);
+      updateTaskState('import_processing', 'completed');
         }
         return;
       }
 
       // Multi-file bulk import
       setIsProcessing(true);
+      updateTaskState('import_processing', 'running');
       let successCount = 0;
       for (const path of filePaths) {
         try {
@@ -185,6 +190,7 @@ export const ImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
       toast.error('Native uplink failure: ' + e.toString());
     } finally {
       setIsProcessing(false);
+      updateTaskState('import_processing', 'completed');
     }
   };
 

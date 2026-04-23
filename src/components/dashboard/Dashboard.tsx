@@ -12,6 +12,7 @@ import {
   Menu
 } from 'lucide-react';
 import { soundService } from '../../utils/sounds';
+import { updateTaskState } from '../../hooks/useTelemetry';
 import { useStore } from '../../store/useStore';
 import { Sidebar } from '../layout/Sidebar';
 import { HardwareVisualization } from './HardwareVisualization';
@@ -99,6 +100,7 @@ export const Dashboard: React.FC = () => {
   const fetchSnippets = async () => {
     if (!user) return;
     setLoading(true);
+    updateTaskState('search_indexing', 'running');
     try {
       const includeArchived = activeTab === 'archive' || !!searchQuery;
       const response: any = await invoke('list_snippets', {
@@ -114,6 +116,7 @@ export const Dashboard: React.FC = () => {
       toast.error(err.toString());
     } finally {
       setLoading(false);
+      updateTaskState('search_indexing', 'completed');
     }
   };
 

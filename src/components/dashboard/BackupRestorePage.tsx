@@ -13,6 +13,7 @@ import { save, open } from '@tauri-apps/plugin-dialog';
 import { toast } from 'react-hot-toast';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { sendNotification } from '@tauri-apps/plugin-notification';
+import { updateTaskState } from '../../hooks/useTelemetry';
 
 interface LogEntry {
   timestamp: string;
@@ -48,6 +49,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
       if (!filePath) return;
 
       setLoading(true);
+      updateTaskState('backup', 'running');
       addLog("READY_FOR_SNAPSHOT_OPERATION");
       
       await invoke('create_backup', { targetPath: filePath });
@@ -67,6 +69,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
       addLog(`ERR: SNAPSHOT_FAILED: ${err}`);
     } finally {
       setLoading(false);
+      updateTaskState('backup', 'completed');
     }
   };
 
@@ -83,6 +86,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
       if (!selected) return;
 
       setLoading(true);
+      updateTaskState('backup', 'running');
       addLog("INIT_RESTORE_SEQUENCE");
       
       await invoke('restore_backup', { sourcePath: selected });
@@ -104,6 +108,7 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
       addLog(`ERR: RESTORE_ABORTED: ${err}`);
     } finally {
       setLoading(false);
+      updateTaskState('backup', 'completed');
     }
   };
 

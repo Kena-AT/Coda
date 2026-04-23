@@ -62,6 +62,10 @@ impl SessionStore {
             self.sessions.remove(&token);
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.sessions.is_empty()
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
