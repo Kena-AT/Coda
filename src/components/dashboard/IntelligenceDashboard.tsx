@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
-import { Flame, Clock, Archive, Activity, Folder } from 'lucide-react';
+import { Flame, Clock, Archive, Activity, Folder, Copy } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
@@ -48,7 +48,9 @@ export const IntelligenceDashboard: React.FC = () => {
       .filter(s => {
         const copies = s.copy_count || 0;
         const edits = s.edit_count || 0;
-        const lastUsed = s.last_used_at ? new Date(s.last_used_at).getTime() : 0;
+        // Normalize SQLite date string (space to T) for JS Date compatibility
+        const lastUsedStr = s.last_used_at ? s.last_used_at.replace(' ', 'T') : null;
+        const lastUsed = lastUsedStr ? new Date(lastUsedStr).getTime() : 0;
         const isRecent = !s.last_used_at || (new Date().getTime() - lastUsed) < 90 * 24 * 60 * 60 * 1000;
         
         return copies >= 5 && edits < (copies * 2) && isRecent;
