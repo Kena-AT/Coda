@@ -111,14 +111,14 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
   const vaultSize = (snippets.length * 0.03).toFixed(1); // Mock MB
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0e0e10] p-12">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <div className="flex-1 overflow-y-auto bg-[#0e0e10] p-6 md:p-12">
+      <div className="max-w-6xl mx-auto space-y-8 md:space-y-12">
         
         {/* Nav */}
         <button 
           onClick={() => { playSound('transition'); onBack(); }}
           onMouseEnter={() => playSound('hover')}
-          className="flex items-center gap-2 text-[#737373] hover:text-white transition-colors font-mono text-[10px] uppercase tracking-[1px]"
+          className="flex items-center gap-2 text-[#737373] hover:text-white transition-colors font-mono text-[9px] md:text-[10px] uppercase tracking-[1px]"
         >
           <ArrowLeft size={14} />
           Return to Settings
@@ -126,48 +126,48 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
 
         {/* Header */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-[var(--accent)] font-mono text-[10px] tracking-[2px] uppercase">
+          <div className="flex items-center gap-2 text-[var(--accent)] font-mono text-[9px] md:text-[10px] tracking-[2px] uppercase">
             <div className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full" />
             Vault_Redundancy_Protocol
           </div>
-          <div className="flex justify-between items-end">
-            <h1 className="text-2xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">BACKUP_RESTORE</h1>
-            <div className="text-right space-y-1 mb-2">
-               <p className="text-[9px] font-mono text-[#737373] uppercase">Storage: local_redundancy</p>
-               <p className="text-[10px] font-main text-green-500 font-bold uppercase tracking-[1px]">Encryption: AES_XTS_4096</p>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
+            <h1 className="text-xl md:text-2xl font-main font-bold text-white tracking-[-1px] uppercase leading-none">BACKUP_RESTORE</h1>
+            <div className="text-left sm:text-right space-y-1">
+               <p className="text-[8px] md:text-[9px] font-mono text-[#737373] uppercase">Storage: local_redundancy</p>
+               <p className="text-[9px] md:text-[10px] font-main text-green-500 font-bold uppercase tracking-[1px]">Encryption: AES_XTS_4096</p>
             </div>
           </div>
         </div>
 
         <div className="h-[1px] w-full bg-[#1f1f22]" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 pt-4">
           
           {/* Create Backup */}
-          <div className="bg-[#131313] border border-[var(--border)]/30 p-10 space-y-10 relative overflow-hidden group">
+          <div className="bg-[#131313] border border-[var(--border)]/30 p-6 md:p-10 space-y-8 md:space-y-10 relative overflow-hidden group">
              {/* Decor */}
              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Database size={80} className="text-[var(--accent)]" />
+                <Database size={60} md:size={80} className="text-[var(--accent)]" />
              </div>
 
              <div className="space-y-2 relative z-10">
-                <h3 className="text-lg font-main font-bold text-white uppercase tracking-tight">EXECUTE_SNAPSHOT</h3>
-                <p className="text-[11px] font-main text-[#737373] uppercase leading-relaxed max-w-xs">
+                <h3 className="text-base md:text-lg font-main font-bold text-white uppercase tracking-tight">EXECUTE_SNAPSHOT</h3>
+                <p className="text-[10px] md:text-[11px] font-main text-[#737373] uppercase leading-relaxed max-w-xs">
                   Generate a complete encrypted clone of the current database state for off-site archival.
                 </p>
              </div>
 
               <div className="space-y-6">
-                <div className="bg-[#1f1f22]/30 border border-[var(--border)]/50 p-6 rounded-sm">
-                   <p className="text-[9px] font-mono text-[#737373] uppercase mb-4">Last backup point</p>
-                   <p className="text-xl font-main font-bold text-white">{lastBackup}</p>
+                <div className="bg-[#1f1f22]/30 border border-[var(--border)]/50 p-4 md:p-6 rounded-sm">
+                   <p className="text-[8px] md:text-[9px] font-mono text-[#737373] uppercase mb-4">Last backup point</p>
+                   <p className="text-lg md:text-xl font-main font-bold text-white">{lastBackup}</p>
                 </div>
 
                 <button 
                   onClick={() => { playSound('click'); handleBackup(); }}
                   onMouseEnter={() => playSound('hover')}
                   disabled={loading}
-                  className="w-full py-5 bg-[var(--accent)] hover:bg-[#ff0000] text-white font-main font-black uppercase text-[13px] tracking-[1px] flex items-center justify-center gap-3 transition-all disabled:opacity-50"
+                  className="w-full py-4 md:py-5 bg-[var(--accent)] hover:bg-[#ff0000] text-white font-main font-black uppercase text-[12px] md:text-[13px] tracking-[1px] flex items-center justify-center gap-3 transition-all disabled:opacity-50"
                 >
                   {loading ? <RefreshCcw className="w-5 h-5 animate-spin" /> : <Database className="w-5 h-5" />}
                   INIT_SNAPSHOT
@@ -176,17 +176,17 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           </div>
 
           {/* Metrics */}
-          <div className="bg-[#131313] border border-[var(--border)]/30 rounded-sm p-8 space-y-12">
+          <div className="bg-[#131313] border border-[var(--border)]/30 rounded-sm p-6 md:p-8 space-y-8 md:space-y-12">
             <div className="flex items-center gap-2 text-[var(--accent)]">
                <Activity size={18} />
-               <span className="text-[10px] font-mono uppercase tracking-[1px]">Vault Metrics</span>
+               <span className="text-[9px] md:text-[10px] font-mono uppercase tracking-[1px]">Vault Metrics</span>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
                <div className="space-y-4">
                   <div className="flex justify-between items-end">
-                    <p className="text-[10px] font-mono text-[#737373] uppercase">Current Size</p>
-                    <p className="text-2xl font-main font-bold text-white">{vaultSize} <span className="text-sm font-light">MB</span></p>
+                    <p className="text-[9px] md:text-[10px] font-mono text-[#737373] uppercase">Current Size</p>
+                    <p className="text-xl md:text-2xl font-main font-bold text-white">{vaultSize} <span className="text-sm font-light">MB</span></p>
                   </div>
                   <div className="h-1 w-full bg-[#1f1f22] rounded-full overflow-hidden">
                     <div className="h-full bg-[var(--accent)] w-2/3" />
@@ -194,30 +194,30 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                </div>
 
                <div className="space-y-1">
-                  <p className="text-[10px] font-mono text-[#737373] uppercase">Snippet Count</p>
-                  <p className="text-2xl font-main font-bold text-white">{snippets.length} <span className="text-sm font-light uppercase text-[#737373]">Entries</span></p>
+                  <p className="text-[9px] md:text-[10px] font-mono text-[#737373] uppercase">Snippet Count</p>
+                  <p className="text-xl md:text-2xl font-main font-bold text-white">{snippets.length} <span className="text-sm font-light uppercase text-[#737373]">Entries</span></p>
                </div>
             </div>
 
-            <div className="pt-12 border-t border-[var(--border)]/20 space-y-2">
+            <div className="pt-8 md:pt-12 border-t border-[var(--border)]/20 space-y-2">
                <p className="text-[8px] font-mono text-[#4a4a4d] uppercase truncate">SHA-256 Checksum: 8f92-bd0a-5f33-1c21...</p>
                <p className="text-[8px] font-mono text-[#4a4a4d] uppercase">Indexing: Optimized</p>
             </div>
           </div>
 
           {/* Restore */}
-          <div className="lg:col-span-2 bg-[#131313] border border-[var(--border)]/30 rounded-sm overflow-hidden p-8 flex flex-col md:flex-row gap-12">
-            <div className="flex-1 space-y-8">
-               <h3 className="text-lg font-main font-bold text-white uppercase">Vault_Reconstruction</h3>
-               <p className="text-[12px] font-main text-[#737373] leading-relaxed">
-                  Load a previously exported <span className="text-white px-1 font-mono text-[11px] bg-[#1f1f22]">.db</span> package. This operation will reconstruct the entire database state based on the provided manifest.
+          <div className="lg:col-span-2 bg-[#131313] border border-[var(--border)]/30 rounded-sm overflow-hidden p-6 md:p-8 flex flex-col md:flex-row gap-8 md:gap-12">
+            <div className="flex-1 space-y-6 md:space-y-8">
+               <h3 className="text-base md:text-lg font-main font-bold text-white uppercase">Vault_Reconstruction</h3>
+               <p className="text-[11px] md:text-[12px] font-main text-[#737373] leading-relaxed">
+                  Load a previously exported <span className="text-white px-1 font-mono text-[10px] md:text-[11px] bg-[#1f1f22]">.db</span> package. This operation will reconstruct the entire database state based on the provided manifest.
                </p>
 
-               <div className="bg-red-600/5 border-l-2 border-red-600 p-6 flex gap-4">
+               <div className="bg-red-600/5 border-l-2 border-red-600 p-4 md:p-6 flex gap-4">
                   <AlertTriangle className="text-red-600 shrink-0" size={20} />
                   <div className="space-y-1">
-                    <p className="text-[11px] font-main font-bold text-red-600 uppercase">Critical Warning</p>
-                    <p className="text-[11px] font-main text-red-600/70">
+                    <p className="text-[10px] md:text-[11px] font-main font-bold text-red-600 uppercase">Critical Warning</p>
+                    <p className="text-[10px] md:text-[11px] font-main text-red-600/70">
                       Restoring will overwrite all existing snippets and session data. This action is destructive and cannot be undone.
                     </p>
                   </div>
@@ -229,12 +229,12 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
                  onClick={() => { playSound('click'); handleRestore(); }}
                  onMouseEnter={() => playSound('hover')}
                  disabled={loading}
-                 className="w-full aspect-square bg-[#1f1f22] border-2 border-dashed border-[var(--border)]/50 hover:border-[var(--accent)]/50 hover:bg-[#1f1111]/10 transition-all flex flex-col items-center justify-center gap-4 group"
+                 className="w-full aspect-video md:aspect-square bg-[#1f1f22] border-2 border-dashed border-[var(--border)]/50 hover:border-[var(--accent)]/50 hover:bg-[#1f1111]/10 transition-all flex flex-col items-center justify-center gap-4 group"
                >
-                 <div className="w-16 h-16 bg-[var(--bg-primary)] border border-[var(--border)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <FileUp className="w-8 h-8 text-[#737373] group-hover:text-red-600 transition-colors" />
+                 <div className="w-12 h-12 md:w-16 md:h-16 bg-[var(--bg-primary)] border border-[var(--border)] flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FileUp className="w-6 h-6 md:w-8 md:h-8 text-[#737373] group-hover:text-red-600 transition-colors" />
                  </div>
-                 <span className="text-[11px] font-mono text-[#737373] uppercase tracking-[1px] group-hover:text-white transition-colors">Select_Archive_Point</span>
+                 <span className="text-[10px] md:text-[11px] font-mono text-[#737373] uppercase tracking-[1px] group-hover:text-white transition-colors">Select_Archive_Point</span>
                </button>
             </div>
           </div>
@@ -242,15 +242,15 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           {/* Terminal Log Output */}
           <div className="lg:col-span-2 bg-[var(--bg-primary)] border border-[var(--border)]/30 rounded-sm overflow-hidden">
             <div className="bg-[#1f1f22]/50 p-2 px-4 border-b border-[var(--border)]/30 flex justify-between items-center">
-               <span className="text-[9px] font-mono text-red-600 font-black uppercase tracking-[1px]">Terminal_Feed_Log</span>
-               <span className="text-[8px] font-mono text-[#4a4a4d] uppercase">Session_ID: 9X-212-ALPHA</span>
+               <span className="text-[8px] md:text-[9px] font-mono text-red-600 font-black uppercase tracking-[1px]">Terminal_Feed_Log</span>
+               <span className="text-[7px] md:text-[8px] font-mono text-[#4a4a4d] uppercase">Session_ID: 9X-212-ALPHA</span>
             </div>
-            <div className="p-6 h-40 font-mono text-[11px] text-[#adaaad] space-y-1 overflow-y-auto custom-scrollbar bg-black/20">
+            <div className="p-4 md:p-6 h-40 font-mono text-[10px] md:text-[11px] text-[#adaaad] space-y-1 overflow-y-auto custom-scrollbar bg-black/20">
                {logs.length === 0 && <p className="text-[#2a2a2e] italic">Waiting for operator input...</p>}
                {logs.map((log, i) => (
-                 <div key={i} className="flex gap-6">
+                 <div key={i} className="flex gap-4 md:gap-6">
                    <span className="text-[#4a4a4d]">[{log.timestamp}]</span>
-                   <span className={`${log.msg.startsWith('ERR') ? 'text-red-500' : ''}`}>{log.msg}</span>
+                   <span className={`${log.msg.startsWith('ERR') ? 'text-red-500' : ''} truncate`}>{log.msg}</span>
                  </div>
                ))}
             </div>

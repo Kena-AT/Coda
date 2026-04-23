@@ -95,6 +95,9 @@ interface AppState {
 
   globalError: AppError | null;
   setGlobalError: (error: AppError | null) => void;
+
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -158,7 +161,10 @@ export const useStore = create<AppState>()(
           ...state.sessionCopies, 
           [id]: (state.sessionCopies[id] || 0) + 1 
         }
-      }))
+      })),
+
+      sidebarOpen: false,
+      setSidebarOpen: (sidebarOpen) => set({ sidebarOpen })
     }),
     {
       name: 'coda-storage',

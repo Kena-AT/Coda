@@ -65,11 +65,11 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <div className={`h-full ${style.accent} w-1/3 animate-pulse`} />
         </div>
 
-        <div className="p-8">
+        <div className="p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className={`w-2 h-2 ${style.accent} animate-pulse`} />
-              <h2 className={`text-lg font-main font-bold ${style.text} tracking-[1px] uppercase`}>
+              <h2 className={`text-base md:text-lg font-main font-bold ${style.text} tracking-[1px] uppercase`}>
                 {title}
               </h2>
             </div>
@@ -82,32 +82,32 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
 
           <div className="flex flex-col gap-6">
-            <div className="flex gap-4 items-start">
-              <div className={`p-3 rounded-lg bg-black/40 border border-[#333] ${style.text}`}>
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className={`p-3 rounded-lg bg-black/40 border border-[#333] ${style.text} shrink-0`}>
                 {variant === 'danger' ? <Trash2 size={24} /> : <AlertTriangle size={24} />}
               </div>
               <div className="flex-1 space-y-2">
-                <p className="text-white font-mono text-sm leading-relaxed">
+                <p className="text-[#e5e2e1] font-mono text-[13px] md:text-sm leading-relaxed">
                   {message}
                 </p>
-                <div className="flex items-center gap-2 text-[9px] font-mono text-[#adaaad] uppercase tracking-widest opacity-50">
+                <div className="flex items-center gap-2 text-[8px] md:text-[9px] font-mono text-[#adaaad] uppercase tracking-widest opacity-50">
                    <div className="w-1 h-1 bg-current" />
                    Security_Level: Red_Clearance
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-3 mt-4 pt-6 border-t border-[var(--border)]">
+            <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-6 border-t border-[var(--border)]">
               <button
                 onClick={() => { playSound('success'); onConfirm(); }}
-                className={`flex-1 ${style.bg} text-white py-4 text-[11px] font-bold uppercase tracking-[1px] ${style.hover} transition-all flex items-center justify-center gap-2 group shadow-lg`}
+                className={`flex-1 ${style.bg} text-white py-3.5 md:py-4 text-[11px] font-bold uppercase tracking-[1px] ${style.hover} transition-all flex items-center justify-center gap-2 group shadow-lg order-1 sm:order-2`}
               >
                 <Check size={14} className="group-hover:scale-125 transition-transform" />
                 {confirmLabel}
               </button>
               <button
                 onClick={() => { playSound('click'); onCancel(); }}
-                className="px-6 py-4 border border-[var(--border)] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors flex items-center justify-center gap-2"
+                className="flex-1 sm:flex-none px-6 py-3.5 md:py-4 border border-[var(--border)] text-[#adaaad] text-[11px] font-bold uppercase tracking-[1px] hover:text-white hover:border-[#adaaad] transition-colors flex items-center justify-center gap-2 order-2 sm:order-1"
               >
                 <X size={14} />
                 {cancelLabel}
@@ -117,7 +117,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         </div>
 
         {/* Bottom Decor */}
-        <div className="p-3 bg-black/40 border-t border-[var(--border)] flex justify-between items-center px-8">
+        <div className="p-3 bg-black/40 border-t border-[var(--border)] flex justify-between items-center px-6 md:px-8">
            <div className="text-[8px] font-mono text-[#444] uppercase">CODA_SYS_PROT_v2.0.4</div>
            <div className="flex gap-2">
               <div className="w-1 h-1 bg-[#222]" />

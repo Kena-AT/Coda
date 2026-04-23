@@ -116,36 +116,36 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="flex-1 flex overflow-hidden lg:h-[600px]">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden lg:h-[600px]">
           
           {/* Options Column */}
-          <div className="flex-1 p-8 overflow-y-auto custom-scrollbar border-r border-[#5f3f3a1a]">
-             <div className="flex flex-col gap-10">
+          <div className="flex-1 p-6 md:p-8 overflow-y-auto custom-scrollbar border-b lg:border-b-0 lg:border-r border-[#5f3f3a1a]">
+             <div className="flex flex-col gap-8 md:gap-10">
                 
                 {/* Method Selection */}
                 <section>
-                   <h3 className="text-white font-main font-bold text-xs uppercase tracking-[2px] mb-6 flex items-center gap-2">
+                   <h3 className="text-white font-main font-bold text-[10px] md:text-xs uppercase tracking-[2px] mb-6 flex items-center gap-2">
                       <Cpu className="text-[var(--accent)] w-4 h-4" />
                       EXPORT_METHOD
                    </h3>
-                   <div className="grid grid-cols-2 gap-4">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div 
                         onClick={() => setExportFormat('json')}
-                        className={`p-6 border cursor-pointer transition-all relative group ${exportFormat === 'json' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[var(--border)] hover:border-[#adaaad]/30'}`}
+                        className={`p-4 md:p-6 border cursor-pointer transition-all relative group ${exportFormat === 'json' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[var(--border)] hover:border-[#adaaad]/30'}`}
                       >
-                         <FileJson className={`w-10 h-10 mb-4 transition-colors ${exportFormat === 'json' ? 'text-[var(--accent)]' : 'text-[#adaaad]'}`} strokeWidth={1.5} />
-                         <h4 className={`text-[11px] font-main font-bold uppercase mb-1 ${exportFormat === 'json' ? 'text-white' : 'text-[#adaaad]'}`}>JSON_BUNDLE</h4>
-                         <p className="text-[9px] font-mono text-[#adaaad] uppercase leading-relaxed opacity-60">Unified metadata & source in single object</p>
+                         <FileJson className={`w-8 h-8 md:w-10 md:h-10 mb-4 transition-colors ${exportFormat === 'json' ? 'text-[var(--accent)]' : 'text-[#adaaad]'}`} strokeWidth={1.5} />
+                         <h4 className={`text-[10px] md:text-[11px] font-main font-bold uppercase mb-1 ${exportFormat === 'json' ? 'text-white' : 'text-[#adaaad]'}`}>JSON_BUNDLE</h4>
+                         <p className="text-[8px] md:text-[9px] font-mono text-[#adaaad] uppercase leading-relaxed opacity-60">Unified metadata & source in single object</p>
                          {exportFormat === 'json' && <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[var(--accent)] rotate-45" />}
                       </div>
 
                       <div 
                         onClick={() => setExportFormat('module')}
-                        className={`p-6 border cursor-pointer transition-all relative group ${exportFormat === 'module' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[var(--border)] hover:border-[#adaaad]/30'}`}
+                        className={`p-4 md:p-6 border cursor-pointer transition-all relative group ${exportFormat === 'module' ? 'bg-[var(--accent)]/10 border-[var(--accent)]' : 'bg-[#151515] border-[var(--border)] hover:border-[#adaaad]/30'}`}
                       >
-                         <FileCode className={`w-10 h-10 mb-4 transition-colors ${exportFormat === 'module' ? 'text-[var(--accent)]' : 'text-[#adaaad]'}`} strokeWidth={1.5} />
-                         <h4 className={`text-[11px] font-main font-bold uppercase mb-1 ${exportFormat === 'module' ? 'text-white' : 'text-[#adaaad]'}`}>LANGUAGE_MODULES</h4>
-                         <p className="text-[9px] font-mono text-[#adaaad] uppercase leading-relaxed opacity-60">Individual source files sorted by type</p>
+                         <FileCode className={`w-8 h-8 md:w-10 md:h-10 mb-4 transition-colors ${exportFormat === 'module' ? 'text-[var(--accent)]' : 'text-[#adaaad]'}`} strokeWidth={1.5} />
+                         <h4 className={`text-[10px] md:text-[11px] font-main font-bold uppercase mb-1 ${exportFormat === 'module' ? 'text-white' : 'text-[#adaaad]'}`}>LANGUAGE_MODULES</h4>
+                         <p className="text-[8px] md:text-[9px] font-mono text-[#adaaad] uppercase leading-relaxed opacity-60">Individual source files sorted by type</p>
                          {exportFormat === 'module' && <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[var(--accent)] rotate-45" />}
                       </div>
                    </div>
@@ -155,15 +155,15 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 <section className="space-y-8">
                    <div className="flex flex-col gap-4">
                       <div className="flex justify-between items-center">
-                         <h3 className="text-white font-main font-bold text-[10px] uppercase tracking-[2px]">COMPRESSION_LEVEL</h3>
-                         <span className="text-[var(--accent)] font-mono text-[10px] font-bold">{['NONE', 'LZ', 'GZIP'][compressionLevel]}</span>
+                         <h3 className="text-white font-main font-bold text-[9px] md:text-[10px] uppercase tracking-[2px]">COMPRESSION_LEVEL</h3>
+                         <span className="text-[var(--accent)] font-mono text-[9px] md:text-[10px] font-bold">{['NONE', 'LZ', 'GZIP'][compressionLevel]}</span>
                       </div>
                       <input 
                         type="range" min="0" max="2" step="1" 
                         value={compressionLevel} onChange={(e) => setCompressionLevel(parseInt(e.target.value))}
                         className="accent-[var(--accent)] w-full"
                       />
-                      <div className="flex justify-between text-[8px] font-mono text-[#adaaad] uppercase px-1">
+                      <div className="flex justify-between text-[7px] md:text-[8px] font-mono text-[#adaaad] uppercase px-1">
                          <span>RAW_SOURCE</span>
                          <span>LZ_ENCODER</span>
                          <span>GZIP_ARCHIVE</span>
@@ -171,9 +171,9 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                    </div>
 
                    <div className="flex flex-col gap-4">
-                      <h3 className="text-white font-main font-bold text-[10px] uppercase tracking-[2px]">SCHEMA_VERSION</h3>
-                      <div className="bg-[#151515] border border-[var(--border)] p-4 text-[#adaaad] font-mono text-[11px] flex justify-between items-center">
-                         <span className="text-white">V3.4.0 (CURRENT_STABLE)</span>
+                      <h3 className="text-white font-main font-bold text-[9px] md:text-[10px] uppercase tracking-[2px]">SCHEMA_VERSION</h3>
+                      <div className="bg-[#151515] border border-[var(--border)] p-3 md:p-4 text-[#adaaad] font-mono text-[10px] md:text-[11px] flex justify-between items-center">
+                         <span className="text-white">V3.4.0 (STABLE)</span>
                          <div className="flex gap-1">
                             <div className="w-1 h-1 bg-[#15ff00]" />
                             <div className="w-1 h-1 bg-[#15ff00]" />
@@ -186,26 +186,26 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Snippet List Column */}
-          <div className="w-[380px] bg-[var(--bg-primary)] flex flex-col shrink-0">
+          <div className="w-full lg:w-[380px] bg-[var(--bg-primary)] flex flex-col shrink-0 lg:max-h-full">
              <div className="p-6 border-b border-[#5f3f3a1a]">
-                <h3 className="text-white font-main font-bold text-[11px] uppercase tracking-[2px] mb-2">SELECTED_SNIPPETS_FOR_EXPORT</h3>
-                <p className="text-[#adaaad] text-[9px] font-mono uppercase">Buffer selection: {selectedIds.length} / {snippets.length}</p>
+                <h3 className="text-white font-main font-bold text-[10px] md:text-[11px] uppercase tracking-[2px] mb-2">SELECTED_SNIPPETS</h3>
+                <p className="text-[#adaaad] text-[8px] md:text-[9px] font-mono uppercase">Buffer selection: {selectedIds.length} / {snippets.length}</p>
              </div>
 
-             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
+             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2 max-h-[300px] lg:max-h-none">
                 {selectedSnippets.map(s => (
-                  <div key={s.id} className="bg-[#151515] border border-[var(--border)] p-4 flex justify-between items-center group hover:border-[var(--accent)]/40 transition-colors">
+                  <div key={s.id} className="bg-[#151515] border border-[var(--border)] p-3 md:p-4 flex justify-between items-center group hover:border-[var(--accent)]/40 transition-colors">
                      <div className="flex flex-col gap-1 overflow-hidden">
-                        <span className="text-white font-main font-bold text-[11px] uppercase truncate tracking-[0.5px]">{s.title || 'UNTITLED'}</span>
+                        <span className="text-white font-main font-bold text-[10px] md:text-[11px] uppercase truncate tracking-[0.5px]">{s.title || 'UNTITLED'}</span>
                         <div className="flex items-center gap-2">
-                           <span className="text-[var(--accent)] font-mono text-[9px] uppercase">{s.language}</span>
+                           <span className="text-[var(--accent)] font-mono text-[8px] md:text-[9px] uppercase">{s.language}</span>
                            <span className="w-1 h-1 rounded-full bg-[#adaaad] opacity-20" />
-                           <span className="text-[#adaaad] font-mono text-[9px] uppercase">{( (s.content?.length || 0) / 1024).toFixed(1)} KB</span>
+                           <span className="text-[#adaaad] font-mono text-[8px] md:text-[9px] uppercase">{( (s.content?.length || 0) / 1024).toFixed(1)} KB</span>
                         </div>
                      </div>
                      <button 
                         onClick={() => handleRemoveSnippet(s.id!)}
-                        className="text-[#adaaad] hover:text-[var(--accent)] p-1 transition-colors opacity-0 group-hover:opacity-100"
+                        className="text-[#adaaad] hover:text-[var(--accent)] p-1 transition-colors opacity-100 lg:opacity-0 group-hover:opacity-100"
                      >
                         <Trash2 size={14} />
                      </button>
@@ -214,30 +214,30 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 {selectedIds.length === 0 && (
                   <div className="h-full flex flex-col items-center justify-center text-[#adaaad] opacity-30 p-8 text-center gap-4">
                      <ShieldCheck size={32} />
-                     <p className="text-[10px] font-mono uppercase">Selection buffer empty. No data queued for extraction.</p>
+                     <p className="text-[9px] md:text-[10px] font-mono uppercase">Selection buffer empty. No data queued for extraction.</p>
                   </div>
                 )}
              </div>
 
-             <div className="p-8 border-t border-[#5f3f3a1a] bg-[#151515]">
-                <div className="flex justify-between items-end mb-8">
+             <div className="p-6 md:p-8 border-t border-[#5f3f3a1a] bg-[#151515]">
+                <div className="flex justify-between items-end mb-6 md:mb-8">
                    <div>
-                      <span className="text-[9px] font-mono text-[#adaaad] uppercase block mb-1">Total_Payload</span>
+                      <span className="text-[8px] md:text-[9px] font-mono text-[#adaaad] uppercase block mb-1">Total_Payload</span>
                       <div className="flex items-end gap-1">
-                         <span className="text-2xl font-main font-bold text-white leading-none">{totalPayloadSize}</span>
-                         <span className="text-[var(--accent)] font-mono font-bold">KB</span>
+                         <span className="text-xl md:text-2xl font-main font-bold text-white leading-none">{totalPayloadSize}</span>
+                         <span className="text-[var(--accent)] font-mono font-bold text-sm md:text-base">KB</span>
                       </div>
                    </div>
                    <div className="text-right">
-                      <span className="text-[9px] font-mono text-[#adaaad] uppercase block mb-1">Enc_Format</span>
-                      <span className="text-white font-mono text-[10px] font-bold uppercase">AES-256-GCM</span>
+                      <span className="text-[8px] md:text-[9px] font-mono text-[#adaaad] uppercase block mb-1">Enc_Format</span>
+                      <span className="text-white font-mono text-[9px] md:text-[10px] font-bold uppercase">AES-256-GCM</span>
                    </div>
                 </div>
 
                 <button 
                   onClick={handleExport}
                   disabled={isExporting || selectedIds.length === 0}
-                  className="w-full bg-[var(--accent)] hover:bg-[#ff0000] disabled:bg-[#333] text-white py-4 flex items-center justify-center gap-3 text-[11px] font-main font-bold uppercase tracking-[2px] transition-all group"
+                  className="w-full bg-[var(--accent)] hover:bg-[#ff0000] disabled:bg-[#333] text-white py-3.5 md:py-4 flex items-center justify-center gap-3 text-[10px] md:text-[11px] font-main font-bold uppercase tracking-[2px] transition-all group"
                 >
                    {isExporting ? (
                      <span className="animate-pulse">EXECUTING_EXTRACT...</span>
@@ -254,18 +254,18 @@ export const ExportModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer info line */}
-        <div className="bg-[var(--bg-primary)] border-t border-[#5f3f3a1a] px-8 py-4 flex justify-between items-center shrink-0">
-           <div className="flex items-center gap-4 text-[9px] font-mono text-[#adaaad] uppercase">
+        <div className="bg-[var(--bg-primary)] border-t border-[#5f3f3a1a] px-6 md:px-8 py-3 md:py-4 flex flex-col md:flex-row justify-between items-center gap-2 shrink-0">
+           <div className="flex items-center gap-4 text-[8px] md:text-[9px] font-mono text-[#adaaad] uppercase">
               <span className="text-[var(--accent)]">Encryption: AES-256-GCM</span>
-              <span>Model: CODA-P9</span>
+              <span className="hidden sm:inline">Model: CODA-P9</span>
            </div>
            {/* Decorative Monitoring Data */}
-           <div className="hidden md:flex flex-col items-end opacity-40">
+           <div className="hidden lg:flex flex-col items-end opacity-40">
               <span className="text-[8px] font-mono text-[#ffb4a8] uppercase leading-tight">SYS_MONITOR_INIT</span>
               <span className="text-[8px] font-mono text-[#ffb4a8] uppercase leading-tight">BUFFER_HEALTH: 99%</span>
               <span className="text-[8px] font-mono text-[#ffb4a8] uppercase leading-tight">LATENCY: 12ms</span>
            </div>
-           <div className="text-[9px] font-mono text-[var(--accent)] animate-pulse uppercase">
+           <div className="text-[8px] md:text-[9px] font-mono text-[var(--accent)] animate-pulse uppercase">
               Waiting_for_operator_input...
            </div>
         </div>

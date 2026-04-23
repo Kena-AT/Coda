@@ -103,25 +103,25 @@ export const IntelligenceDashboard: React.FC = () => {
   );
 
   return (
-    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#0a0a0a] selection:bg-[var(--accent)] selection:text-white">
+    <div className="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar bg-[#0a0a0a] selection:bg-[var(--accent)] selection:text-white">
       
       {/* Header */}
-      <div className="flex justify-between items-end mb-12">
+      <div className="flex justify-between items-end mb-8 md:mb-12">
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[var(--accent)]" />
                 <span className="text-[10px] font-mono text-[var(--accent)] tracking-[2px] uppercase">Central Intelligence // Library.root</span>
             </div>
-            <h1 className="text-[56px] font-main font-bold text-white tracking-[-3px] uppercase leading-none">Library</h1>
+            <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-[-2px] md:tracking-[-3px] uppercase leading-tight md:leading-none">Library</h1>
         </div>
       </div>
 
       <div className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <div className="p-2 bg-[var(--border)]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
-          <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Active Projects</h2>
+          <h2 className="text-lg md:text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Active Projects</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {sections.projScores.map(p => p && (
             <div 
               key={p.id} 

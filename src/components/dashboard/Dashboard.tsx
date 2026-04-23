@@ -8,7 +8,8 @@ import {
   Database,
   Upload,
   Download,
-  Archive
+  Archive,
+  Menu
 } from 'lucide-react';
 import { soundService } from '../../utils/sounds';
 import { useStore } from '../../store/useStore';
@@ -50,7 +51,9 @@ export const Dashboard: React.FC = () => {
     setProjects,
     activeTab,
     setActiveTab,
-    settings
+    settings,
+    sidebarOpen,
+    setSidebarOpen
   } = useStore();
 
   // Enable automatic token expiry tracking and refresh
@@ -166,7 +169,7 @@ export const Dashboard: React.FC = () => {
         }
         if (key === settings.shortcuts.search.toUpperCase()) {
           e.preventDefault();
-          const searchInput = document.querySelector('input[placeholder="GLOBAL_SEARCH_CMD..."]') as HTMLInputElement;
+          const searchInput = document.querySelector('input[placeholder="SEARCH..."]') as HTMLInputElement;
           if (searchInput) searchInput.focus();
         }
       }
@@ -192,30 +195,37 @@ export const Dashboard: React.FC = () => {
   }, [selectedSnippetId]);
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-primary)] text-white">
+    <div className="flex min-h-screen bg-[var(--bg-primary)] text-white overflow-hidden">
       <Sidebar onNewSnippet={() => setSelectedSnippetId(-1)} />
 
-      <main className="flex-1 ml-[0px] lg:ml-[256px] flex flex-col relative overflow-hidden min-h-0">
+      <main className="flex-1 flex flex-col relative overflow-hidden min-h-0">
         
         {/* Global Navbar Header */}
-        <header className="h-[64px] bg-[var(--bg-primary)] border-b border-[var(--border)] px-8 flex items-center justify-between z-40 shrink-0">
-          <div className="flex items-center gap-8">
-            <h2 className="text-lg font-main font-bold text-[var(--accent)] tracking-[-1px] uppercase cursor-pointer" onClick={() => setSearchQuery('')}>
+        <header className="h-[64px] bg-[var(--bg-primary)] border-b border-[var(--border)] px-4 md:px-8 flex items-center justify-between z-40 shrink-0 lg:ml-[256px]">
+          <div className="flex items-center gap-3 md:gap-8">
+            <button 
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-[#adaaad] hover:text-white p-1"
+            >
+              <Menu size={20} />
+            </button>
+
+            <h2 className="text-base md:text-lg font-main font-bold text-[var(--accent)] tracking-[-1px] uppercase cursor-pointer hidden sm:block" onClick={() => setSearchQuery('')}>
               CODA
             </h2>
-            <div className="relative w-[300px] flex items-center">
+            <div className="relative w-full max-w-[150px] sm:max-w-[300px] flex items-center">
               <Search className="absolute left-3 w-[14px] h-[14px] text-[var(--accent)] z-10" />
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="GLOBAL_SEARCH_CMD..."
-                className="w-full bg-[var(--bg-primary)] border border-[var(--border)] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[var(--accent)] transition-colors font-main text-[11px] tracking-[1px]"
+                placeholder="SEARCH..."
+                className="w-full bg-[var(--bg-primary)] border border-[var(--border)] pl-10 pr-4 py-2 text-[#adaaad] placeholder-[#adaaad]/50 outline-none focus:border-[var(--accent)] transition-colors font-main text-[10px] md:text-[11px] tracking-[1px]"
               />
               {searchQuery && (
                  <button 
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 text-[#adaaad] hover:text-white font-mono text-[9px]"
+                  className="absolute right-3 text-[#adaaad] hover:text-white font-mono text-[9px] hidden sm:block"
                  >
                    [ESC]
                  </button>
@@ -223,8 +233,8 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-8">
-            <div className="flex gap-4">
+          <div className="flex items-center gap-4 md:gap-8">
+            <div className="hidden md:flex gap-4">
               <div className={`flex items-center justify-center p-1.5 rounded-md border ${
                 systemStatus?.db_healthy ? 'bg-[#15ff00]/10 border-[#15ff00]/30 text-[#15ff00]' : 'bg-[var(--accent)]/10 border-[var(--accent)]/30 text-[var(--accent)]'
               }`}>
@@ -244,20 +254,20 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-6 border-l border-[var(--border)] pl-8">
+            <div className="flex items-center gap-4 md:gap-6 border-l border-[var(--border)] pl-4 md:pl-8">
               <button 
                 onClick={() => setIsImportModalOpen(true)} 
                 className="text-[#adaaad] hover:text-white transition-colors"
                 title="Import Intelligence"
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               <button 
                 onClick={() => setIsExportModalOpen(true)} 
                 className="text-[#adaaad] hover:text-white transition-colors"
                 title="Export Protocol"
               >
-                <Upload className="w-5 h-5" />
+                <Upload className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               <button 
                 onClick={() => setIsArchiveModalOpen(true)} 
@@ -268,16 +278,16 @@ export const Dashboard: React.FC = () => {
                 <span className="hidden xl:inline">ARCHIVE</span>
               </button>
               <button onClick={() => setActiveTab('settings')} className={`transition-colors ${activeTab === 'settings' ? 'text-[var(--accent)]' : 'text-[#adaaad] hover:text-[var(--accent)]'}`} title="Settings">
-                <SettingsIcon className="w-5 h-5" />
+                <SettingsIcon className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               <button onClick={() => setActiveTab('logout-confirm')} className="text-[#adaaad] hover:text-[var(--accent)] transition-colors" title="Logout">
-                <Power className="w-5 h-5" />
+                <Power className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>
         </header>
 
-        <div className="flex-1 flex overflow-hidden min-h-0">
+        <div className="flex-1 flex overflow-hidden min-h-0 lg:ml-[256px]">
           {selectedSnippetId !== null ? (
             <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
               <SnippetEditor />

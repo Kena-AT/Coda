@@ -305,8 +305,8 @@ export const ProjectVault: React.FC = () => {
     return (
       <div className="flex-1 flex flex-col bg-[var(--bg-primary)] overflow-hidden">
         {/* Scoped Header */}
-        <div className="p-8 border-b border-[var(--border)] bg-[var(--bg-primary)]">
-          <div className="flex items-center gap-2 text-[#adaaad] text-[10px] font-mono tracking-widest uppercase mb-4">
+        <div className="p-4 md:p-8 border-b border-[var(--border)] bg-[var(--bg-primary)]">
+          <div className="flex items-center gap-2 text-[#adaaad] text-[9px] md:text-[10px] font-mono tracking-widest uppercase mb-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
             <button 
               onClick={() => { playSound('click'); setSelectedProjectId(null); }}
               onMouseEnter={() => playSound('hover')}
@@ -318,8 +318,8 @@ export const ProjectVault: React.FC = () => {
             <span className="text-[var(--accent)]">{activeProject.name}</span>
           </div>
           
-          <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-2 flex-1">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+            <div className="flex flex-col gap-2 w-full lg:flex-1">
               {isEditing ? (
                 <div className="flex flex-col gap-4 animate-in slide-in-from-top-2 duration-300">
                   <input 
@@ -327,7 +327,7 @@ export const ProjectVault: React.FC = () => {
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
                     onFocus={() => playSound('hover')}
-                    className="text-3xl font-main font-bold bg-[#151515] border border-[var(--border)] text-white px-3 py-1 outline-none uppercase tracking-[-1.5px]"
+                    className="text-2xl md:text-3xl font-main font-bold bg-[#151515] border border-[var(--border)] text-white px-3 py-1 outline-none uppercase tracking-[-1px] md:tracking-[-1.5px]"
                   />
                   <input 
                     type="text" 
@@ -335,11 +335,11 @@ export const ProjectVault: React.FC = () => {
                     onChange={e => setEditDesc(e.target.value)}
                     onFocus={() => playSound('hover')}
                     placeholder="ENTER_DESCRIPTION..."
-                    className="text-[#adaaad] font-mono text-[11px] bg-[#151515] border border-[var(--border)] px-3 py-1 outline-none uppercase"
+                    className="text-[#adaaad] font-mono text-[10px] md:text-[11px] bg-[#151515] border border-[var(--border)] px-3 py-1 outline-none uppercase"
                   />
                   <div className="flex gap-2">
                     <button onClick={() => { playSound('click'); handleUpdateActiveProject(); }} className="flex items-center gap-2 px-4 py-1.5 bg-[var(--accent)] text-white text-[10px] font-bold uppercase transition-colors hover:bg-[#ff0000]">
-                      <Check size={14} /> SAVE_METADATA
+                      <Check size={14} /> SAVE
                     </button>
                     <button onClick={() => { playSound('click'); setIsEditing(false); }} className="px-4 py-1.5 border border-[var(--border)] text-[#adaaad] text-[10px] font-bold uppercase hover:text-white transition-colors">
                       <X size={14} /> CANCEL
@@ -348,20 +348,20 @@ export const ProjectVault: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-start md:items-center gap-3">
                     <button
                       onClick={() => { playSound('click'); setSelectedProjectId(null); }}
                       onMouseEnter={() => playSound('hover')}
-                      className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors"
+                      className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors shrink-0"
                       title="Back to Projects"
                     >
                       <ArrowLeft className="w-4 h-4" />
                     </button>
-                    <div>
-                      <h1 className="text-4xl font-main font-bold text-white tracking-[-2px] uppercase">
+                    <div className="min-w-0">
+                      <h1 className="text-2xl md:text-4xl font-main font-bold text-white tracking-[-1px] md:tracking-[-2px] uppercase truncate">
                         {activeProject.name}
                       </h1>
-                      <p className="text-[#adaaad] font-mono text-[11px] uppercase max-w-xl">
+                      <p className="text-[#adaaad] font-mono text-[10px] md:text-[11px] uppercase max-w-xl line-clamp-2">
                         {activeProject.description || 'REPOSITORY_VIEW__MODAL_ACTIVE'}
                       </p>
                     </div>
@@ -370,7 +370,7 @@ export const ProjectVault: React.FC = () => {
               )}
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
               {!isEditing && (
                 <button 
                   onClick={() => {
@@ -379,44 +379,44 @@ export const ProjectVault: React.FC = () => {
                     setSelectedSnippetId(-1);
                   }}
                   onMouseEnter={() => playSound('hover')}
-                  className="flex items-center gap-2 px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase hover:bg-[#ff0000] hover:shadow-[0_0_20px_var(--accent-glow)0.3)] transition-all"
+                  className="flex items-center justify-center gap-2 px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase hover:bg-[#ff0000] transition-all shrink-0"
                 >
-                  <Plus size={14} /> INITIALISE_SNIPPET
+                  <Plus size={14} /> <span className="hidden sm:inline">INITIALISE_SNIPPET</span><span className="sm:hidden">NEW_SNIPPET</span>
                 </button>
               )}
-              <div className="relative w-64 group">
+              <div className="relative flex-1 sm:w-64 group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#adaaad] group-focus-within:text-[var(--accent)] transition-colors" />
                 <input 
                   type="text" 
                   value={localSearch}
                   onChange={e => setLocalSearch(e.target.value)}
                   onFocus={() => playSound('hover')}
-                  placeholder="FILTER_SCOPED_VAULT..."
+                  placeholder="FILTER..."
                   className="w-full bg-[#151515] border border-[var(--border)] pl-9 pr-4 py-2 text-[#adaaad] text-[10px] uppercase font-mono outline-none focus:border-[var(--accent)] transition-colors"
                 />
               </div>
               {activeProject.id !== -1 && (
-                <>
-                   <button onClick={() => { playSound('click'); setIsEditing(true); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-white transition-colors" title="Edit Metadata">
+                <div className="flex gap-2">
+                   <button onClick={() => { playSound('click'); setIsEditing(true); }} onMouseEnter={() => playSound('hover')} className="flex-1 sm:flex-none p-2 border border-[var(--border)] text-[#adaaad] hover:text-white transition-colors flex justify-center" title="Edit Metadata">
                     <Edit2 size={16} />
                   </button>
-                  <button onClick={() => { playSound('click'); openDeleteModal(activeProject.id!); }} onMouseEnter={() => playSound('hover')} className="p-2 border border-[var(--border)] text-[#adaaad] hover:text-[var(--accent)] transition-colors" title="Purge Project">
+                  <button onClick={() => { playSound('click'); openDeleteModal(activeProject.id!); }} onMouseEnter={() => playSound('hover')} className="flex-1 sm:flex-none p-2 border border-[var(--border)] text-[#adaaad] hover:text-[var(--accent)] transition-colors flex justify-center" title="Purge Project">
                     <Trash2 size={16} />
                   </button>
-                </>
+                </div>
               )}
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar">
           {scopedSnippets.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[11px]">
+            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[10px] md:text-[11px] px-4 text-center">
               {localSearch || searchQuery ? 'NO_MATCHING_CODE_ENTRIES' : 'PROJECT_VAULT_EMPTY'}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
               {scopedSnippets.map(snippet => (
                 <div key={snippet.id} className="h-[220px]">
                    <SnippetCard 
@@ -460,21 +460,21 @@ export const ProjectVault: React.FC = () => {
 
   // Overview Tier
   return (
-    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)]">
-      <div className="mb-10 flex justify-between items-end gap-2 border-b border-[var(--border)] pb-8">
+    <div className="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)]">
+      <div className="mb-8 md:mb-10 flex justify-between items-end gap-2 border-b border-[var(--border)] pb-6 md:pb-8">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-main font-bold text-white tracking-[-1.5px] uppercase">Project Vault</h1>
-          <p className="text-[#adaaad] font-mono text-[11px] uppercase tracking-[1px]">Organizational & Contextual Scoping Layer</p>
+          <h1 className="text-2xl md:text-3xl font-main font-bold text-white tracking-[-1px] md:tracking-[-1.5px] uppercase">Project Vault</h1>
+          <p className="text-[#adaaad] font-mono text-[10px] md:text-[11px] uppercase tracking-[1px]">Organizational & Contextual Scoping Layer</p>
         </div>
       </div>
       
       {loadingStats ? (
-        <div className="h-64 flex items-center justify-center text-[#adaaad] font-mono text-[11px] uppercase">
+        <div className="h-64 flex items-center justify-center text-[#adaaad] font-mono text-[10px] md:text-[11px] uppercase">
           <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin mr-3" />
           MAPPING_VAULT_TOPOLOGY...
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 pb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
           {allProjects.map(p => {
             const s = stats[p.id!];
             const health = calculateHealth(s);

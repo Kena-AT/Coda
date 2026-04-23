@@ -23,6 +23,13 @@ import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { soundService } from '../../utils/sounds';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { AnimatePresence, motion } from 'framer-motion';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface Version {
   id: number;
@@ -323,15 +330,30 @@ export const SnippetEditor: React.FC = () => {
     return new Date(dateStr).toISOString().replace('T', ' ').substring(0, 19);
   };
 
+  const [showRightSidebar, setShowRightSidebar] = useState(false);
+
   return (
-    <div className="flex-1 flex overflow-hidden min-h-0 w-full">
+    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0 w-full relative">
       
+      {/* Sidebar Overlay for Mobile */}
+      <AnimatePresence>
+        {showRightSidebar && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowRightSidebar(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[47] lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Center Code Workspace */}
       <div className="flex-1 flex flex-col bg-[var(--bg-primary)] border-r border-[var(--border)] relative min-h-0">
         
         {/* Editor Settings Header */}
-        <div className="h-auto bg-[#131313]/80 backdrop-blur-md border-b border-[var(--border)]/20 p-8 flex flex-col gap-6">
-          <div className="flex items-center justify-between">
+        <div className="h-auto bg-[#131313]/80 backdrop-blur-md border-b border-[var(--border)]/20 p-4 md:p-8 flex flex-col gap-4 md:gap-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => { playSound('transition'); setSelectedSnippetId(null); }}
@@ -341,29 +363,39 @@ export const SnippetEditor: React.FC = () => {
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
-              <h2 className="text-[14px] font-main font-bold text-white tracking-[2px] uppercase flex items-center gap-2">
-                <Terminal className="w-5 h-5 text-[var(--accent)]" />
-                {selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}
+              <h2 className="text-[12px] md:text-[14px] font-main font-bold text-white tracking-[1px] md:tracking-[2px] uppercase flex items-center gap-2">
+                <Terminal className="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]" />
+                <span className="truncate">{selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}</span>
               </h2>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
               <button 
                 onClick={() => { playSound('click'); setShowTemplates(true); }}
                 onMouseEnter={() => playSound('hover')}
-                className="px-6 py-2 border border-[var(--accent)] text-[var(--accent)] flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase hover:bg-[var(--accent)] hover:text-white transition-all group"
+                className="px-3 md:px-6 py-2 border border-[var(--accent)] text-[var(--accent)] flex items-center gap-2 text-[9px] md:text-[10px] font-main font-bold tracking-[1px] md:tracking-[1.5px] uppercase hover:bg-[var(--accent)] hover:text-white transition-all group shrink-0"
                 title="Protocol Template Override"
               >
-                <LayoutTemplate className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                TEMPLATE_OVERRIDE
+                <LayoutTemplate className="w-3 md:w-4 h-3 md:h-4 group-hover:rotate-12 transition-transform" />
+                <span className="hidden sm:inline">TEMPLATE_OVERRIDE</span>
+                <span className="sm:hidden">TEMPLATES</span>
               </button>
               <button 
                 onClick={() => { playSound('click'); handleSave(); }}
                 onMouseEnter={() => playSound('hover')}
                 disabled={saving}
-                className={`px-6 py-2 flex items-center gap-2 text-[10px] font-main font-bold tracking-[1.5px] uppercase transition-all disabled:opacity-50 ${titleError ? 'bg-[var(--border)] text-slate-500 cursor-not-allowed' : 'bg-[var(--accent)] text-white hover:bg-[#ff0000]'}`}
+                className={`px-3 md:px-6 py-2 flex items-center gap-2 text-[9px] md:text-[10px] font-main font-bold tracking-[1px] md:tracking-[1.5px] uppercase transition-all disabled:opacity-50 shrink-0 ${titleError ? 'bg-[var(--border)] text-slate-500 cursor-not-allowed' : 'bg-[var(--accent)] text-white hover:bg-[#ff0000]'}`}
               >
-                <Save className="w-4 h-4" />
-                {saving ? 'COMMITTING...' : 'SAVE REVISION'}
+                <Save className="w-3 md:w-4 h-3 md:h-4" />
+                {saving ? 'SAVING...' : 'SAVE'}
+              </button>
+              <button 
+                onClick={() => setShowRightSidebar(!showRightSidebar)}
+                className={cn(
+                  "lg:hidden p-2 border transition-colors shrink-0",
+                  showRightSidebar ? "border-[var(--accent)] text-[var(--accent)]" : "border-[var(--border)] text-[#adaaad]"
+                )}
+              >
+                <Zap size={16} />
               </button>
               <button 
                 onClick={() => {
@@ -372,7 +404,7 @@ export const SnippetEditor: React.FC = () => {
                   setPreSelectedProjectId(null);
                 }}
                 onMouseEnter={() => playSound('hover')}
-                className="p-2 border border-[var(--border)]/50 text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors"
+                className="p-2 border border-[var(--border)]/50 text-[#adaaad] hover:text-white hover:border-[var(--accent)] transition-colors shrink-0"
                 title="Close Editor"
               >
                 <X className="w-4 h-4" />
@@ -380,7 +412,7 @@ export const SnippetEditor: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
              <div className="flex-1 relative">
                <div className="flex items-center justify-between mb-1">
                  <span className="text-[9px] font-mono text-[#adaaad] uppercase">INPUT_ENTITY_TITLE</span>
@@ -394,52 +426,50 @@ export const SnippetEditor: React.FC = () => {
                  type="text" 
                  value={snippet.title}
                  onChange={e => setSnippet({...snippet, title: e.target.value})}
-                 className={`w-full bg-transparent border-b text-2xl font-main font-bold text-white px-0 py-2 outline-none transition-colors ${titleError ? 'border-red-600' : 'border-[var(--border)]/50 focus:border-[var(--accent)]'}`}
+                 className={`w-full bg-transparent border-b text-xl md:text-2xl font-main font-bold text-white px-0 py-2 outline-none transition-colors ${titleError ? 'border-red-600' : 'border-[var(--border)]/50 focus:border-[var(--accent)]'}`}
                  placeholder="PROXIMA_VOYAGER_01"
                />
-               {titleError && (
-                 <p className="absolute -bottom-5 left-0 text-red-400/70 text-[9px] font-mono italic">
-                   {">"} ERROR: Registry node indicates title collision in cluster-A
-                 </p>
-               )}
              </div>
-             <div className="flex flex-col gap-1 w-48">
-               <span className="text-[9px] font-mono text-[#adaaad] uppercase">PROJECT_REPOSITORY</span>
-               <select 
-                 value={snippet.project_id || ''}
-                 onChange={e => {
-                   const value = e.target.value;
-                   if (value === 'create_new') {
-                     handleCreateProjectFromDropdown();
-                   } else {
-                     setSnippet({...snippet, project_id: value ? parseInt(value) : null});
-                   }
-                 }}
-                 className="bg-[#1c1b1b] border border-[var(--border)]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[var(--accent)] transition-colors cursor-pointer"
-               >
-                 <option value="">INBOX / UNSORTED</option>
-                 {projects.map(p => (
-                   <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
-                 ))}
-                 <option value="create_new" className="text-[var(--accent)]">+ CREATE NEW PROJECT</option>
-               </select>
-             </div>
+             
+             <div className="flex gap-3">
+               <div className="flex flex-col gap-1 flex-1 md:w-48">
+                 <span className="text-[9px] font-mono text-[#adaaad] uppercase">PROJECT_REPOSITORY</span>
+                 <select 
+                   value={snippet.project_id || ''}
+                   onChange={e => {
+                     const value = e.target.value;
+                     if (value === 'create_new') {
+                       handleCreateProjectFromDropdown();
+                     } else {
+                       setSnippet({...snippet, project_id: value ? parseInt(value) : null});
+                     }
+                   }}
+                   className="bg-[#1c1b1b] border border-[var(--border)]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[var(--accent)] transition-colors cursor-pointer w-full"
+                 >
+                   <option value="">INBOX / UNSORTED</option>
+                   {projects.map(p => (
+                     <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>
+                   ))}
+                   <option value="create_new" className="text-[var(--accent)]">+ CREATE NEW PROJECT</option>
+                 </select>
+               </div>
 
-             <div className="flex flex-col gap-1 w-48">
-               <span className="text-[9px] font-mono text-[#adaaad] uppercase">Language</span>
-               <select 
-                 value={snippet.language}
-                 onChange={e => setSnippet({...snippet, language: e.target.value})}
-                 className="bg-[#1c1b1b] border border-[var(--border)]/50 text-white text-[10px] font-mono p-2 outline-none"
-               >
-                 <option value="javascript">JavaScript</option>
-                 <option value="typescript">TypeScript</option>
-                 <option value="rust">Rust</option>
-                 <option value="python">Python</option>
-                 <option value="go">GoLang</option>
-                 <option value="sql">SQL</option>
-                 <option value="json">JSON</option>
-               </select>
+               <div className="flex flex-col gap-1 flex-1 md:w-48">
+                 <span className="text-[9px] font-mono text-[#adaaad] uppercase">Language</span>
+                 <select 
+                   value={snippet.language}
+                   onChange={e => setSnippet({...snippet, language: e.target.value})}
+                   className="bg-[#1c1b1b] border border-[var(--border)]/50 text-white text-[10px] font-mono p-2 outline-none w-full"
+                 >
+                   <option value="javascript">JavaScript</option>
+                   <option value="typescript">TypeScript</option>
+                   <option value="rust">Rust</option>
+                   <option value="python">Python</option>
+                   <option value="go">GoLang</option>
+                   <option value="sql">SQL</option>
+                   <option value="json">JSON</option>
+                 </select>
+               </div>
              </div>
           </div>
         </div>
@@ -508,7 +538,19 @@ export const SnippetEditor: React.FC = () => {
       </div>
 
       {/* Right Sidebar */}
-      <aside className="w-[320px] bg-[var(--bg-primary)] border-l border-[var(--border)]/20 flex flex-col pt-14 min-h-0 overflow-hidden">
+      <aside className={cn(
+        "bg-[var(--bg-primary)] border-l border-[var(--border)]/20 flex flex-col pt-14 lg:pt-0 min-h-0 overflow-hidden transition-all duration-300 z-[48]",
+        "fixed inset-y-0 right-0 w-[300px] lg:relative lg:w-[320px] lg:translate-x-0",
+        showRightSidebar ? "translate-x-0" : "translate-x-full"
+      )}>
+        
+        {/* Mobile Close Button for Sidebar */}
+        <button 
+          onClick={() => setShowRightSidebar(false)}
+          className="lg:hidden absolute top-4 left-4 p-2 text-[#adaaad] hover:text-white"
+        >
+          <X size={20} />
+        </button>
         
         {/* Tab Switcher */}
         <div className="flex border-b border-[var(--border)]/20">

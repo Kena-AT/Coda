@@ -50,36 +50,36 @@ export const ArchiveView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 p-10 overflow-y-auto custom-scrollbar bg-[#0a0a0a]">
+    <div className="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar bg-[#0a0a0a]">
       {/* Header */}
-      <div className="flex justify-between items-end mb-12">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-8 md:mb-12">
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[#adaaad]" />
                 <span className="text-[10px] font-mono text-[#adaaad] tracking-[2px] uppercase">Archive Layer // Cold Storage</span>
             </div>
-            <h1 className="text-[56px] font-main font-bold text-white tracking-[-3px] uppercase leading-none">Archive</h1>
+            <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-[-2px] md:tracking-[-3px] uppercase leading-tight md:leading-none">Archive</h1>
         </div>
 
-        <div className="relative w-64 group">
+        <div className="relative w-full md:w-64 group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#adaaad] group-focus-within:text-[var(--accent)] transition-colors" />
             <input 
                 type="text" 
                 value={localSearch}
                 onChange={e => setLocalSearch(e.target.value)}
-                placeholder="SEARCH_ARCHIVE..."
+                placeholder="SEARCH..."
                 className="w-full bg-[#151515] border border-[var(--border)] pl-9 pr-4 py-2 text-[#adaaad] text-[10px] uppercase font-mono outline-none focus:border-[var(--accent)] transition-colors"
             />
         </div>
       </div>
 
       {archivedSnippets.length === 0 ? (
-        <div className="h-[400px] flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[11px] gap-4">
-          <Archive size={48} className="opacity-20" />
+        <div className="h-[300px] md:h-[400px] flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[10px] md:text-[11px] gap-4 px-4 text-center">
+          <Archive size={40} className="md:size-12 opacity-20" />
           {localSearch ? 'NO_ARCHIVED_NODES_MATCH_QUERY' : 'COLD_STORAGE_EMPTY'}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {archivedSnippets.map(s => (
             <div key={s.id} className="h-[220px] group relative">
               <SnippetCard 
