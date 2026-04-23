@@ -216,11 +216,9 @@ pub fn login(
         // Generate token pair
         let token_pair = generate_token_pair(id, &username)?;
 
-        // Store session in memory for non-remember-me logins
-        if !remember_me {
-            if let Some(state) = app_handle.try_state::<SessionStore>() {
-                state.store_session(token_pair.access_token.clone(), id, username.clone());
-            }
+        // Store session in memory for status tracking
+        if let Some(state) = app_handle.try_state::<SessionStore>() {
+            state.store_session(token_pair.access_token.clone(), id, username.clone());
         }
 
         Ok(AuthResponse {
@@ -270,7 +268,7 @@ fn generate_token_pair(user_id: i32, username: &str) -> Result<TokenPair, String
 }
 
 #[tauri::command]
-pub fn refresh_access_token(refresh_token: String) -> Result<RefreshResponse, String> {
+pub fn refresh_access_token(app_handle: AppHandle, refresh_token: String) -> Result<RefreshResponse, String> {
     let validation = Validation::default();
     let token_data = decode::<Claims>(&refresh_token, &DecodingKey::from_secret(REFRESH_SECRET_KEY), &validation).map_err(|e| e.to_string())?;
     let claims = token_data.claims;
@@ -287,6 +285,11 @@ pub fn refresh_access_token(refresh_token: String) -> Result<RefreshResponse, St
     let access_claims = Claims { sub: claims.sub.clone(), exp: access_expiration, token_type: "access".to_string(), user_id: claims.user_id };
     let access_token = encode(&Header::default(), &access_claims, &EncodingKey::from_secret(SECRET_KEY)).map_err(|e| e.to_string())?;
 
+    // Re-populate session store for status tracking
+    if let Some(state) = app_handle.try_state::<SessionStore>() {
+        state.store_session(access_token.clone(), claims.user_id, claims.sub.clone());
+    }
+
     Ok(RefreshResponse { success: true, access_token: Some(access_token), access_expires_at: Some(access_expiration as i64), message: "Token refreshed successfully".to_string() })
 }
 
@@ -302,11 +305,22 @@ pub fn logout(app_handle: AppHandle, access_token: String, refresh_token: Option
 }
 
 #[tauri::command]
-pub fn validate_token(token: String, token_type: String) -> Result<bool, String> {
+pub fn validate_token(app_handle: AppHandle, token: String, token_type: String) -> Result<bool, String> {
     let secret = if token_type == "refresh" { REFRESH_SECRET_KEY } else { SECRET_KEY };
     let validation = Validation::default();
     match decode::<Claims>(&token, &DecodingKey::from_secret(secret), &validation) {
-        Ok(token_data) => Ok(token_data.claims.exp > Utc::now().timestamp() as usize),
+        Ok(token_data) => {
+            let is_valid = token_data.claims.exp > Utc::now().timestamp() as usize;
+            
+            // If valid, ensure it's in the session store
+            if is_valid {
+                if let Some(state) = app_handle.try_state::<SessionStore>() {
+                    state.store_session(token.clone(), token_data.claims.user_id, token_data.claims.sub.clone());
+                }
+            }
+            
+            Ok(is_valid)
+        },
         Err(_) => Ok(false),
     }
 }

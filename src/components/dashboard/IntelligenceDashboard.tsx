@@ -43,8 +43,16 @@ export const IntelligenceDashboard: React.FC = () => {
   const sections = useMemo(() => {
     const unarchived = snippets.filter(s => s && !s.is_archived);
     
-    // Top Snippets (by copies)
+    // Top Snippets (Elite Criteria: min 5 copies, stable edits, used in last 90 days)
     const topSnippets = [...unarchived]
+      .filter(s => {
+        const copies = s.copy_count || 0;
+        const edits = s.edit_count || 0;
+        const lastUsed = s.last_used_at ? new Date(s.last_used_at).getTime() : 0;
+        const isRecent = !s.last_used_at || (new Date().getTime() - lastUsed) < 90 * 24 * 60 * 60 * 1000;
+        
+        return copies >= 5 && edits < (copies * 2) && isRecent;
+      })
       .sort((a, b) => (b.copy_count || 0) - (a.copy_count || 0))
       .slice(0, 8);
 
@@ -58,8 +66,9 @@ export const IntelligenceDashboard: React.FC = () => {
     const projScores = (projects || []).map(p => {
        const pSnips = unarchived.filter(s => s.project_id === p.id);
        const activeBase = pSnips.length * 5;
-       const copiesBase = pSnips.reduce((acc, curr) => acc + (curr.copy_count || 0), 0) * 2;
-       return { ...p, score: activeBase + copiesBase, snippetCount: pSnips.length };
+       const totalCopies = pSnips.reduce((acc, curr) => acc + (curr.copy_count || 0), 0);
+       const copiesBase = totalCopies * 2;
+       return { ...p, score: activeBase + copiesBase, snippetCount: pSnips.length, totalCopies };
     }).sort((a, b) => b.score - a.score).slice(0, 4);
 
     // Needs Cleanup
@@ -138,7 +147,13 @@ export const IntelligenceDashboard: React.FC = () => {
                 <span className="text-[#adaaad] text-[9px] font-mono tracking-widest">{p.snippetCount} ITEMS</span>
               </div>
               <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[var(--accent)] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
-              <p className="text-[10px] text-[#adaaad] font-mono mt-2">ACTIVITY SCORE: {p.score}</p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-[10px] text-[#adaaad] font-mono">ACTIVITY SCORE: {p.score}</p>
+                <div className="flex items-center gap-1">
+                  <Copy size={10} className="text-[var(--accent)]" />
+                  <span className="text-[10px] text-white font-mono font-bold">{p.totalCopies}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>

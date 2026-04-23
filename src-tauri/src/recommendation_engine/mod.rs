@@ -142,10 +142,19 @@ pub fn get_stale_snippets(app_handle: AppHandle, user_id: i32) -> Result<Vec<Rec
 pub fn get_popular_snippets(app_handle: AppHandle, user_id: i32) -> Result<Vec<Recommendation>, String> {
     let conn = get_db_connection(&app_handle)?;
     
+    // Stricter Criteria for "Top Snippets":
+    // 1. Minimum 5 copies to even be considered
+    // 2. Not archived
+    // 3. Must have been used in the last 90 days
+    // 4. Exclude snippets that are constantly being edited (likely work-in-progress)
     let mut stmt = conn.prepare("
         SELECT id, title, content, language, copy_count, edit_count, last_used_at, created_at, impressions, clicks
         FROM snippets
-        WHERE user_id = ? AND is_archived = 0
+        WHERE user_id = ? 
+          AND is_archived = 0 
+          AND copy_count >= 5
+          AND (last_used_at > datetime('now', '-90 days') OR last_used_at IS NULL)
+          AND edit_count < (copy_count * 2)
         ORDER BY copy_count DESC
         LIMIT 50
     ").map_err(|e| e.to_string())?;
@@ -170,14 +179,17 @@ pub fn get_popular_snippets(app_handle: AppHandle, user_id: i32) -> Result<Vec<R
             0.0, 0.0, 0.0, pop_score, impressions, clicks
         );
 
-        results.push(Recommendation {
-            id, title, content,
-            language: lang.clone(),
-            category: "Popular".to_string(),
-            match_score: final_score,
-            reason: format!("High velocity in {}", lang),
-            breakdown,
-        });
+        // Only include if they pass the normalized quality bar
+        if final_score > 30 {
+            results.push(Recommendation {
+                id, title, content,
+                language: lang.clone(),
+                category: "Elite".to_string(),
+                match_score: final_score,
+                reason: format!("High velocity in {}", lang),
+                breakdown,
+            });
+        }
     }
 
     results.sort_by(|a, b| b.match_score.cmp(&a.match_score));

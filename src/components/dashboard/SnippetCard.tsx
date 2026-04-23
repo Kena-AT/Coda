@@ -32,7 +32,10 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
       await navigator.clipboard.writeText(snippet.content);
       if (snippet.id) {
         await invoke('record_snippet_usage', { snippetId: snippet.id });
-        updateSnippetInStore(snippet.id, { copy_count: (snippet.copy_count || 0) + 1 });
+        updateSnippetInStore(snippet.id, { 
+          copy_count: (snippet.copy_count || 0) + 1,
+          last_used_at: new Date().toISOString()
+        });
       }
       toast.success('Snippet copied to terminal buffer', {
         style: {
@@ -98,6 +101,10 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
               <span className="text-[9px] font-mono tracking-[1px] uppercase text-[#adaaad]">
                 {snippet.language}
               </span>
+              <div className="flex items-center gap-1 ml-2 pl-2 border-l border-[var(--border)]">
+                <Copy className="w-2.5 h-2.5 text-[#adaaad]" />
+                <span className="text-[9px] font-mono text-white font-bold">{snippet.copy_count || 0}</span>
+              </div>
             </div>
             {snippet.is_archived && (
               <span className="text-[8px] font-mono font-bold bg-[var(--accent)]/20 text-[var(--accent)] px-1.5 py-0.5 animate-pulse">ARCHIVED</span>

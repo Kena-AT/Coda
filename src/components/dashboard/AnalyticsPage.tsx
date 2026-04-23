@@ -71,7 +71,7 @@ export const AnalyticsPage: React.FC = () => {
     fetchAnalytics();
     const interval = setInterval(fetchAnalytics, 10000); // 10s live feed
     return () => clearInterval(interval);
-  }, [user, snippets.length]);
+  }, [user, snippets]);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr || dateStr === "No entries") return "N/A";
