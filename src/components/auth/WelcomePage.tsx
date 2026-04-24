@@ -53,13 +53,13 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-6 sm:px-0">
               <button 
                 onClick={onGetStarted}
-                className="w-full sm:w-auto bg-[var(--accent)] text-[#050505] font-main font-bold text-xs tracking-premium hover:brightness-110 transition-all px-8 py-4 uppercase shadow-[0_0_15px_var(--accent-glow)] border border-[var(--accent)]"
+                className="w-full sm:w-auto bg-[var(--accent)] text-[#050505] font-main font-bold text-xs tracking-premium hover:bg-[var(--accent-secondary)] hover:-translate-y-1 hover:shadow-[0_0_30px_var(--accent-glow)] transition-all duration-300 px-8 py-4 uppercase shadow-[0_0_15px_var(--accent-glow)] border border-[var(--accent)]"
               >
                 Get Started
               </button>
               <button 
                 onClick={onLogin}
-                className="w-full sm:w-auto border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)]/10 bg-[#19191c]/60 backdrop-blur-sm transition-colors font-main font-bold text-xs tracking-premium uppercase px-8 py-4"
+                className="w-full sm:w-auto border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[#050505] hover:-translate-y-1 hover:shadow-[0_0_20px_var(--accent-glow)] bg-[#19191c]/60 backdrop-blur-sm transition-all duration-300 font-main font-bold text-xs tracking-premium uppercase px-8 py-4"
               >
                 Sign In
               </button>
