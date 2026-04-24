@@ -136,6 +136,7 @@ pub fn run() {
             vault_maintenance::update_vault_config,
             vault_maintenance::add_vault_monitor,
             snippet::validate_snippet_title,
+            snippet::purge_snippet_cache,
             backup::create_backup,
             backup::restore_backup,
             notifications::update_notification_settings,

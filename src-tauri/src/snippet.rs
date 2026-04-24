@@ -602,3 +602,9 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
         db_size_bytes,
     })
 }
+
+#[tauri::command]
+pub fn purge_snippet_cache(state: tauri::State<'_, crate::AppState>) -> Result<(), String> {
+    state.snippet_cache.clear();
+    Ok(())
+}
