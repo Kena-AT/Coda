@@ -48,8 +48,20 @@ export const CodaAI: React.FC = () => {
   const [activeModel, setActiveModel] = useState(MODELS[0]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const aiContainerRef = useRef<HTMLDivElement>(null);
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (isOpen && aiContainerRef.current && !aiContainerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -159,7 +171,7 @@ export const CodaAI: React.FC = () => {
   };
 
   return (
-    <>
+    <div ref={aiContainerRef}>
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -304,6 +316,6 @@ export const CodaAI: React.FC = () => {
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
-    </>
+    </div>
   );
 };
