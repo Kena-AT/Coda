@@ -15,7 +15,8 @@ import {
   Edit2, 
   Check, 
   X,
-  ArrowLeft
+  ArrowLeft,
+  RefreshCw
 } from 'lucide-react';
 import { SnippetCard } from './SnippetCard';
 import toast from 'react-hot-toast';
@@ -62,6 +63,7 @@ export const ProjectVault: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
   const [projectToDeleteName, setProjectToDeleteName] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   const allProjects = projects;
 
@@ -115,6 +117,27 @@ export const ProjectVault: React.FC = () => {
     
     fetchStats();
   }, [projects, user, snippets]);
+
+  const handleManualRefresh = async () => {
+    if (!user || refreshing) return;
+    setRefreshing(true);
+    playSound('click');
+    
+    const toastId = toast.loading('SYNCHRONIZING_VAULT_STATISTICS...', {
+      style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)', fontSize: '10px', fontFamily: 'var(--font-main)' }
+    });
+
+    try {
+      await Promise.all([fetchProjects(), fetchSnippets()]);
+      await invoke('run_vault_maintenance');
+      toast.success('VAULT_SYNCHRONIZATION_COMPLETE', { id: toastId });
+      playSound('success');
+    } catch (e) {
+      toast.error('SYNCHRONIZATION_FAILED', { id: toastId });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -466,6 +489,15 @@ export const ProjectVault: React.FC = () => {
           <h1 className="text-2xl md:text-3xl font-main font-bold text-white tracking-[-1px] md:tracking-[-1.5px] uppercase">Project Vault</h1>
           <p className="text-[#adaaad] font-mono text-[10px] md:text-[11px] uppercase tracking-[1px]">Organizational & Contextual Scoping Layer</p>
         </div>
+        <button 
+          onClick={handleManualRefresh}
+          disabled={refreshing}
+          onMouseEnter={() => playSound('hover')}
+          className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] hover:border-[var(--accent)] text-[#adaaad] hover:text-white transition-all group"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[var(--accent)]' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+          <span className="text-[10px] font-main font-bold tracking-premium uppercase">Refresh_Stats</span>
+        </button>
       </div>
       
       {loadingStats ? (
