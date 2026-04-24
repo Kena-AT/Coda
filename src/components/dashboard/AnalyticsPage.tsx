@@ -35,6 +35,7 @@ interface AnalyticsSummary {
     ram_mb: number;
     db_size_bytes: number;
   };
+  db_query_ms: number;
   copy_growth: number;
   db_size_bytes: number;
 }
@@ -330,9 +331,9 @@ export const AnalyticsPage: React.FC = () => {
             <h4 className="text-[14px] font-main font-bold text-white uppercase tracking-[1px]">System Health</h4>
             <div className="flex flex-col gap-4">
                {[
-                 { label: 'DB Query Latency', val: 'Low-Latency', progress: 5 },
+                 { label: 'DB Query Latency', val: summary?.db_query_ms !== undefined ? `${summary.db_query_ms.toFixed(2)}ms` : 'N/A', progress: summary?.db_query_ms ? Math.min(100, summary.db_query_ms) : 0 },
                  { label: 'System Memory', val: summary?.resource_usage ? `${Math.round(summary.resource_usage.ram_mb)}MB` : 'N/A', progress: summary?.resource_usage ? Math.min(100, (summary.resource_usage.ram_mb / 1024) * 100) : 0 },
-                 { label: 'CPU Utilization', val: summary?.resource_usage ? `${summary.resource_usage.global_cpu.toFixed(1)}%` : 'N/A', progress: summary?.resource_usage?.global_cpu || 0 }
+                 { label: 'CPU Utilization', val: summary?.resource_usage ? `${summary.resource_usage.cpu_percent.toFixed(1)}%` : 'N/A', progress: summary?.resource_usage?.cpu_percent || 0 }
                ].map((item, i) => (
                  <div key={i} className="flex flex-col gap-2">
                     <div className="flex justify-between items-center text-[10px] font-mono text-[#adaaad] uppercase">

@@ -38,6 +38,7 @@ pub struct AnalyticsSummary {
     pub activity: Vec<ActivityData>,
     pub ledger: Vec<Snippet>,
     pub resource_usage: Option<crate::telemetry::ResourceSample>,
+    pub db_query_ms: f64,
     pub copy_growth: f64,
     pub db_size_bytes: u64,
 }
@@ -591,6 +592,7 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
     } else {
         0.0
     };
+    let db_query_ms = state.telemetry.lock().map(|t| t.get_snapshot().db_query_ms).unwrap_or(Some(0.0)).unwrap_or(0.0);
 
     Ok(AnalyticsSummary {
         global_copies,
@@ -598,6 +600,7 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
         activity,
         ledger,
         resource_usage,
+        db_query_ms,
         copy_growth,
         db_size_bytes,
     })
