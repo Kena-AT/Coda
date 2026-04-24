@@ -9,7 +9,8 @@ import {
   Upload,
   Download,
   Archive,
-  Menu
+  Menu,
+  RefreshCw
 } from 'lucide-react';
 import { soundService } from '../../utils/sounds';
 import { updateTaskState } from '../../hooks/useTelemetry';
@@ -69,6 +70,7 @@ export const Dashboard: React.FC = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
 
   useEffect(() => {
@@ -129,6 +131,47 @@ export const Dashboard: React.FC = () => {
       }
     } catch (e) {
       console.error('Failed to fetch projects', e);
+    }
+  };
+
+  const handleRefresh = async () => {
+    if (!user || refreshing) return;
+    setRefreshing(true);
+    soundService.playClick();
+    
+    const toastId = toast.loading('SYNCHRONIZING_INTELLIGENCE_VAULT...', {
+      style: { 
+        background: '#1a1a1a', 
+        color: '#fff', 
+        border: '1px solid var(--accent)',
+        fontSize: '10px',
+        fontFamily: 'var(--font-main)',
+        letterSpacing: '1px'
+      }
+    });
+
+    try {
+      // 1. Fetch latest data
+      await Promise.all([fetchSnippets(), fetchProjects()]);
+      
+      // 2. Trigger backend analysis
+      await invoke('run_vault_maintenance');
+      await invoke('recompute_snippet_links');
+      
+      toast.success('INTELLIGENCE_VAULT_SYNCHRONIZED', { 
+        id: toastId,
+        style: { 
+          background: '#1a1a1a', 
+          color: '#15ff00', 
+          border: '1px solid #15ff00' 
+        }
+      });
+      soundService.playSuccess();
+    } catch (e) {
+      console.error('Refresh failed:', e);
+      toast.error('SYNCHRONIZATION_ERROR', { id: toastId });
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -258,6 +301,14 @@ export const Dashboard: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-4 md:gap-6 border-l border-[var(--border)] pl-4 md:pl-8">
+              <button 
+                onClick={handleRefresh} 
+                disabled={refreshing}
+                className={`text-[#adaaad] hover:text-white transition-all ${refreshing ? 'animate-spin text-[var(--accent)]' : ''}`}
+                title="Synchronize & Reanalyze"
+              >
+                <RefreshCw className="w-4 h-4 md:w-5 md:h-5" />
+              </button>
               <button 
                 onClick={() => setIsImportModalOpen(true)} 
                 className="text-[#adaaad] hover:text-white transition-colors"
