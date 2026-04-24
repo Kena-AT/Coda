@@ -167,7 +167,6 @@ export const IntelligenceDashboard: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-header md:tracking-tighter uppercase leading-tight md:leading-none">Library</h1>
         </div>
-        </div>
       </div>
 
       <div className="mb-12">
