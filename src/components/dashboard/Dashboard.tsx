@@ -156,7 +156,14 @@ export const Dashboard: React.FC = () => {
       
       // 2. Trigger backend analysis
       await invoke('run_vault_maintenance');
-      await invoke('recompute_snippet_links');
+      
+      // Only recompute links if a snippet is currently active
+      if (selectedSnippetId && selectedSnippetId !== -1) {
+        await invoke('recompute_snippet_links', { 
+          snippetId: selectedSnippetId, 
+          userId: user.id 
+        });
+      }
       
       toast.success('INTELLIGENCE_VAULT_SYNCHRONIZED', { 
         id: toastId,
