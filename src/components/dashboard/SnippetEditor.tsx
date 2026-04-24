@@ -363,7 +363,7 @@ export const SnippetEditor: React.FC = () => {
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
-              <h2 className="text-[12px] md:text-[14px] font-main font-bold text-white tracking-[1px] md:tracking-[2px] uppercase flex items-center gap-2">
+              <h2 className="text-[12px] md:text-[14px] font-main font-bold text-white tracking-tight uppercase flex items-center gap-2">
                 <Terminal className="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]" />
                 <span className="truncate">{selectedSnippetId === -1 ? 'NEW_SEQUENCE' : 'EDIT_MATRIX'}</span>
               </h2>
@@ -372,7 +372,7 @@ export const SnippetEditor: React.FC = () => {
               <button 
                 onClick={() => { playSound('click'); setShowTemplates(true); }}
                 onMouseEnter={() => playSound('hover')}
-                className="px-3 md:px-6 py-2 border border-[var(--accent)] text-[var(--accent)] flex items-center gap-2 text-[9px] md:text-[10px] font-main font-bold tracking-[1px] md:tracking-[1.5px] uppercase hover:bg-[var(--accent)] hover:text-white transition-all group shrink-0"
+                className="px-3 md:px-6 py-2 border border-[var(--accent)] text-[var(--accent)] flex items-center gap-2 text-[9px] md:text-[10px] font-main font-bold tracking-premium uppercase hover:bg-[var(--accent)] hover:text-white transition-all group shrink-0"
                 title="Protocol Template Override"
               >
                 <LayoutTemplate className="w-3 md:w-4 h-3 md:h-4 group-hover:rotate-12 transition-transform" />
@@ -383,7 +383,7 @@ export const SnippetEditor: React.FC = () => {
                 onClick={() => { playSound('click'); handleSave(); }}
                 onMouseEnter={() => playSound('hover')}
                 disabled={saving}
-                className={`px-3 md:px-6 py-2 flex items-center gap-2 text-[9px] md:text-[10px] font-main font-bold tracking-[1px] md:tracking-[1.5px] uppercase transition-all disabled:opacity-50 shrink-0 ${titleError ? 'bg-[var(--border)] text-slate-500 cursor-not-allowed' : 'bg-[var(--accent)] text-white hover:bg-[#ff0000]'}`}
+                className={`px-3 md:px-6 py-2 flex items-center gap-2 text-[9px] md:text-[10px] font-main font-bold tracking-premium uppercase transition-all disabled:opacity-50 shrink-0 ${titleError ? 'bg-[var(--border)] text-slate-500 cursor-not-allowed' : 'bg-[var(--accent)] text-white hover:bg-[#ff0000]'}`}
               >
                 <Save className="w-3 md:w-4 h-3 md:h-4" />
                 {saving ? 'SAVING...' : 'SAVE'}
@@ -502,7 +502,7 @@ export const SnippetEditor: React.FC = () => {
                 loading={
                   <div className="flex flex-col items-center justify-center h-full bg-[#0e0e10] gap-4">
                     <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
-                    <span className="text-[#adaaad] font-mono text-[10px] uppercase tracking-widest">Initialising_Editor_Engine...</span>
+                     <span className="text-[#adaaad] font-mono text-[10px] uppercase tracking-premium">Initialising_Editor_Engine...</span>
                   </div>
                 }
                onMount={(editor, monaco) => {
@@ -528,7 +528,7 @@ export const SnippetEditor: React.FC = () => {
             <div className="mt-8 border-t border-[var(--border)]/20 p-8 bg-[var(--bg-primary)]/30">
               <div className="flex items-center gap-3 mb-6">
                 <Network size={18} className="text-[var(--accent)]" />
-                <h4 className="text-[12px] font-bold text-white tracking-[2px] uppercase">Behavioral Correlations</h4>
+                <h4 className="text-[12px] font-bold text-white tracking-premium uppercase">Behavioral Correlations</h4>
               </div>
               <ProjectLinkingPanel snippetId={selectedSnippetId!} />
             </div>
@@ -557,7 +557,7 @@ export const SnippetEditor: React.FC = () => {
           <button 
             onClick={() => { playSound('click'); setRightSidebarTab('validation'); }}
             onMouseEnter={() => playSound('hover')}
-            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-[1px] uppercase transition-all ${rightSidebarTab === 'validation' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
+            className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-bold tracking-premium uppercase transition-all ${rightSidebarTab === 'validation' ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#131313]' : 'text-[#adaaad] hover:text-white'}`}
           >
             <ShieldAlert size={14} />
             SCAN
@@ -584,7 +584,7 @@ export const SnippetEditor: React.FC = () => {
         {rightSidebarTab === 'validation' ? (
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-6 border-b border-[var(--border)]/20 bg-[#131313]">
-               <h3 className="text-white text-[12px] font-main font-bold tracking-[1.5px] uppercase flex items-center gap-2">
+               <h3 className="text-white text-[12px] font-main font-bold tracking-premium uppercase flex items-center gap-2">
                  <Activity className="w-4 h-4 text-[var(--accent)]" />
                  CORE_VALIDATION_ENGINE
                </h3>
@@ -595,7 +595,7 @@ export const SnippetEditor: React.FC = () => {
               {/* Properties Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">METRICS_SNAPSHOT</span>
+                  <span className="text-[10px] text-slate-500 font-mono uppercase tracking-premium">METRICS_SNAPSHOT</span>
                   <div className="flex items-center gap-1.5 font-mono text-[10px] text-red-500">
                     <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" />
                     LIVE
@@ -620,7 +620,7 @@ export const SnippetEditor: React.FC = () => {
 
               {/* Issues Section */}
               <div className="space-y-4">
-                <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">DIAGNOSTIC_ISSUES ({validationIssues.length})</span>
+                <span className="text-[10px] text-slate-500 font-mono uppercase tracking-premium">DIAGNOSTIC_ISSUES ({validationIssues.length})</span>
                 
                 <div className="space-y-3">
                   {validationIssues.length === 0 ? (
@@ -663,7 +663,7 @@ export const SnippetEditor: React.FC = () => {
                <button 
                  onClick={handleSave}
                  disabled={saving || titleError !== null}
-                 className={`w-full py-4 flex items-center justify-center gap-2 text-[11px] font-bold tracking-[2px] uppercase transition-all active:scale-95 ${titleError ? 'bg-[#252525] text-slate-600 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(220,38,38,0.2)]'}`}
+                 className={`w-full py-4 flex items-center justify-center gap-2 text-[11px] font-bold tracking-tight uppercase transition-all active:scale-95 ${titleError ? 'bg-[#252525] text-slate-600 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(220,38,38,0.2)]'}`}
                >
                  <Zap className="w-4 h-4" />
                  SYNC_TO_MAINFRAME
