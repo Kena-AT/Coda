@@ -155,7 +155,7 @@ pub fn login(
     app_handle: AppHandle,
     username: String,
     password: String,
-    remember_me: bool,
+    _remember_me: bool,
 ) -> Result<AuthResponse, String> {
     let conn = get_db_connection(&app_handle)?;
     let (max_attempts, duration_mins) = get_lockout_settings(&conn);
