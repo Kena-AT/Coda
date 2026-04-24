@@ -156,7 +156,9 @@ export const Dashboard: React.FC = () => {
       await Promise.all([fetchSnippets(true), fetchProjects()]);
       
       // 2. Trigger backend analysis
+      updateTaskState('analytics', 'running');
       await invoke('run_vault_maintenance');
+      updateTaskState('analytics', 'completed');
       
       // Only recompute links if a snippet is currently active
       if (selectedSnippetId && selectedSnippetId !== -1) {
