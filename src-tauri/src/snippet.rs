@@ -483,6 +483,9 @@ pub fn record_snippet_usage(app_handle: AppHandle, state: State<'_, AppState>, s
         [snippet_id]
     ).map_err(|e| e.to_string())?;
 
+    // 5. Invalidate cache so list_snippets picks up the new copy_count
+    state.snippet_cache.remove(&user_id);
+
     Ok(())
 }
 
