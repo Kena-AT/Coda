@@ -77,10 +77,14 @@ export const ProjectVault: React.FC = () => {
     }
   };
 
-  const fetchSnippets = async () => {
+  const fetchSnippets = async (force = false) => {
     if (!user) return;
     try {
-      const response: any = await invoke('list_snippets', { userId: user.id, includeArchived: false });
+      const response: any = await invoke('list_snippets', { 
+        userId: user.id, 
+        includeArchived: true,
+        bypass_cache: force 
+      });
       if (response.success) setSnippets(response.data || []);
     } catch (e) {
       console.error('Failed to fetch snippets', e);
@@ -128,7 +132,8 @@ export const ProjectVault: React.FC = () => {
     });
 
     try {
-      await Promise.all([fetchProjects(), fetchSnippets()]);
+      await fetchSnippets(true);
+      await fetchProjects();
       await invoke('run_vault_maintenance');
       toast.success('VAULT_SYNCHRONIZATION_COMPLETE', { id: toastId });
       playSound('success');
