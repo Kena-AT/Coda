@@ -217,8 +217,8 @@ pub fn login(
         let token_pair = generate_token_pair(id, &username)?;
 
         // Store session in memory for status tracking
-        if let Some(state) = app_handle.try_state::<SessionStore>() {
-            state.store_session(token_pair.access_token.clone(), id, username.clone());
+        if let Some(state) = app_handle.try_state::<crate::AppState>() {
+            state.session_store.store_session(token_pair.access_token.clone(), id, username.clone());
         }
 
         Ok(AuthResponse {
@@ -286,8 +286,8 @@ pub fn refresh_access_token(app_handle: AppHandle, refresh_token: String) -> Res
     let access_token = encode(&Header::default(), &access_claims, &EncodingKey::from_secret(SECRET_KEY)).map_err(|e| e.to_string())?;
 
     // Re-populate session store for status tracking
-    if let Some(state) = app_handle.try_state::<SessionStore>() {
-        state.store_session(access_token.clone(), claims.user_id, claims.sub.clone());
+    if let Some(state) = app_handle.try_state::<crate::AppState>() {
+        state.session_store.store_session(access_token.clone(), claims.user_id, claims.sub.clone());
     }
 
     Ok(RefreshResponse { success: true, access_token: Some(access_token), access_expires_at: Some(access_expiration as i64), message: "Token refreshed successfully".to_string() })
@@ -295,9 +295,9 @@ pub fn refresh_access_token(app_handle: AppHandle, refresh_token: String) -> Res
 
 #[tauri::command]
 pub fn logout(app_handle: AppHandle, access_token: String, refresh_token: Option<String>, user_id: i32) -> Result<bool, String> {
-    if let Some(state) = app_handle.try_state::<SessionStore>() {
-        state.remove_session(&access_token);
-        if let Some(refresh) = &refresh_token { state.remove_session(refresh); }
+    if let Some(state) = app_handle.try_state::<crate::AppState>() {
+        state.session_store.remove_session(&access_token);
+        if let Some(refresh) = &refresh_token { state.session_store.remove_session(refresh); }
     }
     let conn = get_db_connection(&app_handle)?;
     conn.execute("UPDATE users SET last_logout_at = CURRENT_TIMESTAMP WHERE id = ?", [user_id]).map_err(|e| e.to_string())?;
@@ -314,8 +314,8 @@ pub fn validate_token(app_handle: AppHandle, token: String, token_type: String) 
             
             // If valid, ensure it's in the session store
             if is_valid {
-                if let Some(state) = app_handle.try_state::<SessionStore>() {
-                    state.store_session(token.clone(), token_data.claims.user_id, token_data.claims.sub.clone());
+                if let Some(state) = app_handle.try_state::<crate::AppState>() {
+                    state.session_store.store_session(token.clone(), token_data.claims.user_id, token_data.claims.sub.clone());
                 }
             }
             
