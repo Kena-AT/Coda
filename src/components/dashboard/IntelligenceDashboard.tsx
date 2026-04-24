@@ -1,16 +1,56 @@
 import React, { useMemo, useState } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
-import { Flame, Clock, Archive, Activity, Folder, Copy } from 'lucide-react';
+import { Flame, Clock, Archive, Activity, Folder, Copy, RefreshCw } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import { ConfirmationModal } from './ConfirmationModal';
 
 export const IntelligenceDashboard: React.FC = () => {
-  const { user, snippets, projects, setSelectedSnippetId, setSnippets, setActiveTab, setSelectedProjectId } = useStore();
+  const { user, snippets, projects, setSelectedSnippetId, setSnippets, setActiveTab, setSelectedProjectId, setLoading } = useStore();
   const playSound = useSoundEffect();
   const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchSnippets = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const response: any = await invoke('list_snippets', {
+        userId: user.id,
+        includeArchived: false
+      });
+      if (response.success) {
+        setSnippets(response.data || []);
+      }
+    } catch (err: any) {
+      toast.error(err.toString());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    if (!user || refreshing) return;
+    setRefreshing(true);
+    playSound('click');
+    
+    const toastId = toast.loading('ANALYZING_VAULT_METRICS...', {
+      style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)', fontSize: '10px', fontFamily: 'var(--font-main)' }
+    });
+
+    try {
+      await fetchSnippets();
+      await invoke('run_vault_maintenance');
+      toast.success('VAULT_ANALYSIS_COMPLETE', { id: toastId });
+      playSound('success');
+    } catch (e) {
+      toast.error('ANALYSIS_FAILED', { id: toastId });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleArchive = async (id: number) => {
     try {
@@ -125,6 +165,16 @@ export const IntelligenceDashboard: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-header md:tracking-tighter uppercase leading-tight md:leading-none">Library</h1>
         </div>
+
+        <button 
+          onClick={handleManualRefresh}
+          disabled={refreshing}
+          onMouseEnter={() => playSound('hover')}
+          className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] hover:border-[var(--accent)] text-[#adaaad] hover:text-white transition-all group"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[var(--accent)]' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+          <span className="text-[10px] font-main font-bold tracking-premium uppercase">Refresh_Vault</span>
+        </button>
       </div>
 
       <div className="mb-12">
