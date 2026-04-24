@@ -5,7 +5,8 @@ import {
   ShieldCheck, 
   Clock,
   Copy,
-  Search
+  Search,
+  RefreshCw
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import toast from 'react-hot-toast';
@@ -43,6 +44,7 @@ export const AnalyticsPage: React.FC = () => {
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [popularSnippets, setPopularSnippets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchAnalytics = async () => {
     if (!user) return;
@@ -64,6 +66,25 @@ export const AnalyticsPage: React.FC = () => {
       toast.error(err.toString());
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    if (!user || refreshing) return;
+    setRefreshing(true);
+    
+    const toastId = toast.loading('REANALYZING_SYSTEM_LEDGER...', {
+      style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)', fontSize: '10px', fontFamily: 'var(--font-main)' }
+    });
+
+    try {
+      await fetchAnalytics();
+      await invoke('run_vault_maintenance');
+      toast.success('LEDGER_ANALYSIS_COMPLETE', { id: toastId });
+    } catch (e) {
+      toast.error('ANALYSIS_FAILED', { id: toastId });
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -107,9 +128,19 @@ export const AnalyticsPage: React.FC = () => {
         </div>
         <div className="flex items-center justify-between">
            <h1 className="text-[56px] font-main font-bold text-white tracking-[-3px] uppercase leading-none">Usage Stats</h1>
-           <div className="flex flex-col items-end">
-              <span className="text-[10px] text-[#adaaad] font-mono uppercase">User Session ID</span>
-              <span className="text-[14px] text-white font-bold font-mono">0x{user?.id.toString(16).padStart(4, '0').toUpperCase()}</span>
+           <div className="flex flex-col items-end gap-3">
+              <button 
+                onClick={handleManualRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-2 px-4 py-1.5 border border-[var(--border)] hover:border-[var(--accent)] text-[#adaaad] hover:text-white transition-all group"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[var(--accent)]' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                <span className="text-[10px] font-main font-bold tracking-premium uppercase">Refresh_Ledger</span>
+              </button>
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] text-[#adaaad] font-mono uppercase">User Session ID</span>
+                <span className="text-[14px] text-white font-bold font-mono">0x{user?.id.toString(16).padStart(4, '0').toUpperCase()}</span>
+              </div>
            </div>
         </div>
       </div>
