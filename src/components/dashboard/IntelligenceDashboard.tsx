@@ -13,13 +13,14 @@ export const IntelligenceDashboard: React.FC = () => {
   const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchSnippets = async () => {
+  const fetchSnippets = async (force = false) => {
     if (!user) return;
     setLoading(true);
     try {
       const response: any = await invoke('list_snippets', {
         userId: user.id,
-        includeArchived: false
+        includeArchived: false,
+        bypass_cache: force
       });
       if (response.success) {
         setSnippets(response.data || []);
@@ -41,7 +42,7 @@ export const IntelligenceDashboard: React.FC = () => {
     });
 
     try {
-      await fetchSnippets();
+      await fetchSnippets(true);
       await invoke('run_vault_maintenance');
       toast.success('VAULT_ANALYSIS_COMPLETE', { id: toastId });
       playSound('success');
@@ -91,9 +92,10 @@ export const IntelligenceDashboard: React.FC = () => {
         // Normalize SQLite date string (space to T) for JS Date compatibility
         const lastUsedStr = s.last_used_at ? s.last_used_at.replace(' ', 'T') : null;
         const lastUsed = lastUsedStr ? new Date(lastUsedStr).getTime() : 0;
-        const isRecent = !s.last_used_at || (new Date().getTime() - lastUsed) < 90 * 24 * 60 * 60 * 1000;
+        const isRecent = !s.last_used_at || (new Date().getTime() - lastUsed) < 180 * 24 * 60 * 60 * 1000;
         
-        return copies >= 5 && edits < (copies * 2) && isRecent;
+        // Relaxed criteria: 5+ copies and used in last 6 months
+        return copies >= 5 && isRecent;
       })
       .sort((a, b) => (b.copy_count || 0) - (a.copy_count || 0))
       .slice(0, 8);
