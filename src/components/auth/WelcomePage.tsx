@@ -13,7 +13,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
 
       {/* Header - Top Navigation Bar */}
       <header className="absolute top-0 left-0 w-full h-[56px] bg-[var(--bg-secondary)] border-b border-[var(--border)] px-6 flex items-center justify-between z-50">
-        <div className="text-[var(--accent)] font-main font-bold text-[14px] tracking-[2px]">CODA</div>
+        <div className="text-[var(--accent)] font-main font-bold text-[14px] tracking-tight">CODA</div>
       </header>
 
       {/* Main Content */}
@@ -32,7 +32,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             className="flex flex-col items-center relative z-10 w-full"
           >
             <div className="border-l-2 border-[var(--accent)] bg-[var(--bg-secondary)]/80 px-4 py-1 mb-6 flex items-center justify-center backdrop-blur-sm">
-              <span className="text-[var(--accent)] font-main text-[10px] tracking-[1.2px] uppercase">SYSTEM READY // V1.0.0-STABLE</span>
+              <span className="text-[var(--accent)] font-main text-[10px] tracking-premium uppercase">SYSTEM READY // V1.0.0-STABLE</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-[72px] font-main font-bold leading-[1.1] md:leading-[0.95] tracking-[-2px] md:tracking-[-4px] text-[#fffbfe] mb-6 flex flex-col pt-4">
@@ -53,13 +53,13 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-6 sm:px-0">
               <button 
                 onClick={onGetStarted}
-                className="w-full sm:w-auto bg-[var(--accent)] text-[#04f5ff] font-main font-bold text-xs tracking-[1.8px] hover:bg-[#ff0000] transition-all px-8 py-4 uppercase border border-[var(--accent)]"
+                className="w-full sm:w-auto bg-[var(--accent)] text-[#04f5ff] font-main font-bold text-xs tracking-premium hover:bg-[#ff0000] transition-all px-8 py-4 uppercase border border-[var(--accent)]"
               >
                 Get Started
               </button>
               <button 
                 onClick={onLogin}
-                className="w-full sm:w-auto border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)]/10 bg-[#19191c]/60 backdrop-blur-sm transition-colors font-main font-bold text-xs tracking-[1.8px] uppercase px-8 py-4"
+                className="w-full sm:w-auto border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)]/10 bg-[#19191c]/60 backdrop-blur-sm transition-colors font-main font-bold text-xs tracking-premium uppercase px-8 py-4"
               >
                 Sign In
               </button>
@@ -100,7 +100,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
                   </p>
                </div>
                <div className="pt-8">
-                 <span className="text-[var(--accent)] font-main text-[8px] tracking-[1px] uppercase">QUERY_EXECUTED: 0.002MS</span>
+                 <span className="text-[var(--accent)] font-main text-[8px] tracking-premium uppercase">QUERY_EXECUTED: 0.002MS</span>
                </div>
             </div>
 
