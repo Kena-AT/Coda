@@ -68,9 +68,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
           <div className="flex flex-col">
             <div className="flex items-center gap-3 mb-1 cursor-pointer" onMouseEnter={() => playSound('hover')}>
               <div className="w-4 h-4 bg-[var(--accent)]" />
-              <h1 className="text-[13px] font-main font-bold text-[var(--accent)] tracking-[1px] uppercase">TERMINAL_SYSTEM</h1>
+              <h1 className="text-[13px] font-main font-bold text-[var(--accent)] tracking-tight uppercase">TERMINAL_SYSTEM</h1>
             </div>
-            <p className="text-[#adaaad] font-main text-[9px] tracking-[1px] uppercase opacity-60 ml-7">v2.0.4-STABLE</p>
+            <p className="text-[#adaaad] font-main text-[9px] tracking-premium uppercase opacity-60 ml-7">v2.0.4-STABLE</p>
           </div>
 
           <button 
@@ -99,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
                 "w-[18px] h-[18px]",
                 activeTab === item.id ? "text-white" : "text-[#adaaad] group-hover:text-white"
               )} strokeWidth={1.5} />
-              <span className="font-main text-[11px] font-medium tracking-[0.5px] uppercase">{item.label}</span>
+              <span className="font-main text-[11px] font-medium tracking-premium uppercase">{item.label}</span>
               
               {/* Active Indicator */}
               {activeTab === item.id && (
@@ -121,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
               if (window.innerWidth < 1024) setSidebarOpen(false);
             }}
             onMouseEnter={() => playSound('hover')}
-            className="w-full bg-[var(--accent)] text-white flex items-center justify-center gap-2 py-4 font-main font-bold text-[11px] tracking-[2px] uppercase hover:bg-[#ff0000] transition-colors"
+            className="w-full bg-[var(--accent)] text-white flex items-center justify-center gap-2 py-4 font-main font-bold text-[11px] tracking-tight uppercase hover:bg-[#ff0000] transition-colors"
           >
             <span>NEW_SNIPPET</span>
           </button>

@@ -98,7 +98,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
                 className="w-1.5 h-1.5 rounded-full" 
                 style={{ backgroundColor: getLanguageColor(snippet.language) }} 
               />
-              <span className="text-[9px] font-mono tracking-[1px] uppercase text-[#adaaad]">
+              <span className="text-[9px] font-mono tracking-premium uppercase text-[#adaaad]">
                 {snippet.language}
               </span>
               <div className="flex items-center gap-1 ml-2 pl-2 border-l border-[var(--border)]">
@@ -185,7 +185,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
       ) : (
         <div className="flex-1 mb-4 relative z-10 overflow-hidden" onClick={onEdit}>
           <div className="bg-black/40 p-3 font-mono text-[10px] text-[#adaaad]/60 line-clamp-3 rounded border border-white/5 cursor-pointer hover:bg-black/60 transition-colors">
-            <code className="leading-relaxed">
+            <code className="leading-tight tracking-tight">
               <HighlightText text={snippet.content} query={searchQuery} />
             </code>
           </div>
@@ -205,7 +205,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
           )}
         </div>
         <div className="flex items-center gap-1.5 text-[#adaaad] group-hover:text-white transition-colors cursor-pointer" onClick={onEdit}>
-          <span className="text-[9px] font-mono uppercase">Open</span>
+          <span className="text-[9px] font-mono uppercase tracking-premium">Open</span>
           <ChevronRight className="w-3 h-3 text-[var(--accent)]" />
         </div>
       </div>

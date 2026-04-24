@@ -121,16 +121,16 @@ export const IntelligenceDashboard: React.FC = () => {
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[var(--accent)]" />
-                <span className="text-[10px] font-mono text-[var(--accent)] tracking-[2px] uppercase">Central Intelligence // Library.root</span>
+                <span className="text-[10px] font-mono text-[var(--accent)] tracking-premium uppercase">Central Intelligence // Library.root</span>
             </div>
-            <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-[-2px] md:tracking-[-3px] uppercase leading-tight md:leading-none">Library</h1>
+            <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-header md:tracking-tighter uppercase leading-tight md:leading-none">Library</h1>
         </div>
       </div>
 
       <div className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <div className="p-2 bg-[var(--border)]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
-          <h2 className="text-lg md:text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Active Projects</h2>
+          <h2 className="text-lg md:text-xl font-bold font-main uppercase text-white tracking-header">Active Projects</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {sections.projScores.map(p => p && (
@@ -146,7 +146,7 @@ export const IntelligenceDashboard: React.FC = () => {
             >
               <div className="flex justify-between items-start mb-4">
                 <Folder className="w-5 h-5 text-[var(--accent)]" />
-                <span className="text-[#adaaad] text-[9px] font-mono tracking-widest">{p.snippetCount} ITEMS</span>
+                <span className="text-[#adaaad] text-[9px] font-mono tracking-premium">{p.snippetCount} ITEMS</span>
               </div>
               <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[var(--accent)] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
               <div className="flex justify-between items-center mt-2">

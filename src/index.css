@@ -63,15 +63,27 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-size: 16px;
+  letter-spacing: -0.015em;
+  line-height: 1.5;
   zoom: var(--font-scale);
   overflow-x: hidden;
   height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-weight: 700;
 }
 
 button {
   cursor: pointer;
   border: none;
   font-family: inherit;
+  letter-spacing: -0.01em;
 }
 
 input {
@@ -88,7 +100,7 @@ input {
   padding: 12px 24px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: -0.01em;
   transition: all 0.2s ease;
 }
 
