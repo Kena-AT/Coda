@@ -167,16 +167,7 @@ export const IntelligenceDashboard: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-header md:tracking-tighter uppercase leading-tight md:leading-none">Library</h1>
         </div>
-
-        <button 
-          onClick={handleManualRefresh}
-          disabled={refreshing}
-          onMouseEnter={() => playSound('hover')}
-          className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] hover:border-[var(--accent)] text-[#adaaad] hover:text-white transition-all group"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[var(--accent)]' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-          <span className="text-[10px] font-main font-bold tracking-premium uppercase">Refresh_Vault</span>
-        </button>
+        </div>
       </div>
 
       <div className="mb-12">
