@@ -40,7 +40,7 @@ interface AnalyticsSummary {
 }
 
 export const AnalyticsPage: React.FC = () => {
-  const { user, snippets } = useStore();
+  const { user, snippets, setSnippets } = useStore();
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [popularSnippets, setPopularSnippets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,6 +61,16 @@ export const AnalyticsPage: React.FC = () => {
         copies: r.match_score,
         reason: r.reason
       })));
+
+      // Also refresh the global snippets list to keep counts consistent
+      const response: any = await invoke('list_snippets', { 
+        userId: user.id, 
+        includeArchived: false,
+        bypass_cache: true
+      });
+      if (response.success) {
+        setSnippets(response.data || []);
+      }
     } catch (err: any) {
       console.error(err);
       toast.error(err.toString());
@@ -366,7 +376,18 @@ export const AnalyticsPage: React.FC = () => {
                     Encrypted database node localized in application data.
                   </p>
                </div>
-               <button className="w-fit px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors shadow-[0_0_15px_var(--accent-glow)0.2)]">
+               <button 
+                  onClick={async () => {
+                    try {
+                      await invoke('purge_snippet_cache');
+                      toast.success('GLOBAL_CACHE_PURGED');
+                      fetchAnalytics();
+                    } catch (e) {
+                      toast.error('PURGE_FAILED');
+                    }
+                  }}
+                  className="w-fit px-6 py-2 bg-[var(--accent)] text-white text-[10px] font-bold uppercase tracking-[1px] hover:bg-[#ff0000] transition-colors shadow-[0_0_15px_var(--accent-glow)0.2)]"
+               >
                   Purge Cache
                </button>
             </div>
