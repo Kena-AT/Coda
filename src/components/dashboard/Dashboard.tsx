@@ -99,7 +99,7 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const fetchSnippets = async () => {
+  const fetchSnippets = async (force = false) => {
     if (!user) return;
     setLoading(true);
     updateTaskState('search_indexing', 'running');
@@ -107,7 +107,8 @@ export const Dashboard: React.FC = () => {
       const includeArchived = activeTab === 'archive' || !!searchQuery;
       const response: any = await invoke('list_snippets', {
         userId: user.id,
-        includeArchived: includeArchived
+        includeArchived: includeArchived,
+        bypass_cache: force
       });
       if (response.success) {
         setSnippets(response.data || []);
@@ -151,8 +152,8 @@ export const Dashboard: React.FC = () => {
     });
 
     try {
-      // 1. Fetch latest data
-      await Promise.all([fetchSnippets(), fetchProjects()]);
+      // 1. Fetch latest data (force fresh from DB)
+      await Promise.all([fetchSnippets(true), fetchProjects()]);
       
       // 2. Trigger backend analysis
       await invoke('run_vault_maintenance');
