@@ -141,10 +141,11 @@ pub fn list_snippets(
     app_handle: AppHandle,
     state: State<'_, AppState>,
     user_id: i32,
-    include_archived: bool
+    include_archived: bool,
+    bypass_cache: Option<bool>
 ) -> Result<SnippetResponse, String> {
     // Basic cache check (only for main list, not archived for simplicity)
-    if !include_archived {
+    if !include_archived && !bypass_cache.unwrap_or(false) {
         if let Some(cached) = state.snippet_cache.get(&user_id) {
             return Ok(SnippetResponse {
                 success: true,

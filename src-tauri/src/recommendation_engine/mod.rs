@@ -180,7 +180,7 @@ pub fn get_popular_snippets(app_handle: AppHandle, user_id: i32) -> Result<Vec<R
         );
 
         // Only include if they pass the normalized quality bar
-        if final_score > 30 {
+        if final_score >= 5 {
             results.push(Recommendation {
                 id, title, content,
                 language: lang.clone(),
