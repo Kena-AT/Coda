@@ -124,8 +124,9 @@ export const CodaAI: React.FC = () => {
         const errData = await response.json().catch(() => ({}));
         const errMsg = errData.error?.message || '';
         
-        // If model not found or not supported, try fallback
-        if (response.status === 404 || errMsg.includes('not found') || errMsg.includes('not supported')) {
+        // If model not found, not supported, or overloaded, try fallback
+        const isOverloaded = response.status === 503 || errMsg.toLowerCase().includes('high demand') || errMsg.toLowerCase().includes('overloaded');
+        if (response.status === 404 || isOverloaded || errMsg.includes('not found') || errMsg.includes('not supported')) {
           const fallbackModel = MODELS.find(m => m !== activeModel) || MODELS[1];
           console.log(`Model ${activeModel} unavailable, falling back to ${fallbackModel}`);
           setActiveModel(fallbackModel);
