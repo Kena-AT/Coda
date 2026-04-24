@@ -53,7 +53,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-6 sm:px-0">
               <button 
                 onClick={onGetStarted}
-                className="w-full sm:w-auto bg-[var(--accent)] text-[#04f5ff] font-main font-bold text-xs tracking-premium hover:bg-[#ff0000] transition-all px-8 py-4 uppercase border border-[var(--accent)]"
+                className="w-full sm:w-auto bg-[var(--accent)] text-[#050505] font-main font-bold text-xs tracking-premium hover:brightness-110 transition-all px-8 py-4 uppercase shadow-[0_0_15px_var(--accent-glow)] border border-[var(--accent)]"
               >
                 Get Started
               </button>

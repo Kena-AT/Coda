@@ -257,7 +257,7 @@ export const CodaAI: React.FC = () => {
                 <div
                   className={`max-w-[85%] px-4 py-3 rounded-lg text-[11px] leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-[var(--accent)] text-white rounded-br-none'
+                      ? 'bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-white rounded-br-none shadow-[0_0_10px_var(--accent-glow)]'
                       : 'bg-[#161616] border border-[var(--border)] text-[#e5e2e1] rounded-bl-none'
                   }`}
                 >
