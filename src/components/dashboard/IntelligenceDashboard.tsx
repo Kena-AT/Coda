@@ -159,13 +159,32 @@ export const IntelligenceDashboard: React.FC = () => {
     <div className="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar bg-[#0a0a0a] selection:bg-[var(--accent)] selection:text-white">
       
       {/* Header */}
-      <div className="flex justify-between items-end mb-8 md:mb-12">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-8 md:mb-12">
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[var(--accent)]" />
                 <span className="text-[10px] font-mono text-[var(--accent)] tracking-premium uppercase">Central Intelligence // Library.root</span>
             </div>
             <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-header md:tracking-tighter uppercase leading-tight md:leading-none">Library</h1>
+        </div>
+
+        {/* Tag Filtering Bar */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <button 
+            onClick={() => setSelectedTag(null)}
+            className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${!selectedTag ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'border-[var(--border)] text-[#adaaad] hover:border-[var(--accent)]/50'}`}
+          >
+            All_Nodes
+          </button>
+          {availableTags.map(tag => (
+            <button 
+              key={tag.id}
+              onClick={() => setSelectedTag(tag.name === selectedTag ? null : tag.name)}
+              className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${selectedTag === tag.name ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-[0_0_10px_rgba(230,0,0,0.3)]' : 'border-[var(--border)] text-[#adaaad] hover:border-[var(--accent)]/50'}`}
+            >
+              #{tag.name}
+            </button>
+          ))}
         </div>
       </div>
 
