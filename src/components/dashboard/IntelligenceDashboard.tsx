@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
 import { Flame, Clock, Archive, Activity, Folder, Copy } from 'lucide-react';
