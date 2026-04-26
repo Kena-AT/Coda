@@ -260,7 +260,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({ onBack, onSignUp, onSucc
               </div>
             </div>
             <div className="uppercase">
-              Build: v2.0.4
+              Build: v1.0.0
             </div>
           </footer>
 
