@@ -169,8 +169,8 @@ export const TrashRepository: React.FC = () => {
           <div className="bg-[#201f1f] p-6">
             <h4 className="text-[#adaaad] font-bold text-[10px] uppercase mb-2">Buffer_Status</h4>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl text-white font-bold">STABLE</span>
-              <span className="text-[9px] text-[#adaaad] uppercase font-mono">98%_Efficiency</span>
+              <span className="text-2xl text-white font-bold">{analytics?.buffer_status || 'STABLE'}</span>
+              <span className="text-[9px] text-[#adaaad] uppercase font-mono">{analytics?.efficiency?.toFixed(2) || '98.00'}%_Efficiency</span>
             </div>
           </div>
         </div>
@@ -179,7 +179,7 @@ export const TrashRepository: React.FC = () => {
       {/* Decorative Coordinates */}
       <div className="absolute bottom-8 right-8 flex flex-col items-end gap-1 opacity-40 font-mono text-[8px] text-[#353534]">
         <span>LOC: 37.7749° N, 122.4194° W</span>
-        <span>BUFFER_STATUS: STABLE_98%</span>
+        <span>BUFFER_STATUS: {analytics?.buffer_status || 'STABLE'}_{analytics?.efficiency?.toFixed(0) || '98'}%</span>
       </div>
 
       {/* Modals */}
