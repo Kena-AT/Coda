@@ -132,6 +132,12 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         if !columns.contains(&"archive_snoozed_until".to_string()) {
             conn.execute("ALTER TABLE snippets ADD COLUMN archive_snoozed_until DATETIME", []).map_err(|e| e.to_string())?;
         }
+        if !columns.contains(&"is_favorite".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN is_favorite BOOLEAN DEFAULT 0", []).map_err(|e| e.to_string())?;
+        }
+        if !columns.contains(&"deleted_at".to_string()) {
+            conn.execute("ALTER TABLE snippets ADD COLUMN deleted_at DATETIME", []).map_err(|e| e.to_string())?;
+        }
     }
 
     conn.execute(
@@ -141,6 +147,31 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
             content TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE CASCADE
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS tags (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            category TEXT,
+            color TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, name)
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS snippet_tags (
+            snippet_id INTEGER NOT NULL,
+            tag_id INTEGER NOT NULL,
+            PRIMARY KEY (snippet_id, tag_id),
+            FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE CASCADE,
+            FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
         )",
         [],
     ).map_err(|e| e.to_string())?;

@@ -10,6 +10,8 @@ export interface Snippet {
   language: string;
   tags: string | null;
   is_archived: boolean;
+  is_favorite: boolean;
+  deleted_at: string | null;
   copy_count: number;
   edit_count: number;
   detected_patterns: string | null;
