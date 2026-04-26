@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
-import { Flame, Clock, Archive, Activity, Folder, Copy, RefreshCw } from 'lucide-react';
+import { Flame, Clock, Archive, Activity, Folder, Copy } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
@@ -12,6 +12,24 @@ export const IntelligenceDashboard: React.FC = () => {
   const playSound = useSoundEffect();
   const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [availableTags, setAvailableTags] = useState<any[]>([]);
+
+  const fetchTags = async () => {
+    if (!user) return;
+    try {
+      const response: any = await invoke('list_tags', { userId: user.id });
+      if (response.success) {
+        setAvailableTags(response.data || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch tags', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchTags();
+  }, [user]);
 
   const fetchSnippets = async (force = false) => {
     if (!user) return;
@@ -82,7 +100,11 @@ export const IntelligenceDashboard: React.FC = () => {
   };
 
   const sections = useMemo(() => {
-    const unarchived = snippets.filter(s => s && !s.is_archived);
+    let unarchived = snippets.filter(s => s && !s.is_archived && !s.deleted_at);
+    
+    if (selectedTag) {
+      unarchived = unarchived.filter(s => s.tags?.split(',').map((t: string) => t.trim().toUpperCase()).includes(selectedTag.toUpperCase()));
+    }
     
     // Top Snippets (Elite Criteria: min 5 copies, stable edits, used in last 90 days)
     const topSnippets = [...unarchived]
