@@ -105,9 +105,11 @@ export const Dashboard: React.FC = () => {
     updateTaskState('search_indexing', 'running');
     try {
       const includeArchived = activeTab === 'archive' || !!searchQuery;
+      const includeDeleted = activeTab === 'trash';
       const response: any = await invoke('list_snippets', {
         userId: user.id,
         includeArchived: includeArchived,
+        includeDeleted: includeDeleted,
         bypass_cache: force
       });
       if (response.success) {
