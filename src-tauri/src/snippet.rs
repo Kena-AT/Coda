@@ -704,6 +704,79 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
 }
 
 #[tauri::command]
+pub fn create_tag(app_handle: AppHandle, user_id: i32, name: String, category: Option<String>, color: Option<String>) -> Result<TagResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    match conn.execute(
+        "INSERT INTO tags (user_id, name, category, color) VALUES (?, ?, ?, ?)",
+        rusqlite::params![user_id, name, category, color],
+    ) {
+        Ok(_) => Ok(TagResponse { success: true, message: "Tag created".to_string(), data: None }),
+        Err(e) => Ok(TagResponse { success: false, message: format!("Failed to create tag: {}", e), data: None }),
+    }
+}
+
+#[tauri::command]
+pub fn list_tags(app_handle: AppHandle, user_id: i32) -> Result<TagResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    let mut stmt = conn.prepare("SELECT id, user_id, name, category, color, created_at FROM tags WHERE user_id = ? ORDER BY name ASC").map_err(|e| e.to_string())?;
+    let tag_iter = stmt.query_map([user_id], |row| {
+        Ok(Tag {
+            id: Some(row.get(0)?),
+            user_id: row.get(1)?,
+            name: row.get(2)?,
+            category: row.get(3)?,
+            color: row.get(4)?,
+            created_at: Some(row.get(5)?),
+        })
+    }).map_err(|e| e.to_string())?;
+
+    let mut tags = Vec::new();
+    for tag in tag_iter {
+        tags.push(tag.map_err(|e| e.to_string())?);
+    }
+    Ok(TagResponse { success: true, message: "Tags retrieved".to_string(), data: Some(tags) })
+}
+
+#[tauri::command]
+pub fn update_tag(app_handle: AppHandle, id: i32, name: String, category: Option<String>, color: Option<String>) -> Result<TagResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    match conn.execute(
+        "UPDATE tags SET name = ?, category = ?, color = ? WHERE id = ?",
+        rusqlite::params![name, category, color, id],
+    ) {
+        Ok(_) => Ok(TagResponse { success: true, message: "Tag updated".to_string(), data: None }),
+        Err(e) => Ok(TagResponse { success: false, message: format!("Failed to update tag: {}", e), data: None }),
+    }
+}
+
+#[tauri::command]
+pub fn delete_tag(app_handle: AppHandle, id: i32) -> Result<TagResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    match conn.execute("DELETE FROM tags WHERE id = ?", [id]) {
+        Ok(_) => Ok(TagResponse { success: true, message: "Tag deleted".to_string(), data: None }),
+        Err(e) => Ok(TagResponse { success: false, message: format!("Failed to delete tag: {}", e), data: None }),
+    }
+}
+
+#[tauri::command]
+pub fn add_tag_to_snippet(app_handle: AppHandle, snippet_id: i32, tag_id: i32) -> Result<SnippetResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    match conn.execute("INSERT OR IGNORE INTO snippet_tags (snippet_id, tag_id) VALUES (?, ?)", [snippet_id, tag_id]) {
+        Ok(_) => Ok(SnippetResponse { success: true, message: "Tag added to snippet".to_string(), data: None }),
+        Err(e) => Ok(SnippetResponse { success: false, message: format!("Failed to add tag: {}", e), data: None }),
+    }
+}
+
+#[tauri::command]
+pub fn remove_tag_from_snippet(app_handle: AppHandle, snippet_id: i32, tag_id: i32) -> Result<SnippetResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    match conn.execute("DELETE FROM snippet_tags WHERE snippet_id = ? AND tag_id = ?", [snippet_id, tag_id]) {
+        Ok(_) => Ok(SnippetResponse { success: true, message: "Tag removed from snippet".to_string(), data: None }),
+        Err(e) => Ok(SnippetResponse { success: false, message: format!("Failed to remove tag: {}", e), data: None }),
+    }
+}
+
+#[tauri::command]
 pub fn purge_snippet_cache(state: tauri::State<'_, crate::AppState>) -> Result<(), String> {
     state.snippet_cache.clear();
     Ok(())
