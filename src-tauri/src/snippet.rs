@@ -629,9 +629,9 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
 
     // 4. Ledger (Top 5 popular snippets)
     let mut stmt = conn.prepare("
-        SELECT id, user_id, project_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at 
+        SELECT id, user_id, project_id, title, content, language, tags, is_archived, is_favorite, deleted_at, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at 
         FROM snippets 
-        WHERE user_id = ? 
+        WHERE user_id = ? AND deleted_at IS NULL
         ORDER BY copy_count DESC 
         LIMIT 5
     ").map_err(|e| e.to_string())?;
@@ -646,15 +646,17 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
             language: row.get(5)?,
             tags: row.get(6)?,
             is_archived: row.get(7)?,
-            copy_count: row.get(8)?,
-            edit_count: row.get(9)?,
-            detected_patterns: row.get(10)?,
-            impressions: row.get(11)?,
-            clicks: row.get(12)?,
-            last_used_at: row.get(13)?,
-            archive_snoozed_until: row.get(14)?,
-            created_at: Some(row.get(15)?),
-            updated_at: Some(row.get(16)?),
+            is_favorite: row.get(8)?,
+            deleted_at: row.get(9)?,
+            copy_count: row.get(10)?,
+            edit_count: row.get(11)?,
+            detected_patterns: row.get(12)?,
+            impressions: row.get(13)?,
+            clicks: row.get(14)?,
+            last_used_at: row.get(15)?,
+            archive_snoozed_until: row.get(16)?,
+            created_at: Some(row.get(17)?),
+            updated_at: Some(row.get(18)?),
         })
     }).map_err(|e| e.to_string())?;
 
