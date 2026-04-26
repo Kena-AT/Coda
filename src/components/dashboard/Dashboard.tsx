@@ -23,6 +23,9 @@ import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import { ArchiveModal } from './ArchiveModal';
 import { ArchiveView } from './ArchiveView';
+import { TrashRepository } from './TrashRepository';
+import { FavoritesVault } from './FavoritesVault';
+import { MetadataOrchestrator } from './MetadataOrchestrator';
 import { ProjectVault } from './ProjectVault';
 import { IntelligenceDashboard } from './IntelligenceDashboard';
 import { GlobalSearchResults } from './GlobalSearchResults';
@@ -379,6 +382,18 @@ export const Dashboard: React.FC = () => {
           ) : activeTab === 'archive' ? (
             <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
               <ArchiveView />
+            </div>
+          ) : activeTab === 'favorites' ? (
+            <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
+              <FavoritesVault />
+            </div>
+          ) : activeTab === 'tags' ? (
+            <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
+              <MetadataOrchestrator />
+            </div>
+          ) : activeTab === 'trash' ? (
+            <div className="flex-1 flex overflow-hidden min-h-0 bg-[var(--bg-primary)]">
+              <TrashRepository />
             </div>
           ) : (
             <div className="flex-1 flex overflow-hidden">
