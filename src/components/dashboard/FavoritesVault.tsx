@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { useStore } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
-import { Star, Search, Filter, Shield, Activity, Database } from 'lucide-react';
+import { Star, Search, Shield, Activity, Database } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 
 export const FavoritesVault: React.FC = () => {
-  const { snippets, setSelectedSnippetId, searchQuery, activeTab } = useStore();
+  const { snippets, setSelectedSnippetId } = useStore();
   const playSound = useSoundEffect();
   const [localSearch, setLocalSearch] = useState('');
 

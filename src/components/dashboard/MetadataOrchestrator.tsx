@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../store/useStore';
-import { Tag as TagIcon, Plus, X, Edit2, Trash2, Search, Filter, AlertCircle, Info } from 'lucide-react';
+import { Tag as TagIcon, Plus, X, Edit2, Trash2, Search, Filter, Info } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
