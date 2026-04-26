@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useStore } from '../../store/useStore';
-import { Trash2, RotateCcw, Search, Trash, AlertTriangle, Terminal } from 'lucide-react';
+import { Trash2, RotateCcw, Search, Trash, AlertTriangle } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
