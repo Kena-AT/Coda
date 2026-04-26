@@ -53,6 +53,8 @@ pub struct AnalyticsSummary {
     pub db_query_ms: f64,
     pub copy_growth: f64,
     pub db_size_bytes: u64,
+    pub efficiency: f64,
+    pub buffer_status: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -693,6 +695,59 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
     };
     let db_query_ms = state.telemetry.lock().map(|t| t.get_snapshot().db_query_ms).unwrap_or(Some(0.0)).unwrap_or(0.0);
 
+    // 7. Efficiency & Buffer Status Calculation
+    let total_all: i32 = conn.query_row(
+        "SELECT COUNT(*) FROM snippets WHERE user_id = ?",
+        [user_id],
+        |row| row.get(0)
+    ).unwrap_or(0);
+
+    let (efficiency, buffer_status) = if total_all > 0 {
+        let active_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM snippets WHERE user_id = ? AND deleted_at IS NULL",
+            [user_id],
+            |row| row.get(0)
+        ).unwrap_or(0);
+
+        let organized_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM snippets WHERE user_id = ? AND project_id IS NOT NULL AND deleted_at IS NULL",
+            [user_id],
+            |row| row.get(0)
+        ).unwrap_or(0);
+
+        let tagged_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM snippets WHERE user_id = ? AND (tags IS NOT NULL OR id IN (SELECT snippet_id FROM snippet_tags)) AND deleted_at IS NULL",
+            [user_id],
+            |row| row.get(0)
+        ).unwrap_or(0);
+
+        // Efficiency components (weighted)
+        let cleanliness_score = (active_count as f64 / total_all as f64) * 40.0;
+        let organization_score = (organized_count as f64 / active_count.max(1) as f64) * 30.0;
+        let tagging_score = (tagged_count as f64 / active_count.max(1) as f64) * 30.0;
+
+        let mut final_efficiency = cleanliness_score + organization_score + tagging_score;
+        
+        // Performance penalty (DB query time)
+        if db_query_ms > 50.0 {
+            final_efficiency -= (db_query_ms - 50.0) / 10.0;
+        }
+
+        let status = if final_efficiency > 90.0 {
+            "STABLE"
+        } else if final_efficiency > 75.0 {
+            "OPTIMAL"
+        } else if final_efficiency > 50.0 {
+            "DEGRADED"
+        } else {
+            "CRITICAL"
+        };
+
+        (final_efficiency.clamp(0.0, 100.0), status.to_string())
+    } else {
+        (100.0, "STABLE".to_string())
+    };
+
     Ok(AnalyticsSummary {
         global_copies,
         last_entry,
@@ -702,6 +757,8 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
         db_query_ms,
         copy_growth,
         db_size_bytes,
+        efficiency,
+        buffer_status,
     })
 }
 
