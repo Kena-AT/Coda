@@ -26,6 +26,27 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
   const { user, projects, updateSnippetInStore, searchQuery } = useStore();
   const [isMoving, setIsMoving] = useState(false);
   const [tempProjectId, setTempProjectId] = useState<number | null>(snippet.project_id || null);
+  const [isFavoriting, setIsFavoriting] = useState(false);
+
+  const toggleFavorite = async () => {
+    if (!user || !snippet.id || isFavoriting) return;
+    setIsFavoriting(true);
+    try {
+      const response: any = await invoke('toggle_favorite', { 
+        id: snippet.id, 
+        userId: user.id, 
+        isFavorite: !snippet.is_favorite 
+      });
+      if (response.success) {
+        updateSnippetInStore(snippet.id, { is_favorite: !snippet.is_favorite });
+        toast.success(snippet.is_favorite ? 'Removed from favorites' : 'Added to favorites');
+      }
+    } catch (err) {
+      toast.error('Failed to toggle favorite');
+    } finally {
+      setIsFavoriting(false);
+    }
+  };
 
   const copyToClipboard = async () => {
     try {
