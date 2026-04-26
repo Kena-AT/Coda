@@ -41,6 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
     { id: 'analytics', label: 'Analytics', icon: BarChart2 },
     { id: 'tags', label: 'Tags', icon: Tag },
     { id: 'archive', label: 'Archive', icon: Archive },
+    { id: 'trash', label: 'Trash', icon: Trash2 },
   ];
 
   return (
