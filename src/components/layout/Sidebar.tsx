@@ -6,6 +6,7 @@ import {
   BarChart2, 
   Tag, 
   Archive,
+  Trash2,
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
