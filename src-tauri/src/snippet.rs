@@ -14,6 +14,8 @@ pub struct Snippet {
     pub language: String,
     pub tags: Option<String>,
     pub is_archived: bool,
+    pub is_favorite: bool,
+    pub deleted_at: Option<String>,
     pub copy_count: i32,
     pub edit_count: i32,
     pub detected_patterns: Option<String>,
@@ -23,6 +25,16 @@ pub struct Snippet {
     pub archive_snoozed_until: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Tag {
+    pub id: Option<i32>,
+    pub user_id: i32,
+    pub name: String,
+    pub category: Option<String>,
+    pub color: Option<String>,
+    pub created_at: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -58,6 +70,13 @@ pub struct SnippetResponse {
     pub data: Option<Vec<Snippet>>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TagResponse {
+    pub success: bool,
+    pub message: String,
+    pub data: Option<Vec<Tag>>,
+}
+
 #[tauri::command]
 pub fn create_snippet(
     app_handle: AppHandle,
@@ -86,7 +105,7 @@ pub fn create_snippet(
 
     // 3. Validation: Duplicate Title
     let exists: bool = conn.query_row(
-        "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND is_archived = 0)",
+        "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND is_archived = 0 AND deleted_at IS NULL)",
         rusqlite::params![user_id, title],
         |row| row.get(0)
     ).unwrap_or(false);
@@ -123,13 +142,13 @@ pub fn validate_snippet_title(app_handle: AppHandle, user_id: i32, title: String
     let conn = get_db_connection(&app_handle)?;
     let exists: bool = if let Some(id) = exclude_id {
         conn.query_row(
-            "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND id != ? AND is_archived = 0)",
+            "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND id != ? AND is_archived = 0 AND deleted_at IS NULL)",
             rusqlite::params![user_id, title, id],
             |row| row.get(0)
         ).unwrap_or(false)
     } else {
         conn.query_row(
-            "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND is_archived = 0)",
+            "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND is_archived = 0 AND deleted_at IS NULL)",
             rusqlite::params![user_id, title],
             |row| row.get(0)
         ).unwrap_or(false)
@@ -143,10 +162,13 @@ pub fn list_snippets(
     state: State<'_, AppState>,
     user_id: i32,
     include_archived: bool,
+    include_deleted: Option<bool>,
     bypass_cache: Option<bool>
 ) -> Result<SnippetResponse, String> {
-    // Basic cache check (only for main list, not archived for simplicity)
-    if !include_archived && !bypass_cache.unwrap_or(false) {
+    let show_trash = include_deleted.unwrap_or(false);
+
+    // Basic cache check (only for main list, not archived/deleted for simplicity)
+    if !include_archived && !show_trash && !bypass_cache.unwrap_or(false) {
         if let Some(cached) = state.snippet_cache.get(&user_id) {
             return Ok(SnippetResponse {
                 success: true,
@@ -159,11 +181,20 @@ pub fn list_snippets(
     let t0 = Instant::now();
     let conn = get_db_connection(&app_handle)?;
     
-    let mut stmt = if include_archived {
-        conn.prepare("SELECT id, user_id, project_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ? ORDER BY updated_at DESC")
+    let mut query = "SELECT id, user_id, project_id, title, content, language, tags, is_archived, is_favorite, deleted_at, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ?".to_string();
+
+    if show_trash {
+        query.push_str(" AND deleted_at IS NOT NULL");
     } else {
-        conn.prepare("SELECT id, user_id, project_id, title, content, language, tags, is_archived, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ? AND is_archived = 0 ORDER BY updated_at DESC")
-    }.map_err(|e| e.to_string())?;
+        query.push_str(" AND deleted_at IS NULL");
+        if !include_archived {
+            query.push_str(" AND is_archived = 0");
+        }
+    }
+    
+    query.push_str(" ORDER BY updated_at DESC");
+
+    let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
 
     let snippet_iter = stmt.query_map([user_id], |row| {
         Ok(Snippet {
@@ -175,15 +206,17 @@ pub fn list_snippets(
             language: row.get(5)?,
             tags: row.get(6)?,
             is_archived: row.get(7)?,
-            copy_count: row.get(8)?,
-            edit_count: row.get(9)?,
-            detected_patterns: row.get(10)?,
-            impressions: row.get(11)?,
-            clicks: row.get(12)?,
-            last_used_at: row.get(13)?,
-            archive_snoozed_until: row.get(14)?,
-            created_at: Some(row.get(15)?),
-            updated_at: Some(row.get(16)?),
+            is_favorite: row.get(8)?,
+            deleted_at: row.get(9)?,
+            copy_count: row.get(10)?,
+            edit_count: row.get(11)?,
+            detected_patterns: row.get(12)?,
+            impressions: row.get(13)?,
+            clicks: row.get(14)?,
+            last_used_at: row.get(15)?,
+            archive_snoozed_until: row.get(16)?,
+            created_at: Some(row.get(17)?),
+            updated_at: Some(row.get(18)?),
         })
     }).map_err(|e| e.to_string())?;
 
@@ -193,7 +226,7 @@ pub fn list_snippets(
     }
 
     // Populate cache for main list
-    if !include_archived {
+    if !include_archived && !show_trash {
         state.snippet_cache.insert(user_id, snippets.clone());
     }
 
@@ -262,7 +295,7 @@ pub fn update_snippet(
 
     // 3. Validation: Duplicate Title
     let exists: bool = tx.query_row(
-        "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND id != ? AND is_archived = 0)",
+        "SELECT EXISTS(SELECT 1 FROM snippets WHERE user_id = ? AND title = ? AND id != ? AND is_archived = 0 AND deleted_at IS NULL)",
         rusqlite::params![user_id, title, id],
         |row| row.get(0)
     ).unwrap_or(false);
@@ -299,18 +332,82 @@ pub fn update_snippet(
 pub fn delete_snippet(app_handle: AppHandle, state: State<'_, AppState>, user_id: i32, id: i32) -> Result<SnippetResponse, String> {
     let conn = get_db_connection(&app_handle)?;
     
-    match conn.execute("DELETE FROM snippets WHERE id = ?", [id]) {
+    // Soft delete: set deleted_at to CURRENT_TIMESTAMP
+    match conn.execute("UPDATE snippets SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?", [id]) {
         Ok(_) => {
             state.snippet_cache.remove(&user_id);
             Ok(SnippetResponse {
                 success: true,
-                message: "Snippet deleted successfully".to_string(),
+                message: "Snippet moved to trash".to_string(),
                 data: None,
             })
         },
         Err(e) => Ok(SnippetResponse {
             success: false,
-            message: format!("Failed to delete snippet: {}", e),
+            message: format!("Failed to move snippet to trash: {}", e),
+            data: None,
+        }),
+    }
+}
+
+#[tauri::command]
+pub fn restore_snippet(app_handle: AppHandle, state: State<'_, AppState>, user_id: i32, id: i32) -> Result<SnippetResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    match conn.execute("UPDATE snippets SET deleted_at = NULL WHERE id = ?", [id]) {
+        Ok(_) => {
+            state.snippet_cache.remove(&user_id);
+            Ok(SnippetResponse {
+                success: true,
+                message: "Snippet restored successfully".to_string(),
+                data: None,
+            })
+        },
+        Err(e) => Ok(SnippetResponse {
+            success: false,
+            message: format!("Failed to restore snippet: {}", e),
+            data: None,
+        }),
+    }
+}
+
+#[tauri::command]
+pub fn permanently_delete_snippet(app_handle: AppHandle, state: State<'_, AppState>, user_id: i32, id: i32) -> Result<SnippetResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    match conn.execute("DELETE FROM snippets WHERE id = ?", [id]) {
+        Ok(_) => {
+            state.snippet_cache.remove(&user_id);
+            Ok(SnippetResponse {
+                success: true,
+                message: "Snippet permanently deleted".to_string(),
+                data: None,
+            })
+        },
+        Err(e) => Ok(SnippetResponse {
+            success: false,
+            message: format!("Failed to permanently delete snippet: {}", e),
+            data: None,
+        }),
+    }
+}
+
+#[tauri::command]
+pub fn toggle_favorite(app_handle: AppHandle, state: State<'_, AppState>, user_id: i32, id: i32, favorite: bool) -> Result<SnippetResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    match conn.execute("UPDATE snippets SET is_favorite = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", rusqlite::params![favorite, id]) {
+        Ok(_) => {
+            state.snippet_cache.remove(&user_id);
+            Ok(SnippetResponse {
+                success: true,
+                message: if favorite { "Snippet added to favorites" } else { "Snippet removed from favorites" }.to_string(),
+                data: None,
+            })
+        },
+        Err(e) => Ok(SnippetResponse {
+            success: false,
+            message: format!("Failed to toggle favorite status: {}", e),
             data: None,
         }),
     }
