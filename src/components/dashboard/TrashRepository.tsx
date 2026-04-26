@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useStore } from '../../store/useStore';
 import { Trash2, RotateCcw, Search, Trash, AlertTriangle } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
