@@ -7,6 +7,7 @@ import {
   ChevronRight,
   FolderInput,
   Check,
+  Star,
   X
 } from 'lucide-react';
 import { Snippet, useStore } from '../../store/useStore';
@@ -137,6 +138,14 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
         </div>
         
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+          <button 
+            onClick={toggleFavorite}
+            disabled={isFavoriting}
+            className={`p-1.5 transition-colors ${snippet.is_favorite ? 'text-yellow-400' : 'text-[#adaaad] hover:text-yellow-400'}`}
+            title={snippet.is_favorite ? "Remove from Favorites" : "Add to Favorites"}
+          >
+            <Star className="w-3.5 h-3.5" fill={snippet.is_favorite ? "currentColor" : "none"} />
+          </button>
           <button 
             onClick={copyToClipboard}
             className="p-1.5 text-[#adaaad] hover:text-[var(--accent)] transition-colors"
