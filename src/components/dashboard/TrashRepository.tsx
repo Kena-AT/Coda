@@ -12,6 +12,21 @@ export const TrashRepository: React.FC = () => {
   const [localSearch, setLocalSearch] = useState('');
   const [snippetToRestore, setSnippetToRestore] = useState<number | null>(null);
   const [snippetToPurge, setSnippetToPurge] = useState<number | null>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
+
+  const fetchAnalytics = async () => {
+    if (!user) return;
+    try {
+      const resp: any = await invoke('get_analytics_summary', { userId: user.id });
+      setAnalytics(resp);
+    } catch (e) {
+      console.error('Failed to fetch analytics', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [user]);
 
   const trashedSnippets = useMemo(() => {
     return snippets.filter(s => s && s.deleted_at && 
