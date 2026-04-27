@@ -22,7 +22,6 @@ import {
 import { RollbackConfirmModal } from './RollbackConfirmModal';
 import { ProjectLinkingPanel } from './ProjectLinkingPanel';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
-import { soundService } from '../../utils/sounds';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AnimatePresence, motion } from 'framer-motion';
