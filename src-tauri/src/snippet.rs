@@ -25,6 +25,7 @@ pub struct Snippet {
     pub archive_snoozed_until: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+    pub tag_nodes: Option<Vec<Tag>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -233,12 +234,40 @@ pub fn list_snippets(
             archive_snoozed_until: row.get(16)?,
             created_at: Some(row.get(17)?),
             updated_at: Some(row.get(18)?),
+            tag_nodes: None, // Will be populated in the loop
         })
     }).map_err(|e| e.to_string())?;
 
     let mut snippets = Vec::new();
-    for snippet in snippet_iter {
-        snippets.push(snippet.map_err(|e| e.to_string())?);
+    for snippet_result in snippet_iter {
+        let mut snippet = snippet_result.map_err(|e| e.to_string())?;
+        
+        // Fetch detailed tag nodes for this snippet
+        if let Some(sid) = snippet.id {
+            let mut tag_stmt = conn.prepare("
+                SELECT t.id, t.user_id, t.name, t.category, t.color, t.created_at
+                FROM tags t
+                JOIN snippet_tags st ON t.id = st.tag_id
+                WHERE st.snippet_id = ?
+            ").map_err(|e| e.to_string())?;
+
+            let tag_nodes: Vec<Tag> = tag_stmt.query_map([sid], |row| {
+                Ok(Tag {
+                    id: Some(row.get(0)?),
+                    user_id: row.get(1)?,
+                    name: row.get(2)?,
+                    category: row.get(3)?,
+                    color: row.get(4)?,
+                    created_at: Some(row.get(5)?),
+                })
+            }).map_err(|e| e.to_string())?
+              .collect::<Result<Vec<_>, _>>()
+              .map_err(|e| e.to_string())?;
+
+            snippet.tag_nodes = Some(tag_nodes);
+        }
+        
+        snippets.push(snippet);
     }
 
     // Populate cache for main list
@@ -681,6 +710,7 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
             archive_snoozed_until: row.get(16)?,
             created_at: Some(row.get(17)?),
             updated_at: Some(row.get(18)?),
+            tag_nodes: None,
         })
     }).map_err(|e| e.to_string())?;
 
