@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useStore, Snippet } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
-import { Flame, Clock, Archive, Activity, Folder, Copy } from 'lucide-react';
+import { Flame, Clock, Archive, Activity, Folder, Copy, Search } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
