@@ -66,53 +66,53 @@ export const TrashRepository: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 h-full bg-[#131313] flex flex-col overflow-hidden font-main relative">
+    <div className="flex-1 h-full bg-[var(--bg-primary)] flex flex-col overflow-hidden font-main relative">
       {/* Decorative Grid Lines */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-5">
-        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(#e60000 1px, transparent 1px), linear-gradient(90deg, #e60000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(var(--accent) 1px, transparent 1px), linear-gradient(90deg, var(--accent) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
       <main className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar relative z-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-12 border-b border-[#5f3f3a] pb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-12 border-b border-[var(--border)] pb-6">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-[#e60000]" />
-              <span className="text-[10px] font-mono text-[#adaaad] tracking-[2px] uppercase">Node_ID: 0x8842_RED_TRASH</span>
+              <div className="w-2 h-2 bg-[var(--accent)]" />
+              <span className="text-[10px] font-mono text-[var(--text-secondary)] tracking-[2px] uppercase">Node_ID: 0x8842_RED_TRASH</span>
             </div>
-            <h1 className="text-4xl md:text-[56px] font-bold text-white tracking-[-2px] uppercase leading-tight">Trash Repository</h1>
+            <h1 className="text-4xl md:text-[56px] font-bold text-white tracking-header uppercase leading-tight">Trash Repository</h1>
           </div>
 
           <div className="relative w-full md:w-80 group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#adaaad] group-focus-within:text-[#e60000] transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)] group-focus-within:text-[var(--accent)] transition-colors" />
             <input 
               type="text" 
               value={localSearch}
               onChange={e => setLocalSearch(e.target.value)}
               placeholder="FILTER_TRASH_NODES..."
-              className="w-full bg-[#0e0e0e] border border-[#353534] pl-10 pr-4 py-3 text-white text-[11px] uppercase font-mono outline-none focus:border-[#e60000] transition-all"
+              className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] pl-10 pr-4 py-3 text-white text-[11px] uppercase font-mono outline-none focus:border-[var(--accent)] transition-all"
             />
           </div>
         </div>
 
         {/* Warning Banner */}
-        <div className="bg-[#93000a] border-l-8 border-[#e60000] p-6 mb-8 flex items-center gap-4">
-          <AlertTriangle className="text-white shrink-0" size={32} />
+        <div className="bg-[var(--accent)]/20 border-l-8 border-[var(--accent)] p-6 mb-8 flex items-center gap-4">
+          <AlertTriangle className="text-[var(--accent)] shrink-0" size={32} />
           <div>
             <h3 className="text-white font-bold text-sm uppercase tracking-wider">Critical Warning: Volatile Storage</h3>
-            <p className="text-[#ff9999] font-mono text-[10px] uppercase">Nodes in this repository are queued for total deletion. Memory recovery is only possible before terminal purge.</p>
+            <p className="text-[var(--text-secondary)] font-mono text-[10px] uppercase">Nodes in this repository are queued for total deletion. Memory recovery is only possible before terminal purge.</p>
           </div>
         </div>
 
         {/* Table Container */}
-        <div className="bg-[#0e0e0e] border border-[#353534] overflow-hidden">
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border)] overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#353534] bg-[#1a1a1a]">
-                <th className="px-6 py-4 text-[10px] font-mono text-[#adaaad] uppercase tracking-wider">Node_ID</th>
-                <th className="px-6 py-4 text-[10px] font-mono text-[#adaaad] uppercase tracking-wider">Title / Language</th>
-                <th className="px-6 py-4 text-[10px] font-mono text-[#adaaad] uppercase tracking-wider">Deleted_At</th>
-                <th className="px-6 py-4 text-[10px] font-mono text-[#adaaad] uppercase tracking-wider text-right">Actions</th>
+              <tr className="border-b border-[var(--border)] bg-white/5">
+                <th className="px-6 py-4 text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-wider">Node_ID</th>
+                <th className="px-6 py-4 text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-wider">Title / Language</th>
+                <th className="px-6 py-4 text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-wider">Deleted_At</th>
+                <th className="px-6 py-4 text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -127,31 +127,31 @@ export const TrashRepository: React.FC = () => {
                 </tr>
               ) : (
                 trashedSnippets.map((snippet) => (
-                  <tr key={snippet.id} className="border-b border-[#353534]/50 hover:bg-[#e60000]/5 transition-colors group">
-                    <td className="px-6 py-4 font-mono text-[10px] text-[#5f3f3a]">
+                  <tr key={snippet.id} className="border-b border-[var(--border)]/50 hover:bg-[var(--accent)]/5 transition-colors group">
+                    <td className="px-6 py-4 font-mono text-[10px] text-[var(--text-secondary)]">
                       0x{snippet.id?.toString(16).toUpperCase()}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
                         <span className="text-white font-bold text-xs uppercase">{snippet.title}</span>
-                        <span className="text-[#adaaad] font-mono text-[9px] uppercase">{snippet.language}</span>
+                        <span className="text-[var(--text-secondary)] font-mono text-[9px] uppercase">{snippet.language}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-[10px] text-[#adaaad]">
+                    <td className="px-6 py-4 font-mono text-[10px] text-[var(--text-secondary)]">
                       {snippet.deleted_at ? new Date(snippet.deleted_at).toLocaleString() : 'N/A'}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-3">
                         <button 
                           onClick={() => setSnippetToRestore(snippet.id!)}
-                          className="flex items-center gap-2 px-3 py-1.5 border border-[#353534] hover:border-[#15ff00] hover:text-[#15ff00] transition-all text-[#adaaad] font-mono text-[9px] uppercase"
+                          className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all text-[var(--text-secondary)] font-mono text-[9px] uppercase"
                         >
                           <RotateCcw size={12} />
                           <span>Restore</span>
                         </button>
                         <button 
                           onClick={() => setSnippetToPurge(snippet.id!)}
-                          className="flex items-center gap-2 px-3 py-1.5 border border-[#353534] hover:border-[#e60000] hover:text-[#e60000] transition-all text-[#adaaad] font-mono text-[9px] uppercase"
+                          className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all text-[var(--text-secondary)] font-mono text-[9px] uppercase"
                         >
                           <Trash size={12} />
                           <span>Purge</span>
@@ -166,26 +166,26 @@ export const TrashRepository: React.FC = () => {
         </div>
 
         {/* Bento Footer */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 mt-12 border border-[#353534] bg-[#353534]">
-          <div className="bg-[#201f1f] p-6 border-l-2 border-[#e60000]">
-            <h4 className="text-[#e60000] font-bold text-[10px] uppercase mb-2">Trash_Statistics</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 mt-12 border border-[var(--border)] bg-[var(--border)]">
+          <div className="bg-[var(--bg-secondary)] p-6 border-l-2 border-[var(--accent)]">
+            <h4 className="text-[var(--accent)] font-bold text-[10px] uppercase mb-2">Trash_Statistics</h4>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl text-white font-bold">{trashedSnippets.length}</span>
-              <span className="text-[9px] text-[#adaaad] uppercase font-mono">Nodes_Queued</span>
+              <span className="text-[9px] text-[var(--text-secondary)] uppercase font-mono">Nodes_Queued</span>
             </div>
           </div>
-          <div className="bg-[#201f1f] p-6">
-            <h4 className="text-[#adaaad] font-bold text-[10px] uppercase mb-2">Memory_Leakage</h4>
+          <div className="bg-[var(--bg-secondary)] p-6">
+            <h4 className="text-[var(--text-secondary)] font-bold text-[10px] uppercase mb-2">Memory_Leakage</h4>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl text-white font-bold">0.00%</span>
-              <span className="text-[9px] text-[#adaaad] uppercase font-mono">No_Data_Loss</span>
+              <span className="text-[9px] text-[var(--text-secondary)] uppercase font-mono">No_Data_Loss</span>
             </div>
           </div>
-          <div className="bg-[#201f1f] p-6">
-            <h4 className="text-[#adaaad] font-bold text-[10px] uppercase mb-2">Buffer_Status</h4>
+          <div className="bg-[var(--bg-secondary)] p-6">
+            <h4 className="text-[var(--text-secondary)] font-bold text-[10px] uppercase mb-2">Buffer_Status</h4>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl text-white font-bold">{analytics?.buffer_status || 'STABLE'}</span>
-              <span className="text-[9px] text-[#adaaad] uppercase font-mono">{analytics?.efficiency?.toFixed(2) || '98.00'}%_Efficiency</span>
+              <span className="text-[9px] text-[var(--text-secondary)] uppercase font-mono">{analytics?.efficiency?.toFixed(2) || '98.00'}%_Efficiency</span>
             </div>
           </div>
         </div>
@@ -198,7 +198,7 @@ export const TrashRepository: React.FC = () => {
       </div>
 
       {/* Modals */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {snippetToRestore !== null && (
           <RestoreModal 
             id={snippetToRestore} 
@@ -229,33 +229,33 @@ const RestoreModal: React.FC<{ id: number; onConfirm: () => void; onCancel: () =
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0 }}
-      className="bg-[#0e0e0e] border-l-4 border-[#e60000] shadow-[0_0_43px_#e6000033] w-full max-w-lg overflow-hidden"
+      className="bg-[var(--bg-secondary)] border-l-4 border-[var(--accent)] shadow-[0_0_43px_var(--accent-glow)] w-full max-w-lg overflow-hidden"
     >
-      <div className="bg-[#353534] px-4 py-2 flex justify-between items-center">
+      <div className="bg-[var(--border)] px-4 py-2 flex justify-between items-center">
         <span className="text-[10px] font-mono text-white font-bold uppercase tracking-widest">PROTOCOL: RESTORE_CONFIRMATION</span>
-        <div className="w-2 h-2 bg-[#e60000] animate-pulse" />
+        <div className="w-2 h-2 bg-[var(--accent)] animate-pulse" />
       </div>
       <div className="p-10 flex flex-col gap-6">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-[#e60000]/10 text-[#e60000]">
+          <div className="p-3 bg-[var(--accent)]/10 text-[var(--accent)]">
             <RotateCcw size={24} />
           </div>
           <div className="flex flex-col gap-2">
             <h2 className="text-white font-bold text-xl uppercase tracking-tighter">Initiate Recovery?</h2>
-            <p className="text-[#adaaad] font-mono text-[11px] uppercase leading-relaxed">
+            <p className="text-[var(--text-secondary)] font-mono text-[11px] uppercase leading-relaxed">
               System will attempt to reintegrate the selected node into the active library. 
               All associated metadata and version history will be restored to the primary vault.
             </p>
           </div>
         </div>
 
-        <div className="bg-[#0a0a0a] border border-[#5f3f3a33] p-4 font-mono text-[9px] text-[#5f3f3a]">
+        <div className="bg-black border border-[var(--border)] p-4 font-mono text-[9px] text-[var(--text-secondary)]">
           <div className="flex gap-2 mb-1">
-            <span className="text-[#e60000] font-bold">{">"}</span>
+            <span className="text-[var(--accent)] font-bold">{">"}</span>
             <span>RESTORE --NODE_ID 0x4821</span>
           </div>
           <div className="flex gap-2">
-            <span className="text-[#e60000] font-bold">{">"}</span>
+            <span className="text-[var(--accent)] font-bold">{">"}</span>
             <span>VERIFYING_INTEGRITY... OK</span>
           </div>
         </div>
@@ -263,13 +263,13 @@ const RestoreModal: React.FC<{ id: number; onConfirm: () => void; onCancel: () =
         <div className="flex justify-end gap-4 mt-4">
           <button 
             onClick={onCancel}
-            className="px-6 py-2 border border-[#353534] text-[#adaaad] font-mono text-[10px] uppercase hover:bg-white/5 transition-all"
+            className="px-6 py-2 border border-[var(--border)] text-[var(--text-secondary)] font-mono text-[10px] uppercase hover:bg-white/5 transition-all"
           >
             Cancel
           </button>
           <button 
             onClick={onConfirm}
-            className="px-8 py-2 bg-[#e60000] text-white font-bold font-main text-[10px] uppercase hover:bg-[#ff0000] transition-all shadow-[0_0_20px_#e6000066]"
+            className="px-8 py-2 bg-[var(--accent)] text-white font-bold font-main text-[10px] uppercase hover:bg-[var(--accent-secondary)] transition-all shadow-[0_0_20px_var(--accent-glow)]"
           >
             Confirm Restore
           </button>
@@ -290,11 +290,11 @@ const PurgeModal: React.FC<{ id: number; onConfirm: () => void; onCancel: () => 
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0 }}
-      className="bg-[#0e0e0e] border-l-4 border-[#e60000] shadow-[0_0_43px_#e6000033] w-full max-w-lg overflow-hidden"
+      className="bg-[var(--bg-secondary)] border-l-4 border-[var(--accent)] shadow-[0_0_43px_var(--accent-glow)] w-full max-w-lg overflow-hidden"
     >
-      <div className="bg-[#353534] px-4 py-2 flex justify-between items-center">
+      <div className="bg-[var(--border)] px-4 py-2 flex justify-between items-center">
         <span className="text-[10px] font-mono text-white font-bold uppercase tracking-widest">PROTOCOL: TERMINAL_PURGE</span>
-        <div className="w-2 h-2 bg-[#e60000] animate-pulse" />
+        <div className="w-2 h-2 bg-[var(--accent)] animate-pulse" />
       </div>
       <div className="p-10 flex flex-col gap-6">
         <div className="flex items-start gap-4">
@@ -312,13 +312,13 @@ const PurgeModal: React.FC<{ id: number; onConfirm: () => void; onCancel: () => 
         <div className="flex justify-end gap-4 mt-4">
           <button 
             onClick={onCancel}
-            className="px-6 py-2 border border-[#353534] text-[#adaaad] font-mono text-[10px] uppercase hover:bg-white/5 transition-all"
+            className="px-6 py-2 border border-[var(--border)] text-[var(--text-secondary)] font-mono text-[10px] uppercase hover:bg-white/5 transition-all"
           >
             Cancel
           </button>
           <button 
             onClick={onConfirm}
-            className="px-8 py-2 bg-[#e60000] text-white font-bold font-main text-[10px] uppercase hover:bg-[#ff0000] transition-all shadow-[0_0_20px_#e6000066]"
+            className="px-8 py-2 bg-[var(--accent)] text-white font-bold font-main text-[10px] uppercase hover:bg-[var(--accent-secondary)] transition-all shadow-[0_0_20px_var(--accent-glow)]"
           >
             Purge Permanently
           </button>
