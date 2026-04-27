@@ -300,7 +300,7 @@ export const IntelligenceDashboard: React.FC = () => {
               <div className="flex flex-col gap-1">
                   <span className="text-[9px] font-mono text-[#adaaad] uppercase">Buffer_Stability</span>
                   <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${analytics?.efficiency > 70 ? 'bg-[#15ff00]' : 'bg-[#e60000]'} animate-pulse`} />
+                      <div className={`w-2 h-2 rounded-full ${analytics?.efficiency > 70 ? 'bg-[#15ff00]' : 'bg-[var(--accent)]'} animate-pulse`} />
                       <span className="text-xl font-bold text-white uppercase">{analytics?.buffer_status || 'STABLE'}</span>
                   </div>
               </div>
