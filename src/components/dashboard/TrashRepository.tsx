@@ -298,7 +298,7 @@ const PurgeModal: React.FC<{ id: number; onConfirm: () => void; onCancel: () => 
       </div>
       <div className="p-10 flex flex-col gap-6">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-[#e60000]/10 text-[#e60000]">
+          <div className="p-3 bg-[var(--accent)]/10 text-[var(--accent)]">
             <Trash2 size={24} />
           </div>
           <div className="flex flex-col gap-2">

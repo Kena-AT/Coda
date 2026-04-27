@@ -24,7 +24,7 @@ export const MetadataOrchestrator: React.FC = () => {
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   
   const [tagName, setTagName] = useState('');
-  const [tagColor, setTagColor] = useState('#e60000');
+  const [tagColor, setTagColor] = useState('var(--accent)');
   const [tagCategory, setTagCategory] = useState('GENERAL');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,7 +116,7 @@ export const MetadataOrchestrator: React.FC = () => {
   const startEdit = (tag: Tag) => {
     setEditingTag(tag);
     setTagName(tag.name);
-    setTagColor(tag.color || '#e60000');
+    setTagColor(tag.color || 'var(--accent)');
     setTagCategory(tag.category || 'GENERAL');
     setIsCreating(true);
   };

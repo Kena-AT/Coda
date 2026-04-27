@@ -470,6 +470,17 @@ export const SnippetEditor: React.FC = () => {
                    <option value="json">JSON</option>
                  </select>
                </div>
+
+               <div className="flex flex-col gap-1 flex-1 md:w-48">
+                 <span className="text-[9px] font-mono text-[#adaaad] uppercase">Tags</span>
+                 <input 
+                   type="text"
+                   value={snippet.tags || ''}
+                   onChange={e => setSnippet({...snippet, tags: e.target.value})}
+                   placeholder="react, api"
+                   className="bg-[#1c1b1b] border border-[var(--border)]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[var(--accent)] transition-colors w-full"
+                 />
+               </div>
              </div>
           </div>
         </div>
