@@ -153,16 +153,32 @@ export const MetadataOrchestrator: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#adaaad]" />
                 <input 
                   type="text" 
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
                   placeholder="QUERY_TAXONOMY..."
                   className="w-full bg-[#151515] border border-[#353534] pl-10 pr-4 py-2.5 text-white text-[10px] uppercase font-mono outline-none focus:border-[#e60000]/50 transition-all"
                 />
               </div>
 
               <div className="flex flex-col gap-4">
-                <span className="text-[9px] font-mono text-[#5f3f3a] uppercase">Active_Categories</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-mono text-[#5f3f3a] uppercase">Active_Categories</span>
+                  {selectedCategory && (
+                    <button 
+                      onClick={() => setSelectedCategory(null)}
+                      className="text-[8px] font-mono text-[#e60000] uppercase hover:underline"
+                    >
+                      Clear_Filter
+                    </button>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
-                  {['GENERAL', 'LOGIC', 'INTERFACE', 'BACKEND', 'STYLE'].map(cat => (
-                    <button key={cat} className="px-3 py-1 bg-[#151515] border border-[#353534] text-[#adaaad] text-[8px] uppercase font-mono hover:text-[#e60000] hover:border-[#e60000]/30 transition-all">
+                  {categories.map(cat => (
+                    <button 
+                      key={cat} 
+                      onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
+                      className={`px-3 py-1 border transition-all text-[8px] uppercase font-mono ${selectedCategory === cat ? 'bg-[#e60000] border-[#e60000] text-white shadow-[0_0_10px_rgba(230,0,0,0.3)]' : 'bg-[#151515] border-[#353534] text-[#adaaad] hover:text-[#e60000] hover:border-[#e60000]/30'}`}
+                    >
                       {cat}
                     </button>
                   ))}
@@ -191,7 +207,7 @@ export const MetadataOrchestrator: React.FC = () => {
                <div className="flex items-center justify-between mb-8">
                  <div className="flex flex-col gap-1">
                    <h2 className="text-white font-bold text-xl uppercase tracking-tight">Taxonomy_Grid</h2>
-                   <span className="text-[9px] font-mono text-[#5f3f3a] uppercase">Registry_Count: {tags.length}_NODES_ACTIVE</span>
+                   <span className="text-[9px] font-mono text-[#5f3f3a] uppercase">Registry_Count: {filteredTags.length}_NODES_MATCHED // Total: {tags.length}</span>
                  </div>
                </div>
 
@@ -202,14 +218,14 @@ export const MetadataOrchestrator: React.FC = () => {
                    </div>
                    <span className="text-[10px] font-mono text-[#adaaad] uppercase">Syncing_Registry...</span>
                  </div>
-               ) : tags.length === 0 ? (
+               ) : filteredTags.length === 0 ? (
                  <div className="flex flex-col items-center justify-center h-[400px] gap-4 border border-dashed border-[#353534]">
                    <TagIcon size={48} className="text-[#353534]" />
                    <span className="text-[10px] font-mono text-[#adaaad] uppercase">No_Metadata_Nodes_Detected</span>
                  </div>
                ) : (
                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                   {tags.map(tag => (
+                   {filteredTags.map(tag => (
                      <div 
                        key={tag.id} 
                        className="group bg-[#151515] border border-[#353534] p-4 flex flex-col gap-3 hover:border-[#e60000]/50 transition-all relative"
