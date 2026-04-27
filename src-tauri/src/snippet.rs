@@ -118,11 +118,25 @@ pub fn create_snippet(
     
     let detected_patterns = crate::patterns::get_pattern_tags_json(&content);
     
-    match conn.execute(
+    let mut conn = get_db_connection(&app_handle)?;
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+
+    match tx.execute(
         "INSERT INTO snippets (user_id, title, content, language, tags, detected_patterns, project_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params![user_id, title, content, language, tags, detected_patterns, project_id],
     ) {
         Ok(_) => {
+            let snippet_id = tx.last_insert_rowid() as i32;
+            
+            // Sync tags to metadata tables
+            if let Some(ref t) = tags {
+                if let Err(e) = sync_snippet_metadata(&tx, snippet_id, user_id, t) {
+                    println!("Failed to sync metadata: {}", e);
+                }
+            }
+            
+            tx.commit().map_err(|e| e.to_string())?;
+            
             // Invalidate cache on write
             state.snippet_cache.remove(&user_id);
             Ok(SnippetResponse {
@@ -313,6 +327,14 @@ pub fn update_snippet(
         "UPDATE snippets SET title = ?, content = ?, language = ?, tags = ?, updated_at = CURRENT_TIMESTAMP, edit_count = edit_count + 1, detected_patterns = ?, project_id = ? WHERE id = ? AND user_id = ?",
         rusqlite::params![title, content, language, tags, detected_patterns, project_id, id, user_id]
     ).map_err(|e| e.to_string())?;
+
+    // Sync tags to metadata tables
+    if let Some(ref t) = tags {
+        let _ = tx.execute("DELETE FROM snippet_tags WHERE snippet_id = ?", [id]);
+        if let Err(e) = sync_snippet_metadata(&tx, id, user_id, t) {
+            println!("Failed to sync metadata: {}", e);
+        }
+    }
 
     if let Err(e) = tx.commit() {
         return Ok(SnippetResponse { success: false, message: format!("CRITICAL_ERROR: {}", e), data: None });
@@ -839,4 +861,58 @@ pub fn remove_tag_from_snippet(app_handle: AppHandle, snippet_id: i32, tag_id: i
 pub fn purge_snippet_cache(state: tauri::State<'_, crate::AppState>) -> Result<(), String> {
     state.snippet_cache.clear();
     Ok(())
+}
+
+fn sync_snippet_metadata(conn: &rusqlite::Connection, snippet_id: i32, user_id: i32, tags_str: &str) -> Result<(), rusqlite::Error> {
+    let tags: Vec<&str> = tags_str.split(',')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    for tag_name in tags {
+        let tag_name_upper = tag_name.to_uppercase();
+        
+        // 1. Ensure tag exists in 'tags' table
+        conn.execute(
+            "INSERT OR IGNORE INTO tags (user_id, name, category, color) VALUES (?, ?, ?, ?)",
+            rusqlite::params![user_id, tag_name_upper, "GENERAL", "#e60000"],
+        )?;
+
+        // 2. Get the tag id
+        let tag_id: i32 = conn.query_row(
+            "SELECT id FROM tags WHERE user_id = ? AND name = ?",
+            rusqlite::params![user_id, tag_name_upper],
+            |row| row.get(0),
+        )?;
+
+        // 3. Link tag to snippet
+        conn.execute(
+            "INSERT OR IGNORE INTO snippet_tags (snippet_id, tag_id) VALUES (?, ?)",
+            rusqlite::params![snippet_id, tag_id],
+        )?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn sync_all_metadata(app_handle: AppHandle, user_id: i32) -> Result<SnippetResponse, String> {
+    let conn = get_db_connection(&app_handle)?;
+    
+    let mut stmt = conn.prepare("SELECT id, tags FROM snippets WHERE user_id = ? AND tags IS NOT NULL AND tags != ''")
+        .map_err(|e| e.to_string())?;
+        
+    let snippet_iter = stmt.query_map([user_id], |row| {
+        Ok((row.get::<_, i32>(0)?, row.get::<_, String>(1)?))
+    }).map_err(|e| e.to_string())?;
+
+    for snippet in snippet_iter {
+        let (id, tags_str) = snippet.map_err(|e| e.to_string())?;
+        sync_snippet_metadata(&conn, id, user_id, &tags_str).map_err(|e| e.to_string())?;
+    }
+
+    Ok(SnippetResponse {
+        success: true,
+        message: "METADATA_SYNCHRONIZATION_COMPLETE".to_string(),
+        data: None,
+    })
 }
