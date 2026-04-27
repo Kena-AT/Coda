@@ -224,14 +224,33 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
 
       {/* Footer */}
       <div className="flex justify-between items-center pt-3 border-t border-[var(--border)]/50 relative z-10">
-        <div className="flex items-center gap-2 overflow-hidden max-w-[70%]">
-          {snippet.tags && snippet.tags.split(',').slice(0, 2).map((tag, i) => (
-            <span key={i} className="text-[8px] text-[#adaaad] py-0.5 px-1.5 bg-[var(--border)] border border-white/5 truncate">
-              {tag.trim().toUpperCase()}
-            </span>
-          ))}
-          {snippet.tags && snippet.tags.split(',').length > 2 && (
-            <span className="text-[8px] text-[#adaaad] opacity-50">+{snippet.tags.split(',').length - 2}</span>
+        <div className="flex items-center gap-2 overflow-hidden max-w-[75%]">
+          {snippet.tag_nodes && snippet.tag_nodes.length > 0 ? (
+            snippet.tag_nodes.slice(0, 3).map((tag, i) => (
+              <div key={i} className="flex items-center gap-1.5 px-2 py-0.5 bg-black/40 border border-white/5 rounded-sm">
+                <div 
+                  className="w-1 h-1 rounded-full shadow-[0_0_5px_rgba(255,255,255,0.2)]" 
+                  style={{ backgroundColor: tag.color || 'var(--accent)' }} 
+                />
+                <span className="text-[8px] font-mono text-white/80 tracking-wider">
+                  {tag.name.toUpperCase()}
+                  {tag.category && (
+                    <span className="ml-1 text-[#5f3f3a] text-[7px] hidden group-hover:inline">[{tag.category}]</span>
+                  )}
+                </span>
+              </div>
+            ))
+          ) : (
+            <>
+              {snippet.tags && snippet.tags.split(',').slice(0, 2).map((tag, i) => (
+                <span key={i} className="text-[8px] text-[#adaaad] py-0.5 px-1.5 bg-[var(--border)] border border-white/5 truncate">
+                  {tag.trim().toUpperCase()}
+                </span>
+              ))}
+            </>
+          )}
+          {(snippet.tag_nodes?.length || 0) > 3 && (
+            <span className="text-[8px] text-[#adaaad] opacity-50">+{snippet.tag_nodes!.length - 3}</span>
           )}
         </div>
         <div className="flex items-center gap-1.5 text-[#adaaad] group-hover:text-white transition-colors cursor-pointer" onClick={onEdit}>
