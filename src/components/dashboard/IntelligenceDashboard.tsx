@@ -15,6 +15,7 @@ export const IntelligenceDashboard: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [availableTags, setAvailableTags] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [localSearch, setLocalSearch] = useState('');
 
   const categories = useMemo(() => {
     const cats = new Set(availableTags.map(t => t.category || 'GENERAL'));
@@ -109,6 +110,15 @@ export const IntelligenceDashboard: React.FC = () => {
       unarchived = unarchived.filter(s => s.tags?.split(',').map((t: string) => t.trim().toUpperCase()).includes(selectedTag.toUpperCase()));
     }
     
+    if (localSearch) {
+      const q = localSearch.toLowerCase();
+      unarchived = unarchived.filter(s => 
+        (s.title || '').toLowerCase().includes(q) ||
+        (s.language || '').toLowerCase().includes(q) ||
+        (s.content || '').toLowerCase().includes(q)
+      );
+    }
+    
     // Top Snippets (Elite Criteria: min 5 copies, stable edits, used in last 90 days)
     const topSnippets = [...unarchived]
       .filter(s => {
@@ -194,6 +204,16 @@ export const IntelligenceDashboard: React.FC = () => {
 
         {/* Taxonomy Orchestration Layer */}
         <div className="flex flex-col gap-4">
+          <div className="relative w-full max-w-[300px]">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#adaaad]" />
+             <input
+               type="text"
+               value={localSearch}
+               onChange={e => setLocalSearch(e.target.value)}
+               placeholder="FILTER LIBRARY..."
+               className="w-full bg-[#151515] border border-[var(--border)] pl-9 pr-4 py-2 text-[#adaaad] text-[10px] uppercase font-mono outline-none focus:border-[var(--accent)] transition-colors"
+             />
+          </div>
           {/* Category Bar */}
           <div className="flex flex-wrap gap-2 items-center">
             <button 
