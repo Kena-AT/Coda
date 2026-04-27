@@ -905,7 +905,7 @@ fn sync_snippet_metadata(conn: &rusqlite::Connection, snippet_id: i32, user_id: 
         // 1. Ensure tag exists in 'tags' table
         conn.execute(
             "INSERT OR IGNORE INTO tags (user_id, name, category, color) VALUES (?, ?, ?, ?)",
-            rusqlite::params![user_id, tag_name_upper, "GENERAL", "#e60000"],
+            rusqlite::params![user_id, tag_name_upper, "GENERAL", "var(--accent)"],
         )?;
 
         // 2. Get the tag id
