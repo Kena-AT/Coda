@@ -1,6 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface Tag {
+  id?: number;
+  user_id: number;
+  name: string;
+  category: string | null;
+  color: string | null;
+  created_at?: string;
+}
+
 export interface Snippet {
   id?: number;
   user_id: number;
@@ -9,6 +18,7 @@ export interface Snippet {
   content: string;
   language: string;
   tags: string | null;
+  tag_nodes?: Tag[] | null;
   is_archived: boolean;
   is_favorite: boolean;
   deleted_at: string | null;
