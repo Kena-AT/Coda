@@ -48,6 +48,7 @@ pub struct ActivityData {
 pub struct AnalyticsSummary {
     pub global_copies: i32,
     pub last_entry: String,
+    pub last_entry_time: Option<String>,
     pub activity: Vec<ActivityData>,
     pub ledger: Vec<Snippet>,
     pub resource_usage: Option<crate::telemetry::ResourceSample>,
@@ -653,11 +654,11 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
     ).unwrap_or(0);
 
     // 2. Last Entry
-    let last_entry: String = conn.query_row(
-        "SELECT title FROM snippets WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+    let (last_entry, last_entry_time): (String, Option<String>) = conn.query_row(
+        "SELECT title, created_at FROM snippets WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
         [user_id],
-        |row| row.get(0)
-    ).unwrap_or_else(|_| "No entries".to_string());
+        |row| Ok((row.get(0)?, row.get(1).unwrap_or(None)))
+    ).unwrap_or_else(|_| ("No entries".to_string(), None));
 
     // 3. Activity (Hourly buckets for last 24h)
     let mut stmt = conn.prepare("
