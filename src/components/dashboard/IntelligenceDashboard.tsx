@@ -12,8 +12,14 @@ export const IntelligenceDashboard: React.FC = () => {
   const playSound = useSoundEffect();
   const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [availableTags, setAvailableTags] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+
+  const categories = useMemo(() => {
+    const cats = new Set(availableTags.map(t => t.category || 'GENERAL'));
+    return Array.from(cats).sort();
+  }, [availableTags]);
 
   const fetchAnalytics = async () => {
     if (!user) return;
@@ -40,6 +46,7 @@ export const IntelligenceDashboard: React.FC = () => {
   useEffect(() => {
     fetchTags();
     fetchAnalytics();
+    fetchSnippets(true);
   }, [user]);
 
   const fetchSnippets = async (force = false) => {
@@ -92,6 +99,12 @@ export const IntelligenceDashboard: React.FC = () => {
   const sections = useMemo(() => {
     let unarchived = snippets.filter(s => s && !s.is_archived && !s.deleted_at);
     
+    if (selectedCategory) {
+      unarchived = unarchived.filter(s => 
+        s.tag_nodes?.some(t => (t.category || 'GENERAL') === selectedCategory)
+      );
+    }
+
     if (selectedTag) {
       unarchived = unarchived.filter(s => s.tags?.split(',').map((t: string) => t.trim().toUpperCase()).includes(selectedTag.toUpperCase()));
     }
@@ -179,23 +192,47 @@ export const IntelligenceDashboard: React.FC = () => {
             <h1 className="text-4xl md:text-[56px] font-main font-bold text-white tracking-header md:tracking-tighter uppercase leading-tight md:leading-none">Library</h1>
         </div>
 
-        {/* Tag Filtering Bar */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <button 
-            onClick={() => setSelectedTag(null)}
-            className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${!selectedTag ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'border-[var(--border)] text-[#adaaad] hover:border-[var(--accent)]/50'}`}
-          >
-            All_Nodes
-          </button>
-          {availableTags.map(tag => (
+        {/* Taxonomy Orchestration Layer */}
+        <div className="flex flex-col gap-4">
+          {/* Category Bar */}
+          <div className="flex flex-wrap gap-2 items-center">
             <button 
-              key={tag.id}
-              onClick={() => setSelectedTag(tag.name === selectedTag ? null : tag.name)}
-              className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${selectedTag === tag.name ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-[0_0_10px_rgba(230,0,0,0.3)]' : 'border-[var(--border)] text-[#adaaad] hover:border-[var(--accent)]/50'}`}
+              onClick={() => setSelectedCategory(null)}
+              className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${!selectedCategory ? 'bg-white text-black border-white' : 'border-[var(--border)] text-[#adaaad] hover:border-white/50'}`}
             >
-              #{tag.name}
+              All_Categories
             </button>
-          ))}
+            {categories.map(cat => (
+              <button 
+                key={cat}
+                onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
+                className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${selectedCategory === cat ? 'bg-white text-black border-white' : 'border-[var(--border)] text-[#adaaad] hover:border-white/50'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Tag Bar */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <button 
+              onClick={() => setSelectedTag(null)}
+              className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${!selectedTag ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'border-[var(--border)] text-[#adaaad] hover:border-[var(--accent)]/50'}`}
+            >
+              All_Tags
+            </button>
+            {availableTags
+              .filter(tag => !selectedCategory || (tag.category || 'GENERAL') === selectedCategory)
+              .map(tag => (
+                <button 
+                  key={tag.id}
+                  onClick={() => setSelectedTag(tag.name === selectedTag ? null : tag.name)}
+                  className={`px-3 py-1.5 text-[9px] font-mono uppercase tracking-wider border transition-all ${selectedTag === tag.name ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-[0_0_10px_rgba(230,0,0,0.3)]' : 'border-[var(--border)] text-[#adaaad] hover:border-[var(--accent)]/50'}`}
+                >
+                  #{tag.name}
+                </button>
+              ))}
+          </div>
         </div>
       </div>
 
