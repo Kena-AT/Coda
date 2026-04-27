@@ -27,6 +27,7 @@ interface SnippetAnalytics {
 interface AnalyticsSummary {
   global_copies: number;
   last_entry: string;
+  last_entry_time?: string;
   activity: ActivityData[];
   ledger: SnippetAnalytics[];
   resource_usage?: {
@@ -223,11 +224,19 @@ export const AnalyticsPage: React.FC = () => {
                   <Clock size={20} className="text-[var(--accent)]" />
                   <span className="text-[10px] text-[#adaaad] font-mono uppercase">Last Entry</span>
               </div>
-              <div className="mt-2">
+               <div className="mt-2">
                  <div className="text-lg font-main font-bold text-white uppercase truncate">
                     {summary?.last_entry || 'N/A'}
                  </div>
-                 <div className="text-[11px] font-mono text-[#adaaad] mt-1">
+                 <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--accent)] mt-1">
+                    {summary?.last_entry_time && (
+                      <>
+                        <Clock size={12} className="opacity-50" />
+                        <span>{formatDate(summary.last_entry_time)}</span>
+                      </>
+                    )}
+                 </div>
+                 <div className="text-[10px] font-mono text-[#adaaad] mt-2 opacity-50">
                     {'>'} {summary?.last_entry !== "No entries" ? "Last recorded buffer activity" : "No snippets added yet"}
                  </div>
               </div>

@@ -804,6 +804,7 @@ pub fn get_analytics_summary(app_handle: AppHandle, state: State<'_, AppState>, 
     Ok(AnalyticsSummary {
         global_copies,
         last_entry,
+        last_entry_time,
         activity,
         ledger,
         resource_usage,
