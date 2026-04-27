@@ -43,7 +43,16 @@ export const MetadataOrchestrator: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTags();
+    const syncAndFetch = async () => {
+      if (!user) return;
+      try {
+        await invoke('sync_all_metadata', { userId: user.id });
+        fetchTags();
+      } catch (err) {
+        fetchTags();
+      }
+    };
+    syncAndFetch();
   }, [user]);
 
   const handleCreate = async () => {
