@@ -27,6 +27,9 @@ export const MetadataOrchestrator: React.FC = () => {
   const [tagColor, setTagColor] = useState('#e60000');
   const [tagCategory, setTagCategory] = useState('GENERAL');
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   const fetchTags = async () => {
     if (!user) return;
     setIsLoading(true);
@@ -117,6 +120,19 @@ export const MetadataOrchestrator: React.FC = () => {
     setTagCategory(tag.category || 'GENERAL');
     setIsCreating(true);
   };
+
+  const categories = React.useMemo(() => {
+    const cats = new Set(tags.map(t => t.category || 'GENERAL'));
+    return Array.from(cats).sort();
+  }, [tags]);
+
+  const filteredTags = React.useMemo(() => {
+    return tags.filter(tag => {
+      const matchesSearch = tag.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = !selectedCategory || (tag.category || 'GENERAL') === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [tags, searchQuery, selectedCategory]);
 
   return (
     <div className="flex-1 h-full bg-[#131313] flex flex-col overflow-hidden font-main relative">
