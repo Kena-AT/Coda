@@ -292,6 +292,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                   </p>
                 </div>
 
+                {/* Voice Mode Toggle */}
+                <div className="flex items-center justify-between p-4 bg-[#131313] border border-[var(--border)]/50 rounded-sm">
+                  <div className="space-y-1">
+                    <p className="text-[12px] md:text-[13px] font-bold uppercase">JARVIS_MODE</p>
+                    <p className="text-[8px] md:text-[9px] font-mono text-[#e5e2e1]/30 uppercase tracking-tighter">Verbal feedback</p>
+                  </div>
+                  <button 
+                    onClick={() => handleUpdateSetting({ voiceEnabled: !settings.voiceEnabled })}
+                    className={`w-12 h-6 rounded-sm transition-all relative shrink-0 ${settings.voiceEnabled ? 'bg-[var(--accent)]' : 'bg-[var(--border)]'}`}
+                  >
+                    <div className={`absolute top-1 w-4 h-4 bg-white transition-all ${settings.voiceEnabled ? 'right-1' : 'left-1'}`} />
+                  </button>
+                </div>
+
                 <div className="p-4 bg-[var(--accent)]/5 border border-[var(--accent)]/10 rounded-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-pulse" />

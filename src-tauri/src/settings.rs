@@ -11,12 +11,13 @@ pub struct UserPreferences {
     pub sound_effects: bool,
     pub lockout_threshold: i32,
     pub lockout_duration_mins: i32,
+    pub voice_enabled: bool,
 }
 
 #[command]
 pub async fn get_user_preferences(app_handle: AppHandle) -> Result<UserPreferences, String> {
     let conn = get_db_connection(&app_handle)?;
-    let mut stmt = conn.prepare("SELECT auto_archive_days, exclude_favorites, min_copy_threshold, push_alerts, sound_effects, lockout_threshold, lockout_duration_mins FROM user_settings LIMIT 1")
+    let mut stmt = conn.prepare("SELECT auto_archive_days, exclude_favorites, min_copy_threshold, push_alerts, sound_effects, lockout_threshold, lockout_duration_mins, voice_enabled FROM user_settings LIMIT 1")
         .map_err(|e| e.to_string())?;
     
     let prefs = stmt.query_row([], |row| {
@@ -28,6 +29,7 @@ pub async fn get_user_preferences(app_handle: AppHandle) -> Result<UserPreferenc
             sound_effects: row.get(4)?,
             lockout_threshold: row.get(5)?,
             lockout_duration_mins: row.get(6)?,
+            voice_enabled: row.get(7)?,
         })
     }).unwrap_or(UserPreferences {
         auto_archive_days: 30,
@@ -37,6 +39,7 @@ pub async fn get_user_preferences(app_handle: AppHandle) -> Result<UserPreferenc
         sound_effects: true,
         lockout_threshold: 3,
         lockout_duration_mins: 20,
+        voice_enabled: true,
     });
 
     Ok(prefs)
@@ -46,8 +49,8 @@ pub async fn get_user_preferences(app_handle: AppHandle) -> Result<UserPreferenc
 pub async fn update_user_preferences(app_handle: AppHandle, prefs: UserPreferences) -> Result<(), String> {
     let conn = get_db_connection(&app_handle)?;
     conn.execute(
-        "INSERT INTO user_settings (user_id, auto_archive_days, exclude_favorites, min_copy_threshold, push_alerts, sound_effects, lockout_threshold, lockout_duration_mins) 
-         VALUES (1, ?, ?, ?, ?, ?, ?, ?)
+        "INSERT INTO user_settings (user_id, auto_archive_days, exclude_favorites, min_copy_threshold, push_alerts, sound_effects, lockout_threshold, lockout_duration_mins, voice_enabled) 
+         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(user_id) DO UPDATE SET 
             auto_archive_days = excluded.auto_archive_days,
             exclude_favorites = excluded.exclude_favorites,
@@ -55,7 +58,8 @@ pub async fn update_user_preferences(app_handle: AppHandle, prefs: UserPreferenc
             push_alerts = excluded.push_alerts,
             sound_effects = excluded.sound_effects,
             lockout_threshold = excluded.lockout_threshold,
-            lockout_duration_mins = excluded.lockout_duration_mins",
+            lockout_duration_mins = excluded.lockout_duration_mins,
+            voice_enabled = excluded.voice_enabled",
         rusqlite::params![
             prefs.auto_archive_days,
             prefs.exclude_favorites,
@@ -63,7 +67,8 @@ pub async fn update_user_preferences(app_handle: AppHandle, prefs: UserPreferenc
             prefs.push_alerts,
             prefs.sound_effects,
             prefs.lockout_threshold,
-            prefs.lockout_duration_mins
+            prefs.lockout_duration_mins,
+            prefs.voice_enabled
         ],
     ).map_err(|e| e.to_string())?;
 

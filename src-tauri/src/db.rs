@@ -281,6 +281,9 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         if !columns.contains(&"lockout_duration_mins".to_string()) {
             conn.execute("ALTER TABLE user_settings ADD COLUMN lockout_duration_mins INTEGER DEFAULT 20", []).map_err(|e| e.to_string())?;
         }
+        if !columns.contains(&"voice_enabled".to_string()) {
+            conn.execute("ALTER TABLE user_settings ADD COLUMN voice_enabled BOOLEAN DEFAULT 1", []).map_err(|e| e.to_string())?;
+        }
     }
 
     // Monitor config and logs for Vault Maintenance

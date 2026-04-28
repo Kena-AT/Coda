@@ -81,6 +81,15 @@ class SoundService {
     osc.start();
     osc.stop(now + 0.1);
   }
+
+  public playJarvis() {
+    const ctx = this.init();
+    const now = ctx.currentTime;
+    // Neural Wake sequence
+    this.playTone(600, now, 0.04, 0.03, 'sine');
+    this.playTone(900, now + 0.04, 0.04, 0.02, 'sine');
+    this.playTone(1400, now + 0.08, 0.06, 0.01, 'sine');
+  }
 }
 
 export const soundService = new SoundService();

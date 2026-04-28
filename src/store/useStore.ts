@@ -60,6 +60,7 @@ export interface Settings {
     newSnippet: string;
     search: string;
   };
+  voiceEnabled: boolean;
 }
 
 interface AppError {
@@ -152,7 +153,8 @@ export const useStore = create<AppState>()(
           save: 'S',
           newSnippet: 'N',
           search: 'F'
-        }
+        },
+        voiceEnabled: true
       },
       setSettings: (newSettings) => set((state) => ({ 
         settings: { ...state.settings, ...newSettings } 
