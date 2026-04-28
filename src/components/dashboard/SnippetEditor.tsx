@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Editor, DiffEditor } from '@monaco-editor/react';
-import { useStore, Snippet } from '../../store/useStore';
+import { useStore, Snippet, Tag } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import { BoilerplateSelector } from './BoilerplateSelector';
@@ -25,6 +25,7 @@ import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Tags, ChevronDown } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -61,6 +62,10 @@ export const SnippetEditor: React.FC = () => {
   const [validationIssues, setValidationIssues] = useState<{ line: number; message: string; severity: 'error' | 'warning' }[]>([]);
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [monacoInstance, setMonacoInstance] = useState<any>(null);
+  const [savedTags, setSavedTags] = useState<Tag[]>([]);
+  const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
+  const [tagSearchInput, setTagSearchInput] = useState('');
+  const tagDropdownRef = useRef<HTMLDivElement>(null);
   const { setGlobalError } = useStore();
   const playSound = useSoundEffect();
   const saveRef = useRef<(() => void) | null>(null);
@@ -75,6 +80,64 @@ export const SnippetEditor: React.FC = () => {
     window.addEventListener('save-snippet', handleSaveShortcut);
     return () => window.removeEventListener('save-snippet', handleSaveShortcut);
   }, [selectedSnippetId]);
+
+  // Load saved tags from the Tags page
+  useEffect(() => {
+    const fetchTags = async () => {
+      if (!user) return;
+      try {
+        const response: any = await invoke('list_tags', { userId: user.id });
+        if (response.success && response.data) {
+          setSavedTags(response.data);
+        }
+      } catch (err) {
+        console.error('Failed to load tags:', err);
+      }
+    };
+    fetchTags();
+  }, [user]);
+
+  // Close tag dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (tagDropdownRef.current && !tagDropdownRef.current.contains(e.target as Node)) {
+        setTagDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Tag helpers
+  const getActiveTags = (): string[] => {
+    const raw = snippet.tags || '';
+    return raw.split(',').map(t => t.trim()).filter(Boolean);
+  };
+
+  const toggleTag = (tagName: string) => {
+    const current = getActiveTags();
+    const normalized = tagName.trim().toLowerCase();
+    const exists = current.some(t => t.toLowerCase() === normalized);
+    const updated = exists
+      ? current.filter(t => t.toLowerCase() !== normalized)
+      : [...current, tagName.trim()];
+    setSnippet({ ...snippet, tags: updated.join(', ') });
+  };
+
+  const removeTag = (tagName: string) => {
+    const updated = getActiveTags().filter(t => t.toLowerCase() !== tagName.toLowerCase());
+    setSnippet({ ...snippet, tags: updated.join(', ') });
+  };
+
+  const addFreeTextTag = () => {
+    const trimmed = tagSearchInput.trim();
+    if (!trimmed) return;
+    const current = getActiveTags();
+    if (!current.some(t => t.toLowerCase() === trimmed.toLowerCase())) {
+      setSnippet({ ...snippet, tags: [...current, trimmed].join(', ') });
+    }
+    setTagSearchInput('');
+  };
 
   // Debounced title check
   useEffect(() => {
@@ -470,15 +533,103 @@ export const SnippetEditor: React.FC = () => {
                  </select>
                </div>
 
-               <div className="flex flex-col gap-1 flex-1 md:w-48">
-                 <span className="text-[9px] font-mono text-[#adaaad] uppercase">Tags</span>
-                 <input 
-                   type="text"
-                   value={snippet.tags || ''}
-                   onChange={e => setSnippet({...snippet, tags: e.target.value})}
-                   placeholder="react, api"
-                   className="bg-[#1c1b1b] border border-[var(--border)]/50 text-white text-[10px] font-mono p-2 outline-none focus:border-[var(--accent)] transition-colors w-full"
-                 />
+               {/* Tags multi-select dropdown */}
+               <div className="flex flex-col gap-1 flex-1 md:w-56 relative" ref={tagDropdownRef}>
+                 <span className="text-[9px] font-mono text-[#adaaad] uppercase flex items-center gap-1">
+                   <Tags size={9} /> TAG_ASSIGNMENT
+                 </span>
+
+                 {/* Selected tag pills */}
+                 <div
+                   onClick={() => setTagDropdownOpen(v => !v)}
+                   className="min-h-[34px] bg-[#1c1b1b] border border-[var(--border)]/50 focus-within:border-[var(--accent)] transition-colors p-1.5 flex flex-wrap gap-1 cursor-pointer relative"
+                 >
+                   {getActiveTags().length === 0 && (
+                     <span className="text-[#adaaad]/40 text-[10px] font-mono px-1 self-center">Select or type tags...</span>
+                   )}
+                   {getActiveTags().map(tag => (
+                     <span
+                       key={tag}
+                       className="flex items-center gap-1 bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-[9px] font-mono px-1.5 py-0.5 uppercase"
+                     >
+                       {tag}
+                       <button
+                         onClick={e => { e.stopPropagation(); removeTag(tag); }}
+                         className="text-[var(--accent)]/60 hover:text-[var(--accent)] leading-none"
+                       >
+                         ×
+                       </button>
+                     </span>
+                   ))}
+                   <ChevronDown
+                     size={12}
+                     className={`absolute right-2 top-1/2 -translate-y-1/2 text-[#adaaad] transition-transform ${tagDropdownOpen ? 'rotate-180' : ''}`}
+                   />
+                 </div>
+
+                 {/* Dropdown panel */}
+                 {tagDropdownOpen && (
+                   <div className="absolute top-full left-0 w-full mt-1 bg-[#151515] border border-[var(--border)] z-50 shadow-xl flex flex-col" style={{ minWidth: '220px' }}>
+                     {/* Free-text input */}
+                     <div className="flex border-b border-[var(--border)]/30">
+                       <input
+                         autoFocus
+                         type="text"
+                         value={tagSearchInput}
+                         onChange={e => setTagSearchInput(e.target.value)}
+                         onKeyDown={e => {
+                           if (e.key === 'Enter') { e.preventDefault(); addFreeTextTag(); }
+                           if (e.key === 'Escape') setTagDropdownOpen(false);
+                         }}
+                         placeholder="Type & press Enter to add..."
+                         className="flex-1 bg-transparent text-white text-[10px] font-mono px-3 py-2 outline-none placeholder-[#adaaad]/30"
+                         onClick={e => e.stopPropagation()}
+                       />
+                       {tagSearchInput && (
+                         <button
+                           onClick={e => { e.stopPropagation(); addFreeTextTag(); }}
+                           className="px-3 text-[var(--accent)] text-[9px] font-mono uppercase border-l border-[var(--border)]/30 hover:bg-[var(--accent)]/10"
+                         >
+                           Add
+                         </button>
+                       )}
+                     </div>
+
+                     {/* Saved tags list */}
+                     <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
+                       {savedTags
+                         .filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))
+                         .map(t => {
+                           const active = getActiveTags().some(a => a.toLowerCase() === t.name.toLowerCase());
+                           return (
+                             <button
+                               key={t.id}
+                               onClick={e => { e.stopPropagation(); toggleTag(t.name); }}
+                               className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono uppercase tracking-[0.5px] transition-colors ${
+                                 active ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[#adaaad] hover:bg-white/5 hover:text-white'
+                               }`}
+                             >
+                               <span className="flex items-center gap-2">
+                                 {t.color && (
+                                   <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: t.color }} />
+                                 )}
+                                 {t.name}
+                                 {t.category && (
+                                   <span className="text-[8px] text-[#adaaad]/50 normal-case">{t.category}</span>
+                                 )}
+                               </span>
+                               {active && <span className="text-[var(--accent)] text-[10px]">✓</span>}
+                             </button>
+                           );
+                         })}
+                       {savedTags.filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase())).length === 0 && (
+                         <div className="px-3 py-4 text-[9px] font-mono text-[#adaaad]/40 text-center uppercase">
+                           {tagSearchInput ? 'No matches — press Enter to add' : 'No tags saved yet'}
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 )}
                </div>
              </div>
           </div>
