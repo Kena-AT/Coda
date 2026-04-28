@@ -25,7 +25,7 @@ import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Tags, ChevronDown } from 'lucide-react';
+import { Tags, ChevronDown, RefreshCw, Search } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -622,33 +622,39 @@ export const SnippetEditor: React.FC = () => {
                      </div>
 
                      {/* Saved tags list */}
-                     <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
-                       {savedTags
-                         .filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))
-                         .map(t => {
-                           const active = getActiveTags().some(a => a.toLowerCase() === t.name.toLowerCase());
-                           return (
-                             <button
-                               key={t.id}
-                               onClick={e => { e.stopPropagation(); toggleTag(t.name); }}
-                               className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono uppercase tracking-[0.5px] transition-colors ${
-                                 active ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[#adaaad] hover:bg-white/5 hover:text-white'
-                               }`}
-                             >
-                               <span className="flex items-center gap-2">
-                                 {t.color && (
-                                   <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: t.color }} />
-                                 )}
-                                 {t.name}
-                                 {t.category && (
-                                   <span className="text-[8px] text-[#adaaad]/50 normal-case">{t.category}</span>
-                                 )}
-                               </span>
-                               {active && <span className="text-[var(--accent)] text-[10px]">✓</span>}
-                             </button>
-                           );
-                         })}
-                       {savedTags.filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase())).length === 0 && (
+{/* Saved tags list */}
+                      <div className="max-h-[180px] overflow-y-auto custom-scrollbar flex flex-col">
+                        <div className="px-3 py-1.5 text-[8px] font-mono text-[#adaaad]/30 border-b border-[var(--border)]/5 flex justify-between items-center bg-white/[0.02]">
+                          <span>REGISTRY_PROTOCOL</span>
+                          <span>{savedTags.length} NODES</span>
+                        </div>
+                        {savedTags.length > 0 ? (
+                          savedTags
+                            .filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase())))
+                            .map((t, idx) => {
+                              const active = getActiveTags().some(a => a.toLowerCase() === (t.name || "").toLowerCase());
+                              return (
+                                <button
+                                  key={t.id || `tag-${idx}`}
+                                  onClick={e => { e.stopPropagation(); toggleTag(t.name); }}
+                                  className={`w-full flex items-center justify-between px-3 py-2.5 text-[10px] font-mono uppercase tracking-[0.5px] transition-all border-b border-white/[0.02] ${
+                                    active ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[#adaaad] hover:bg-white/5 hover:text-white'
+                                  }`}
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_5px_rgba(0,0,0,0.5)]" style={{ backgroundColor: t.color || 'var(--accent)' }} />
+                                    {t.name || "UNKNOWN_TAG"}
+                                  </span>
+                                  {active && <span className="text-[var(--accent)] text-[10px] font-bold">LOCKED</span>}
+                                </button>
+                              );
+                            })
+                        ) : (
+                          <div className="px-3 py-8 text-center">
+                            <div className="text-[10px] font-mono text-[#adaaad]/20 animate-pulse">VAULT_EMPTY</div>
+                          </div>
+                        )}
+                        {savedTags.length > 0 && savedTags.filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))).length === 0 && ({savedTags.filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase())).length === 0 && (
                          <div className="px-3 py-4 text-[9px] font-mono text-[#adaaad]/40 text-center uppercase">
                            {tagSearchInput ? `No matches for "${tagSearchInput}"` : `Registry empty for user ${user?.id || '?'}`}
                          </div>
