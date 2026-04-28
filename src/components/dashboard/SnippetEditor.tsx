@@ -555,7 +555,7 @@ export const SnippetEditor: React.FC = () => {
                {/* Tags multi-select dropdown */}
                <div className="flex flex-col gap-1 flex-1 md:w-56 relative" ref={tagDropdownRef}>
                  <span className="text-[9px] font-mono text-[#adaaad] uppercase flex items-center gap-1">
-                   <Tags size={9} /> TAG_ASSIGNMENT
+                   <Tags size={9} /> TAG_ASSIGNMENT {savedTags.length > 0 && `(${savedTags.length})`}
                  </span>
 
                  {/* Selected tag pills */}
@@ -590,7 +590,7 @@ export const SnippetEditor: React.FC = () => {
                  {tagDropdownOpen && (
                    <div className="absolute top-full left-0 w-full mt-1 bg-[#151515] border border-[var(--border)] z-[100] shadow-xl flex flex-col" style={{ minWidth: '220px' }}>
                      {/* Free-text input */}
-                     <div className="flex border-b border-[var(--border)]/30">
+                     <div className="flex border-b border-[var(--border)]/30 items-center">
                        <input
                          autoFocus
                          type="text"
