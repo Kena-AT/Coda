@@ -9,6 +9,8 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 import toast from 'react-hot-toast';
 
 interface ActivityData {
@@ -118,6 +120,47 @@ export const AnalyticsPage: React.FC = () => {
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleExportCSV = async () => {
+    if (!summary || !summary.ledger || summary.ledger.length === 0) {
+      toast.error('NO_DATA_TO_EXPORT');
+      return;
+    }
+
+    const headers = ['ID', 'Title', 'Language', 'Copy Count', 'Last Used At'];
+    const rows = summary.ledger.map(s => [
+      s.id,
+      `"${s.title.replace(/"/g, '""')}"`,
+      s.language,
+      s.copy_count,
+      s.last_used_at || 'Never'
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.join(','))
+    ].join('\n');
+
+    try {
+      const filePath = await save({
+        filters: [{
+          name: 'CSV Ledger',
+          extensions: ['csv']
+        }],
+        defaultPath: `coda_analytics_${new Date().toISOString().split('T')[0]}.csv`
+      });
+
+      if (filePath) {
+        await writeTextFile(filePath, csvContent);
+        toast.success('ANALYTICS_LEDGER_EXPORTED', {
+          style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)', fontSize: '10px', fontFamily: 'var(--font-main)' }
+        });
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('EXPORT_FAILED');
+    }
   };
 
   if (loading && !summary) {
@@ -288,7 +331,12 @@ export const AnalyticsPage: React.FC = () => {
                     className="bg-[var(--bg-primary)] border border-[var(--border)] pl-9 pr-4 py-2 text-[10px] font-mono text-white outline-none focus:border-[var(--accent)]"
                  />
               </div>
-              <button className="px-6 py-2 bg-[#1c1b1b] border border-[var(--border)] text-[#adaaad] text-[10px] font-bold uppercase transition-all hover:text-white hover:border-[var(--accent)]">Export.CSV</button>
+              <button 
+                  onClick={handleExportCSV}
+                  className="px-6 py-2 bg-[#1c1b1b] border border-[var(--border)] text-[#adaaad] text-[10px] font-bold uppercase transition-all hover:text-white hover:border-[var(--accent)]"
+               >
+                 Export.CSV
+               </button>
            </div>
         </div>
 
