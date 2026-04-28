@@ -82,20 +82,33 @@ export const SnippetEditor: React.FC = () => {
   }, [selectedSnippetId]);
 
   // Load saved tags from the Tags page
-  useEffect(() => {
-    const fetchTags = async () => {
-      if (!user) return;
-      try {
-        const response: any = await invoke('list_tags', { userId: user.id });
-        if (response.success && response.data) {
-          setSavedTags(response.data);
-        }
-      } catch (err) {
-        console.error('Failed to load tags:', err);
+  const fetchTags = useCallback(async () => {
+    if (!user) return;
+    try {
+      // First ensure everything is synced
+      await invoke('sync_all_metadata', { userId: user.id });
+      
+      const response: any = await invoke('list_tags', { userId: user.id });
+      if (response.success) {
+        const tags = response.data || [];
+        setSavedTags(tags);
+        console.log(`[SnippetEditor] Loaded ${tags.length} tags from registry`);
       }
-    };
-    fetchTags();
+    } catch (err) {
+      console.error('Failed to load tags:', err);
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchTags();
+  }, [fetchTags]);
+
+  // Re-fetch when dropdown opens to ensure we have the latest tags
+  useEffect(() => {
+    if (tagDropdownOpen) {
+      fetchTags();
+    }
+  }, [tagDropdownOpen, fetchTags]);
 
   // Close tag dropdown on outside click
   useEffect(() => {
