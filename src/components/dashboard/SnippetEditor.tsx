@@ -588,7 +588,7 @@ export const SnippetEditor: React.FC = () => {
 
                  {/* Dropdown panel */}
                  {tagDropdownOpen && (
-                   <div className="absolute top-full left-0 w-full mt-1 bg-[#151515] border border-[var(--border)] z-50 shadow-xl flex flex-col" style={{ minWidth: '220px' }}>
+                   <div className="absolute top-full left-0 w-full mt-1 bg-[#151515] border border-[var(--border)] z-[100] shadow-xl flex flex-col" style={{ minWidth: '220px' }}>
                      {/* Free-text input */}
                      <div className="flex border-b border-[var(--border)]/30">
                        <input
