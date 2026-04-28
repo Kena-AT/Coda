@@ -1,5 +1,5 @@
 {
-  "version": "2.10",
+  "version": "2.11",
   "children": [
     {
       "type": "frame",
@@ -61869,6 +61869,17 @@
           ]
         }
       ]
+    },
+    {
+      "type": "text",
+      "id": "vJPFx",
+      "x": 0,
+      "y": 0,
+      "fill": "#000000",
+      "content": "SYSTEM READY // V1.0.0-STABLE",
+      "fontFamily": "Inter",
+      "fontSize": 12,
+      "fontWeight": "normal"
     }
   ]
 }
