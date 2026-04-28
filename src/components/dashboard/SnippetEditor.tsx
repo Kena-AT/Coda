@@ -621,51 +621,55 @@ export const SnippetEditor: React.FC = () => {
                        )}
                      </div>
 
-                     {/* Saved tags list */}
-{/* Saved tags list */}
-                      <div className="max-h-[180px] overflow-y-auto custom-scrollbar flex flex-col">
-                        <div className="px-3 py-1.5 text-[8px] font-mono text-[#adaaad]/30 border-b border-[var(--border)]/5 flex justify-between items-center bg-white/[0.02]">
-                          <span>REGISTRY_PROTOCOL</span>
+                      {/* Saved tags list */}
+                      <div className="flex-1 min-h-[50px] max-h-[220px] overflow-y-auto custom-scrollbar flex flex-col bg-[#1a1a1a]">
+                        <div className="px-3 py-2 text-[8px] font-mono text-[#adaaad]/40 border-b border-white/[0.05] flex justify-between items-center sticky top-0 bg-[#1a1a1a] z-10">
+                          <span className="flex items-center gap-1"><Activity size={8} /> REGISTRY_DATA</span>
                           <span>{savedTags.length} NODES</span>
                         </div>
+                        
                         {savedTags.length > 0 ? (
-                          savedTags
-                            .filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase())))
-                            .map((t, idx) => {
-                              const active = getActiveTags().some(a => a.toLowerCase() === (t.name || "").toLowerCase());
-                              return (
-                                <button
-                                  key={t.id || `tag-${idx}`}
-                                  onClick={e => { e.stopPropagation(); toggleTag(t.name); }}
-                                  className={`w-full flex items-center justify-between px-3 py-2.5 text-[10px] font-mono uppercase tracking-[0.5px] transition-all border-b border-white/[0.02] ${
-                                    active ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[#adaaad] hover:bg-white/5 hover:text-white'
-                                  }`}
-                                >
-                                  <span className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_5px_rgba(0,0,0,0.5)]" style={{ backgroundColor: t.color || 'var(--accent)' }} />
-                                    {t.name || "UNKNOWN_TAG"}
-                                  </span>
-                                  {active && <span className="text-[var(--accent)] text-[10px] font-bold">LOCKED</span>}
-                                </button>
-                              );
-                            })
+                          <div className="flex flex-col">
+                            {savedTags
+                              .filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase())))
+                              .map((t, idx) => {
+                                const active = getActiveTags().some(a => a.toLowerCase() === (t.name || "").toLowerCase());
+                                return (
+                                  <button
+                                    key={t.id || `tag-${idx}`}
+                                    onClick={e => { e.stopPropagation(); toggleTag(t.name); }}
+                                    className={`w-full flex items-center justify-between px-3 py-2.5 text-[10px] font-mono uppercase tracking-[0.5px] transition-all border-b border-white/[0.02] ${
+                                      active ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[#adaaad] hover:bg-white/5 hover:text-white'
+                                    }`}
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_5px_rgba(0,0,0,0.5)]" style={{ backgroundColor: t.color || 'var(--accent)' }} />
+                                      {t.name || "UNKNOWN_TAG"}
+                                    </span>
+                                    {active && <span className="text-[var(--accent)] text-[10px] font-bold">SELECTED</span>}
+                                  </button>
+                                );
+                              })}
+                          </div>
                         ) : (
-                          <div className="px-3 py-8 text-center">
-                            <div className="text-[10px] font-mono text-[#adaaad]/20 animate-pulse">VAULT_EMPTY</div>
+                          <div className="px-3 py-10 text-center flex flex-col items-center gap-2">
+                            <Zap size={16} className="text-[#adaaad]/10" />
+                            <div className="text-[9px] font-mono text-[#adaaad]/20 tracking-widest uppercase">Registry_Empty</div>
                           </div>
                         )}
+                        
                         {savedTags.length > 0 && savedTags.filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))).length === 0 && (
-                         <div className="px-3 py-4 text-[9px] font-mono text-[#adaaad]/40 text-center uppercase">
-                           {tagSearchInput ? `No matches for "${tagSearchInput}"` : `Registry empty for user ${user?.id || '?'}`}
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 )}
-               </div>
-             </div>
-          </div>
-        </div>
+                          <div className="px-3 py-6 text-[9px] font-mono text-[#adaaad]/40 text-center uppercase italic">
+                            No matches for "{tagSearchInput}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+           </div>
+         </div>
 
         {/* Scrollable Content Area: Editor + Linking Panel */}
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col min-h-0">
