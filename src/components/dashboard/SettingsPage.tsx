@@ -24,8 +24,24 @@ interface SettingsPageProps {
 }
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }) => {
-  const { settings, setSettings } = useStore();
+  const { user, settings, setSettings } = useStore();
   const playSound = useSoundEffect();
+  const [latency, setLatency] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const measureLatency = async () => {
+      const start = performance.now();
+      try {
+        await invoke('get_analytics_summary', { userId: user?.id || 0 });
+      } catch (e) {}
+      const end = performance.now();
+      setLatency(Math.round(end - start));
+    };
+
+    measureLatency();
+    const interval = setInterval(measureLatency, 5000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleUpdateSetting = async (updates: Partial<typeof settings>) => {
     setSettings(updates);
@@ -75,7 +91,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
           </button>
           <p className="text-[9px] md:text-[10px] font-mono text-[#e5e2e1]/40 uppercase tracking-[2px] md:tracking-[3px]">System.Configuration.Active</p>
           <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#e5e2e1]">APP_SETTINGS</h1>
-          <p className="text-[12px] md:text-[14px] font-mono text-[var(--accent)] uppercase">v4.0.2 // ENCRYPTION: MAX</p>
+          <p className="text-[12px] md:text-[14px] font-mono text-[var(--accent)] uppercase">v1 // ENCRYPTION: MAX</p>
         </header>
 
         {/* Content Grid */}
@@ -243,37 +259,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
             </div>
           </section>
 
-          {/* Section: Shortcuts */}
-          <section className="bg-[var(--bg-primary)] border border-[var(--border)] flex flex-col">
-            <div className="bg-[var(--border)] py-1 px-4 text-[9px] md:text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
-              04 // Control_Binding
-            </div>
-            <div className="p-6 md:p-8 space-y-6">
-              <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
-                <Shield className="text-[var(--accent)]" size={20} md:size={24} />
-                HOTKEY_MAP
-              </h3>
-              <div className="space-y-3 font-mono text-[10px] md:text-[11px]">
-                <div className="flex justify-between items-center p-3 bg-[#131313] border border-[var(--border)]/30">
-                  <span className="text-[#e5e2e1]/40 uppercase">SAVE</span>
-                  <span className="text-[var(--accent)] font-bold">CTRL + {settings.shortcuts.save}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-[#131313] border border-[var(--border)]/30">
-                  <span className="text-[#e5e2e1]/40 uppercase">NEW</span>
-                  <span className="text-[var(--accent)] font-bold">CTRL + {settings.shortcuts.newSnippet}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-[#131313] border border-[var(--border)]/30">
-                  <span className="text-[#e5e2e1]/40 uppercase">SEARCH</span>
-                  <span className="text-[var(--accent)] font-bold">CTRL + {settings.shortcuts.search}</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* Section: Intelligence Layer */}
           <section className="bg-[var(--bg-primary)] border border-[var(--border)] flex flex-col">
             <div className="bg-[var(--border)] py-1 px-4 text-[9px] md:text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
-              05 // Intelligence_Layer
+              04 // Intelligence_Layer
             </div>
             <div className="p-6 md:p-8 space-y-6">
               <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
@@ -322,7 +311,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
           {/* Section: Account */}
           <section className="bg-[var(--bg-primary)] border border-[var(--border)] flex flex-col">
             <div className="bg-[var(--border)] py-1 px-4 text-[9px] md:text-[10px] font-mono text-[#e5e2e1]/60 uppercase tracking-widest">
-              06 // Authentication
+              05 // Authentication
             </div>
             <div className="p-6 md:p-8 space-y-4">
               <h3 className="text-lg md:text-xl font-bold tracking-tight uppercase">ACCOUNT</h3>
@@ -380,14 +369,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
         {/* Footer Meta */}
         <footer className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                 <Lock size={12} className="text-[var(--accent)]" />
-                 <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">CRYPTO_CORE: v4</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <MessageSquare size={12} className="text-[#e5e2e1]/40" />
-                 <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">LATENCY: 12ms</span>
-              </div>
+               <div className="flex items-center gap-2">
+                  <Lock size={12} className="text-[var(--accent)]" />
+                  <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">CRYPTO_CORE: v1</span>
+               </div>
+               <div className="flex items-center gap-2">
+                  <MessageSquare size={12} className="text-[#e5e2e1]/40" />
+                  <span className="text-[9px] font-mono text-[#e5e2e1]/40 uppercase tracking-[1px]">LATENCY: {latency !== null ? `${latency}ms` : 'MEASURING...'}</span>
+               </div>
            </div>
            <p className="text-[9px] font-mono text-[#e5e2e1]/20 tracking-tighter uppercase whitespace-nowrap">
              © 2026 K.A.Y.E // ALL RIGHTS RESERVED.

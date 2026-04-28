@@ -72,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewSnippet }) => {
               <div className="w-4 h-4 bg-[var(--accent)]" />
               <h1 className="text-[13px] font-main font-bold text-[var(--accent)] tracking-tight uppercase">TERMINAL_SYSTEM</h1>
             </div>
-            <p className="text-[#adaaad] font-main text-[9px] tracking-premium uppercase opacity-60 ml-7">v2.0.4-STABLE</p>
+            <p className="text-[#adaaad] font-main text-[9px] tracking-premium uppercase opacity-60 ml-7">v1.0.0-STABLE</p>
           </div>
 
           <button 

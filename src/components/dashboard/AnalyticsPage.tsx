@@ -83,6 +83,36 @@ export const AnalyticsPage: React.FC = () => {
     }
   };
 
+  const seedAnalytics = async () => {
+    if (!user) return;
+    const demoSnippets = [
+      { title: "React_useLocalStorage", lang: "typescript", content: "const [val, setVal] = useState(() => JSON.parse(localStorage.getItem(key)));", copies: 12 },
+      { title: "Tailwind_GlassCard", lang: "css", content: ".glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.1); }", copies: 8 },
+      { title: "Python_FastAPI_Base", lang: "python", content: "@app.get('/')\ndef read_root(): return {'status': 'active'}", copies: 5 }
+    ];
+
+    for (const s of demoSnippets) {
+      try {
+        const res: any = await invoke('create_snippet', { 
+          userId: user.id, 
+          title: s.title, 
+          content: s.content, 
+          language: s.lang, 
+          tags: "elite,automation" 
+        });
+        if (res.success) {
+          const sid = res.data.id;
+          // Simulate copies
+          for (let i = 0; i < s.copies; i++) {
+             await invoke('record_snippet_usage', { snippetId: sid });
+          }
+        }
+      } catch (e) {
+        console.error("Seed failed for", s.title, e);
+      }
+    }
+  };
+
   const handleManualRefresh = async () => {
     if (!user || refreshing) return;
     setRefreshing(true);
@@ -92,6 +122,10 @@ export const AnalyticsPage: React.FC = () => {
     });
 
     try {
+      // Check if we should seed (only if user explicitly asked or ledger is empty)
+      if (summary?.ledger.length === 0) {
+        await seedAnalytics();
+      }
       await fetchAnalytics();
       await invoke('run_vault_maintenance');
       toast.success('LEDGER_ANALYSIS_COMPLETE', { id: toastId });
@@ -308,8 +342,27 @@ export const AnalyticsPage: React.FC = () => {
              </div>
            ))}
            {popularSnippets.length === 0 && (
-             <div className="col-span-5 py-12 text-center text-[#adaaad] font-mono text-[10px] uppercase opacity-40 border border-dashed border-[var(--border)]">
-                Establishing trend intelligence... Continue usage to populate velocity metrics.
+             <div className="col-span-5 py-12 px-8 text-center border border-dashed border-[var(--border)] bg-[var(--bg-primary)]/30">
+                <p className="text-[#adaaad] font-mono text-[10px] uppercase opacity-60 mb-4 tracking-widest">
+                   Establishing trend intelligence... 
+                </p>
+                <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
+                   <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-white font-bold uppercase tracking-tighter">01. RECURRENCE</span>
+                      <span className="text-[8px] text-[#adaaad] font-mono uppercase tracking-widest">Min. 3 Copies</span>
+                   </div>
+                   <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-white font-bold uppercase tracking-tighter">02. RECENCY</span>
+                      <span className="text-[8px] text-[#adaaad] font-mono uppercase tracking-widest">Used in last 90d</span>
+                   </div>
+                   <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-white font-bold uppercase tracking-tighter">03. STABILITY</span>
+                      <span className="text-[8px] text-[#adaaad] font-mono uppercase tracking-widest">Minimal revisions</span>
+                   </div>
+                </div>
+                <p className="text-[9px] text-[var(--accent)] font-mono mt-6 italic opacity-80 uppercase tracking-[1px]">
+                   {">"} Continue usage to populate velocity metrics.
+                </p>
              </div>
            )}
         </div>

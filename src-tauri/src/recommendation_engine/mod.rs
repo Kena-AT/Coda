@@ -152,7 +152,7 @@ pub fn get_popular_snippets(app_handle: AppHandle, user_id: i32) -> Result<Vec<R
         FROM snippets
         WHERE user_id = ? 
           AND is_archived = 0 
-          AND copy_count >= 5
+          AND copy_count >= 3
           AND (last_used_at > datetime('now', '-90 days') OR last_used_at IS NULL)
           AND edit_count < (copy_count * 2)
         ORDER BY copy_count DESC
