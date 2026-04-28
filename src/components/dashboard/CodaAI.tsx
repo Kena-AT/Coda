@@ -54,8 +54,10 @@ export const CodaAI: React.FC = () => {
   
   // Voice State
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const handleSendMessageRef = useRef<any>(null);
+  const isVoiceTriggeredRef = useRef<boolean>(false);
 
   // Keep the ref updated with the latest function
   useEffect(() => {
@@ -80,6 +82,8 @@ export const CodaAI: React.FC = () => {
         if (transcript) {
           setInput(transcript);
           toast.success('Voice Uplink established');
+          // Mark voice-triggered ONLY if Jarvis Mode is enabled in settings
+          isVoiceTriggeredRef.current = !!(settings?.voiceEnabled ?? true);
           // AUTO-SEND using the LATEST ref to avoid stale closures
           setTimeout(() => {
             if (handleSendMessageRef.current) {
@@ -206,10 +210,12 @@ export const CodaAI: React.FC = () => {
         timestamp: Date.now()
       }]);
 
-      if (settings?.voiceEnabled) {
+      // Speak the response if triggered by voice AND Jarvis Mode is on
+      if (isVoiceTriggeredRef.current && (settings?.voiceEnabled ?? true)) {
         soundService.playJarvisResponse();
-        speakResponse(aiText);
+        setTimeout(() => speakResponse(aiText), 250);
       }
+      isVoiceTriggeredRef.current = false; // always reset
     } catch (e: any) {
       setMessages(prev => [...prev, {
         role: 'ai',
@@ -221,12 +227,44 @@ export const CodaAI: React.FC = () => {
     }
   };
 
+  const stopSpeech = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
   const speakResponse = (text: string) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.1;
-    utterance.pitch = 0.9;
+
+    // Strip markdown for cleaner speech
+    const cleanText = text
+      .replace(/[*_`#>\-]+/g, '')
+      .replace(/\n+/g, ' ')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.0;
+    utterance.pitch = 0.85;
+    utterance.volume = 1;
+
+    // Pick best available deep English male voice
+    const tryVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        v.lang.startsWith('en') && /david|mark|daniel|google uk english male/i.test(v.name)
+      ) || voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('female'));
+      if (preferred) utterance.voice = preferred;
+    };
+    tryVoices();
+    // Voices may load async on some browsers
+    window.speechSynthesis.onvoiceschanged = tryVoices;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
     window.speechSynthesis.speak(utterance);
   };
 
@@ -278,10 +316,21 @@ export const CodaAI: React.FC = () => {
                   <Sparkles size={24} className="text-[var(--accent)]" />
                 </div>
                 <div className="text-center">
-                  <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider mb-1">Jarvis Mode Active</p>
-                  <p className="text-[9px] font-mono text-[#adaaad] leading-relaxed max-w-[240px]">
-                    I am ready for your commands. Try clicking the microphone.
-                  </p>
+                  {settings?.voiceEnabled ? (
+                    <>
+                      <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider mb-1">Jarvis Mode Active</p>
+                      <p className="text-[9px] font-mono text-[#adaaad] leading-relaxed max-w-[240px]">
+                        I am ready for your commands. Try clicking the microphone.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-[11px] font-main font-bold text-white uppercase tracking-wider mb-1">Ask me anything</p>
+                      <p className="text-[9px] font-mono text-[#adaaad] leading-relaxed max-w-[240px]">
+                        I know everything about Coda — features, shortcuts, settings, and workflows.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -316,18 +365,30 @@ export const CodaAI: React.FC = () => {
           </div>
 
           <div className="p-3 bg-[#0d0d0d] border-t border-[var(--border)] shrink-0">
-            <div className="flex items-center gap-2 bg-[#161616] border border-[var(--border)] rounded-lg px-3 py-1 focus-within:border-[var(--accent)]/50 transition-colors">
+            {/* Stop Speaking Banner — appears only while AI is talking */}
+            {isSpeaking && (
               <button
-                onClick={toggleListening}
-                className={`w-8 h-8 flex items-center justify-center rounded-md transition-all shrink-0 ${
-                  isListening 
-                    ? 'bg-red-500/20 text-red-500 animate-pulse' 
-                    : 'text-[#adaaad] hover:text-white hover:bg-white/5'
-                }`}
-                title={isListening ? 'Stop Listening' : 'Voice Command'}
+                onClick={stopSpeech}
+                className="w-full mb-2 flex items-center justify-center gap-2 py-1.5 bg-red-500/10 border border-red-500/30 rounded-md text-[9px] font-mono text-red-400 hover:bg-red-500/20 transition-all animate-pulse"
               >
-                {isListening ? <MicOff size={14} /> : <Mic size={14} />}
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+                SPEAKING — CLICK TO STOP
               </button>
+            )}
+            <div className="flex items-center gap-2 bg-[#161616] border border-[var(--border)] rounded-lg px-3 py-1 focus-within:border-[var(--accent)]/50 transition-colors">
+              {settings?.voiceEnabled && (
+                <button
+                  onClick={toggleListening}
+                  className={`w-8 h-8 flex items-center justify-center rounded-md transition-all shrink-0 ${
+                    isListening 
+                      ? 'bg-red-500/20 text-red-500 animate-pulse' 
+                      : 'text-[#adaaad] hover:text-white hover:bg-white/5'
+                  }`}
+                  title={isListening ? 'Stop Listening' : 'Voice Command'}
+                >
+                  {isListening ? <MicOff size={14} /> : <Mic size={14} />}
+                </button>
+              )}
               
               <input
                 ref={inputRef}
@@ -348,7 +409,7 @@ export const CodaAI: React.FC = () => {
               </button>
             </div>
             <p className="text-[7px] font-mono text-[#adaaad]/30 text-center mt-2 tracking-widest uppercase">
-              {isListening ? 'Neural Uplink Active' : `Powered by ${activeModel}`}
+              {isListening ? 'Neural Uplink Active' : isSpeaking ? 'JARVIS SPEAKING...' : `Powered by ${activeModel}`}
             </p>
           </div>
         </div>
