@@ -85,14 +85,20 @@ export const SnippetEditor: React.FC = () => {
   const fetchTags = useCallback(async () => {
     if (!user) return;
     try {
-      // First ensure everything is synced
-      await invoke('sync_all_metadata', { userId: user.id });
+      // Try to sync, but don't block if it fails
+      try {
+        await invoke('sync_all_metadata', { userId: user.id });
+      } catch (e) {
+        console.warn('Metadata sync failed, proceeding to fetch tags anyway');
+      }
       
       const response: any = await invoke('list_tags', { userId: user.id });
-      if (response.success) {
+      if (response && response.success) {
         const tags = response.data || [];
         setSavedTags(tags);
-        console.log(`[SnippetEditor] Loaded ${tags.length} tags from registry`);
+        console.log(`[SnippetEditor] Tags loaded: ${tags.length}`);
+      } else {
+        console.warn('[SnippetEditor] list_tags returned failure:', response?.message);
       }
     } catch (err) {
       console.error('Failed to load tags:', err);
