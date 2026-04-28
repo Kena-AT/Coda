@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, Sparkles, Loader2, Mic, MicOff } from 'lucide-r
 import { useStore } from '../../store/useStore';
 import logo from '../../assets/logo.png';
 import toast from 'react-hot-toast';
+import { soundService } from '../../utils/sounds';
 
 interface ChatMessage {
   role: 'user' | 'ai';
@@ -54,6 +55,12 @@ export const CodaAI: React.FC = () => {
   // Voice State
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const handleSendMessageRef = useRef<any>(null);
+
+  // Keep the ref updated with the latest function
+  useEffect(() => {
+    handleSendMessageRef.current = handleSendMessage;
+  });
 
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -63,14 +70,22 @@ export const CodaAI: React.FC = () => {
       recognition.interimResults = false;
       recognition.lang = 'en-US';
 
-      recognition.onstart = () => setIsListening(true);
+      recognition.onstart = () => {
+        setIsListening(true);
+        soundService.playJarvis();
+      };
       recognition.onend = () => setIsListening(false);
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        // Automatically send after a brief delay if transcript is captured
         if (transcript) {
-           toast.success('Voice command captured');
+          setInput(transcript);
+          toast.success('Voice Uplink established');
+          // AUTO-SEND using the LATEST ref to avoid stale closures
+          setTimeout(() => {
+            if (handleSendMessageRef.current) {
+              handleSendMessageRef.current(transcript);
+            }
+          }, 300);
         }
       };
       recognition.onerror = (event: any) => {
@@ -92,7 +107,7 @@ export const CodaAI: React.FC = () => {
       if (recognitionRef.current) {
         setInput('');
         recognitionRef.current.start();
-        toast('Listening...', { icon: '🎙️', style: { background: '#111', color: '#fff', fontSize: '10px', fontFamily: 'monospace' } });
+        toast('Neural Link Syncing...', { icon: '🎙️', style: { background: '#111', color: '#fff', fontSize: '10px', fontFamily: 'monospace' } });
       } else {
         toast.error('Speech recognition not supported');
       }
@@ -133,8 +148,9 @@ export const CodaAI: React.FC = () => {
     );
   };
 
-  const sendMessage = async () => {
-    const trimmed = input.trim();
+  const handleSendMessage = async (textOverride?: string) => {
+    const textToSubmit = textOverride || input;
+    const trimmed = textToSubmit.trim();
     if (!trimmed || isLoading) return;
 
     if (!apiKey) {
@@ -190,8 +206,8 @@ export const CodaAI: React.FC = () => {
         timestamp: Date.now()
       }]);
 
-      // JARVIS EFFECT: Speak the response if voice mode was active or as a premium feature
       if (settings?.voiceEnabled) {
+        soundService.playJarvisResponse();
         speakResponse(aiText);
       }
     } catch (e: any) {
@@ -210,7 +226,7 @@ export const CodaAI: React.FC = () => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.1;
-    utterance.pitch = 0.9; // Lower pitch for a more "Jarvis" feel
+    utterance.pitch = 0.9;
     window.speechSynthesis.speak(utterance);
   };
 
@@ -318,13 +334,13 @@ export const CodaAI: React.FC = () => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder={isListening ? "Listening..." : "Ask Coda AI..."}
                 className="flex-1 bg-transparent text-[11px] font-main text-white placeholder:text-[#adaaad]/40 outline-none py-2"
               />
               
               <button
-                onClick={sendMessage}
+                onClick={() => handleSendMessage()}
                 disabled={!input.trim() || isLoading}
                 className="w-8 h-8 flex items-center justify-center rounded-md bg-[var(--accent)] hover:brightness-110 transition-all disabled:opacity-30 shrink-0"
               >

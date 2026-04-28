@@ -90,6 +90,14 @@ class SoundService {
     this.playTone(900, now + 0.04, 0.04, 0.02, 'sine');
     this.playTone(1400, now + 0.08, 0.06, 0.01, 'sine');
   }
+
+  public playJarvisResponse() {
+    const ctx = this.init();
+    const now = ctx.currentTime;
+    // Digital acknowledgment blip
+    this.playTone(1100, now, 0.03, 0.02, 'sine');
+    this.playTone(900, now + 0.03, 0.03, 0.02, 'sine');
+  }
 }
 
 export const soundService = new SoundService();
