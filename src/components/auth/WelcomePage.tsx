@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { invoke } from '@tauri-apps/api/core';
 import { ParallaxBackground } from '../layout/ParallaxBackground';
 
 interface WelcomePageProps {
@@ -7,7 +8,68 @@ interface WelcomePageProps {
   onLogin: () => void;
 }
 
+type SystemStatusState = 'checking' | 'ready' | 'degraded' | 'error';
+
+interface SystemStatusResult {
+  db_healthy: boolean;
+  telemetry_active: boolean;
+  session_valid: boolean;
+}
+
+function useSystemStatus() {
+  const [status, setStatus] = useState<SystemStatusState>('checking');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const check = async () => {
+      try {
+        const result = await invoke<SystemStatusResult>('get_system_status');
+        if (cancelled) return;
+        setStatus(result.db_healthy ? 'ready' : 'degraded');
+      } catch {
+        if (!cancelled) setStatus('error');
+      }
+    };
+
+    check();
+    return () => { cancelled = true; };
+  }, []);
+
+  return status;
+}
+
+const STATUS_CONFIG: Record<SystemStatusState, { label: string; dotColor: string; textColor: string; borderColor: string }> = {
+  checking: {
+    label: 'INITIALIZING // CHECKING SYSTEM',
+    dotColor: '#adaaad',
+    textColor: '#adaaad',
+    borderColor: '#adaaad',
+  },
+  ready: {
+    label: 'SYSTEM READY // V1.0.0-STABLE',
+    dotColor: 'var(--accent)',
+    textColor: 'var(--accent)',
+    borderColor: 'var(--accent)',
+  },
+  degraded: {
+    label: 'SYSTEM DEGRADED // DB_FAULT',
+    dotColor: '#f59e0b',
+    textColor: '#f59e0b',
+    borderColor: '#f59e0b',
+  },
+  error: {
+    label: 'SYSTEM ERROR // BACKEND_OFFLINE',
+    dotColor: '#ef4444',
+    textColor: '#ef4444',
+    borderColor: '#ef4444',
+  },
+};
+
 export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin }) => {
+  const systemStatus = useSystemStatus();
+  const cfg = STATUS_CONFIG[systemStatus];
+
   return (
     <div className="relative min-h-screen flex flex-col bg-[var(--bg-primary)] text-[#ffffff] overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
 
@@ -31,9 +93,35 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted, onLogin 
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center relative z-10 w-full"
           >
-            <div className="border-l-2 border-[var(--accent)] bg-[var(--bg-secondary)]/80 px-4 py-1 mb-6 flex items-center justify-center backdrop-blur-sm">
-              <span className="text-[var(--accent)] font-main text-[10px] tracking-premium uppercase">SYSTEM READY // V1.0.0-STABLE</span>
-            </div>
+            <motion.div
+              key={systemStatus}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{ borderColor: cfg.borderColor }}
+              className="border-l-2 bg-[var(--bg-secondary)]/80 px-4 py-1 mb-6 flex items-center gap-2 justify-center backdrop-blur-sm"
+            >
+              {/* Pulsing status dot */}
+              <span className="relative flex h-[6px] w-[6px] flex-shrink-0">
+                <span
+                  className="absolute inline-flex h-full w-full rounded-full opacity-75"
+                  style={{
+                    backgroundColor: cfg.dotColor,
+                    animation: systemStatus === 'checking' ? 'ping 1s cubic-bezier(0,0,0.2,1) infinite' : 'none',
+                  }}
+                />
+                <span
+                  className="relative inline-flex rounded-full h-[6px] w-[6px]"
+                  style={{ backgroundColor: cfg.dotColor }}
+                />
+              </span>
+              <span
+                className="font-main text-[10px] tracking-premium uppercase"
+                style={{ color: cfg.textColor }}
+              >
+                {cfg.label}
+              </span>
+            </motion.div>
 
             <h1 className="text-4xl md:text-6xl lg:text-[72px] font-main font-bold leading-[1.1] md:leading-[0.95] tracking-[-2px] md:tracking-[-4px] text-[#fffbfe] mb-6 flex flex-col pt-4">
               <span>ARCHIVE.</span>
