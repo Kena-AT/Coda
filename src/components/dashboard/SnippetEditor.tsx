@@ -643,7 +643,7 @@ export const SnippetEditor: React.FC = () => {
                          })}
                        {savedTags.filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase())).length === 0 && (
                          <div className="px-3 py-4 text-[9px] font-mono text-[#adaaad]/40 text-center uppercase">
-                           {tagSearchInput ? 'No matches — press Enter to add' : 'No tags saved yet'}
+                           {tagSearchInput ? `No matches for "${tagSearchInput}"` : `Registry empty for user ${user?.id || '?'}`}
                          </div>
                        )}
                      </div>
