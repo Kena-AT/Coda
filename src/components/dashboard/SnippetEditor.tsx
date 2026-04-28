@@ -603,7 +603,14 @@ export const SnippetEditor: React.FC = () => {
                          placeholder="Type & press Enter to add..."
                          className="flex-1 bg-transparent text-white text-[10px] font-mono px-3 py-2 outline-none placeholder-[#adaaad]/30"
                          onClick={e => e.stopPropagation()}
-                       />
+                        />
+                        <button
+                          onClick={e => { e.stopPropagation(); fetchTags(); }}
+                          className="px-2 text-[#adaaad] hover:text-[var(--accent)] transition-colors"
+                          title="Refresh Registry"
+                        >
+                          <RefreshCw size={12} />
+                        </button>
                        {tagSearchInput && (
                          <button
                            onClick={e => { e.stopPropagation(); addFreeTextTag(); }}
