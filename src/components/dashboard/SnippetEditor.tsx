@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+{savedTags.length > 0 && savedTags.filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))).length === 0 && (import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Editor, DiffEditor } from '@monaco-editor/react';
 import { useStore, Snippet, Tag } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
