@@ -1,4 +1,4 @@
-{savedTags.length > 0 && savedTags.filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))).length === 0 && (import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Editor, DiffEditor } from '@monaco-editor/react';
 import { useStore, Snippet, Tag } from '../../store/useStore';
 import { invoke } from '@tauri-apps/api/core';
@@ -654,7 +654,7 @@ export const SnippetEditor: React.FC = () => {
                             <div className="text-[10px] font-mono text-[#adaaad]/20 animate-pulse">VAULT_EMPTY</div>
                           </div>
                         )}
-                        {savedTags.length > 0 && savedTags.filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))).length === 0 && ({savedTags.filter(t => !tagSearchInput || t.name.toLowerCase().includes(tagSearchInput.toLowerCase())).length === 0 && (
+                        {savedTags.length > 0 && savedTags.filter(t => !tagSearchInput || (t.name && t.name.toLowerCase().includes(tagSearchInput.toLowerCase()))).length === 0 && (
                          <div className="px-3 py-4 text-[9px] font-mono text-[#adaaad]/40 text-center uppercase">
                            {tagSearchInput ? `No matches for "${tagSearchInput}"` : `Registry empty for user ${user?.id || '?'}`}
                          </div>
