@@ -421,9 +421,10 @@ export const CodaAI: React.FC = () => {
             <p className="text-[7px] font-mono text-[#adaaad]/30 text-center mt-2 tracking-widest uppercase">
               {isListening ? 'Neural Uplink Active' : isSpeaking ? 'JARVIS SPEAKING...' : `Powered by ${activeModel}`}
             </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </motion.div>
+);
 };
