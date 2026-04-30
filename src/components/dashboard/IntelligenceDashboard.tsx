@@ -1,19 +1,31 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useStore, Snippet } from '../../store/useStore';
+import { useStore, Snippet, Tag } from '../../store/useStore';
 import { SnippetCard } from './SnippetCard';
 import { Flame, Clock, Archive, Activity, Folder, Copy, Search } from 'lucide-react';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { invoke } from '@tauri-apps/api/core';
 import toast from 'react-hot-toast';
 import { ConfirmationModal } from './ConfirmationModal';
+import { VirtuosoGrid } from 'react-virtuoso';
 
 export const IntelligenceDashboard: React.FC = () => {
-  const { user, snippets, projects, setSelectedSnippetId, setSnippets, setActiveTab, setSelectedProjectId, setLoading } = useStore();
+  const { 
+    user, 
+    snippets, 
+    projects, 
+    setSelectedSnippetId, 
+    setSnippets, 
+    setActiveTab, 
+    setSelectedProjectId, 
+    setLoading,
+    selectedTag,
+    setSelectedTag,
+    selectedCategory,
+    setSelectedCategory
+  } = useStore();
   const playSound = useSoundEffect();
   const [snippetToDelete, setSnippetToDelete] = useState<number | null>(null);
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [availableTags, setAvailableTags] = useState<any[]>([]);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const [localSearch, setLocalSearch] = useState('');
 
@@ -259,7 +271,37 @@ export const IntelligenceDashboard: React.FC = () => {
       </div>
 
       {isFiltering ? (
-        renderSnippetRow('Filtered Results', <Search size={18} />, sections.filteredAll, 'No snippets match your filter protocol')
+        <div className="flex-1 overflow-hidden min-h-[500px]">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="p-2 bg-[var(--border)]/50 rounded text-[#adaaad]"><Search size={18} /></div>
+            <h2 className="text-xl font-bold font-main uppercase text-white tracking-[-0.5px]">Filtered Results</h2>
+            <span className="text-[10px] font-mono text-[#adaaad] ml-2">[{sections.filteredAll.length} NODES]</span>
+          </div>
+          {sections.filteredAll.length === 0 ? (
+            <div className="p-8 border border-dashed border-[var(--border)] text-center text-[#adaaad] font-mono text-[11px] uppercase rounded-lg">
+              No snippets match your filter protocol
+            </div>
+          ) : (
+            <VirtuosoGrid
+              style={{ height: '600px' }}
+              totalCount={sections.filteredAll.length}
+              itemContent={(index: number) => {
+                const s = sections.filteredAll[index];
+                return (
+                  <div className="h-[220px] p-2">
+                    <SnippetCard 
+                      snippet={s} 
+                      onEdit={() => { playSound('transition'); setSelectedSnippetId(s.id!); }}
+                      onDelete={() => { playSound('click'); setSnippetToDelete(s.id!); }}
+                      onArchive={() => handleArchive(s.id!)}
+                    />
+                  </div>
+                );
+              }}
+              listClassName="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            />
+          )}
+        </div>
       ) : (
         <>
           <div className="mb-12">

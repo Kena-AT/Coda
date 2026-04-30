@@ -51,7 +51,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(snippet.content);
+      await navigator.clipboard.writeText(snippet.content || '');
       if (snippet.id) {
         await invoke('record_snippet_usage', { snippetId: snippet.id });
         updateSnippetInStore(snippet.id, { 
@@ -216,7 +216,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
         <div className="flex-1 mb-4 relative z-10 overflow-hidden" onClick={onEdit}>
           <div className="bg-black/40 p-3 font-mono text-[10px] text-[#adaaad]/60 line-clamp-3 rounded border border-white/5 cursor-pointer hover:bg-black/60 transition-colors">
             <code className="leading-tight tracking-tight">
-              <HighlightText text={snippet.content} query={searchQuery} />
+              <HighlightText text={snippet.content || ''} query={searchQuery} />
             </code>
           </div>
         </div>
@@ -227,7 +227,18 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
         <div className="flex items-center gap-2 overflow-hidden max-w-[75%]">
           {snippet.tag_nodes && snippet.tag_nodes.length > 0 ? (
             snippet.tag_nodes.slice(0, 3).map((tag, i) => (
-              <div key={i} className="flex items-center gap-1.5 px-2 py-0.5 bg-black/40 border border-white/5 rounded-sm">
+              <button 
+                key={i} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const { setSelectedTag, setSelectedCategory, setActiveTab } = useStore.getState();
+                  setSelectedTag(tag.name);
+                  if (tag.category) setSelectedCategory(tag.category);
+                  setActiveTab('library');
+                  toast.success(`Filtering by #${tag.name.toUpperCase()}`);
+                }}
+                className="flex items-center gap-1.5 px-2 py-0.5 bg-black/40 border border-white/5 rounded-sm hover:border-[var(--accent)]/50 transition-colors"
+              >
                 <div 
                   className="w-1 h-1 rounded-full shadow-[0_0_5px_rgba(255,255,255,0.2)]" 
                   style={{ backgroundColor: tag.color || 'var(--accent)' }} 
@@ -238,14 +249,25 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onEdit, onDel
                     <span className="ml-1 text-[#5f3f3a] text-[7px] hidden group-hover:inline">[{tag.category}]</span>
                   )}
                 </span>
-              </div>
+              </button>
             ))
           ) : (
             <>
               {snippet.tags && snippet.tags.split(',').slice(0, 2).map((tag, i) => (
-                <span key={i} className="text-[8px] text-[#adaaad] py-0.5 px-1.5 bg-[var(--border)] border border-white/5 truncate">
+                <button 
+                  key={i} 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const name = tag.trim();
+                    const { setSelectedTag, setActiveTab } = useStore.getState();
+                    setSelectedTag(name);
+                    setActiveTab('library');
+                    toast.success(`Filtering by #${name.toUpperCase()}`);
+                  }}
+                  className="text-[8px] text-[#adaaad] py-0.5 px-1.5 bg-[var(--border)] border border-white/5 truncate hover:border-[var(--accent)]/50 transition-colors"
+                >
                   {tag.trim().toUpperCase()}
-                </span>
+                </button>
               ))}
             </>
           )}
