@@ -10,7 +10,7 @@ pub struct Snippet {
     pub user_id: i32,
     pub project_id: Option<i32>,
     pub title: String,
-    pub content: String,
+    pub content: Option<String>,
     pub language: String,
     pub tags: Option<String>,
     pub is_archived: bool,
@@ -181,12 +181,16 @@ pub fn list_snippets(
     user_id: i32,
     include_archived: bool,
     include_deleted: Option<bool>,
-    bypass_cache: Option<bool>
+    bypass_cache: Option<bool>,
+    limit: Option<i32>,
+    offset: Option<i32>,
+    load_content: Option<bool>
 ) -> Result<SnippetResponse, String> {
     let show_trash = include_deleted.unwrap_or(false);
+    let should_load_content = load_content.unwrap_or(true);
 
     // Basic cache check (only for main list, not archived/deleted for simplicity)
-    if !include_archived && !show_trash && !bypass_cache.unwrap_or(false) {
+    if !include_archived && !show_trash && !bypass_cache.unwrap_or(false) && limit.is_none() && offset.is_none() && should_load_content {
         if let Some(cached) = state.snippet_cache.get(&user_id) {
             return Ok(SnippetResponse {
                 success: true,
@@ -199,7 +203,11 @@ pub fn list_snippets(
     let t0 = Instant::now();
     let conn = get_db_connection(&app_handle)?;
     
-    let mut query = "SELECT id, user_id, project_id, title, content, language, tags, is_archived, is_favorite, deleted_at, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ?".to_string();
+    let mut query = if should_load_content {
+        "SELECT id, user_id, project_id, title, content, language, tags, is_archived, is_favorite, deleted_at, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ?".to_string()
+    } else {
+        "SELECT id, user_id, project_id, title, NULL as content, language, tags, is_archived, is_favorite, deleted_at, copy_count, edit_count, detected_patterns, impressions, clicks, last_used_at, archive_snoozed_until, created_at, updated_at FROM snippets WHERE user_id = ?".to_string()
+    };
 
     if show_trash {
         query.push_str(" AND deleted_at IS NOT NULL");
@@ -211,6 +219,13 @@ pub fn list_snippets(
     }
     
     query.push_str(" ORDER BY updated_at DESC");
+
+    if let Some(l) = limit {
+        query.push_str(&format!(" LIMIT {}", l));
+    }
+    if let Some(o) = offset {
+        query.push_str(&format!(" OFFSET {}", o));
+    }
 
     let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
 
@@ -241,38 +256,51 @@ pub fn list_snippets(
 
     let mut snippets = Vec::new();
     for snippet_result in snippet_iter {
-        let mut snippet = snippet_result.map_err(|e| e.to_string())?;
-        
-        // Fetch detailed tag nodes for this snippet
-        if let Some(sid) = snippet.id {
-            let mut tag_stmt = conn.prepare("
-                SELECT t.id, t.user_id, t.name, t.category, t.color, t.created_at
-                FROM tags t
-                JOIN snippet_tags st ON t.id = st.tag_id
-                WHERE st.snippet_id = ?
-            ").map_err(|e| e.to_string())?;
-
-            let tag_nodes: Vec<Tag> = tag_stmt.query_map([sid], |row| {
-                Ok(Tag {
-                    id: Some(row.get(0)?),
-                    user_id: row.get(1)?,
-                    name: row.get(2)?,
-                    category: row.get(3)?,
-                    color: row.get(4)?,
-                    created_at: Some(row.get(5)?),
-                })
-            }).map_err(|e| e.to_string())?
-              .collect::<Result<Vec<_>, _>>()
-              .map_err(|e| e.to_string())?;
-
-            snippet.tag_nodes = Some(tag_nodes);
-        }
-        
-        snippets.push(snippet);
+        snippets.push(snippet_result.map_err(|e| e.to_string())?);
     }
 
-    // Populate cache for main list
-    if !include_archived && !show_trash {
+    // Optimization: Fetch all tags for all returned snippets in ONE query (Avoid N+1)
+    if !snippets.is_empty() {
+        let ids: Vec<String> = snippets.iter().map(|s| s.id.unwrap().to_string()).collect();
+        let id_list = ids.join(",");
+        let tag_query = format!("
+            SELECT st.snippet_id, t.id, t.user_id, t.name, t.category, t.color, t.created_at
+            FROM tags t
+            JOIN snippet_tags st ON t.id = st.tag_id
+            WHERE st.snippet_id IN ({})
+        ", id_list);
+
+        let mut tag_stmt = conn.prepare(&tag_query).map_err(|e| e.to_string())?;
+        let tag_map_iter = tag_stmt.query_map([], |row| {
+            Ok((
+                row.get::<_, i32>(0)?,
+                Tag {
+                    id: Some(row.get(1)?),
+                    user_id: row.get(2)?,
+                    name: row.get(3)?,
+                    category: row.get(4)?,
+                    color: row.get(5)?,
+                    created_at: Some(row.get(6)?),
+                }
+            ))
+        }).map_err(|e| e.to_string())?;
+
+        let mut tag_map: std::collections::HashMap<i32, Vec<Tag>> = std::collections::HashMap::new();
+        for item in tag_map_iter {
+            if let Ok((sid, tag)) = item {
+                tag_map.entry(sid).or_insert_with(Vec::new).push(tag);
+            }
+        }
+
+        for snippet in &mut snippets {
+            if let Some(sid) = snippet.id {
+                snippet.tag_nodes = tag_map.remove(&sid);
+            }
+        }
+    }
+
+    // Populate cache for main list (only if full list and content loaded)
+    if !include_archived && !show_trash && limit.is_none() && should_load_content {
         state.snippet_cache.insert(user_id, snippets.clone());
     }
 
@@ -287,6 +315,24 @@ pub fn list_snippets(
         message: "Snippets retrieved from database".to_string(),
         data: Some(snippets),
     })
+}
+
+#[tauri::command]
+pub fn get_snippet_content(app_handle: AppHandle, snippet_id: i32) -> Result<String, String> {
+    let conn = get_db_connection(&app_handle)?;
+    let content: String = conn.query_row(
+        "SELECT content FROM snippets WHERE id = ?",
+        [snippet_id],
+        |row| row.get(0)
+    ).map_err(|e| format!("SNIPPET_NOT_FOUND: {}", e))?;
+    
+    Ok(content)
+}
+
+#[tauri::command]
+pub fn purge_snippet_cache_all(state: State<'_, AppState>) -> Result<(), String> {
+    state.snippet_cache.clear();
+    Ok(())
 }
 
 #[tauri::command]

@@ -178,6 +178,13 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
 
     conn.execute_batch(
         "
+        CREATE INDEX IF NOT EXISTS idx_snippets_user_id ON snippets(user_id);
+        CREATE INDEX IF NOT EXISTS idx_snippets_project_id ON snippets(project_id);
+        CREATE INDEX IF NOT EXISTS idx_snippets_updated_at ON snippets(updated_at);
+        CREATE INDEX IF NOT EXISTS idx_snippets_deleted_at ON snippets(deleted_at);
+        CREATE INDEX IF NOT EXISTS idx_snippets_is_archived ON snippets(is_archived);
+        CREATE INDEX IF NOT EXISTS idx_activity_log_timestamp ON activity_log(timestamp);
+
         CREATE VIRTUAL TABLE IF NOT EXISTS snippets_fts USING fts5(
             title, content, tags, content='snippets', content_rowid='id'
         );
