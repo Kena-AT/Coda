@@ -273,7 +273,6 @@ export const HardwareVisualization: React.FC = () => {
           </div>
         </div>
       </div>
-v>
 
       {/* Footer metrics */}
       <div className="flex gap-4 text-[9px] font-main text-[#adaaad] uppercase tracking-[1px]">
