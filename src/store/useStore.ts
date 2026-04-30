@@ -172,11 +172,13 @@ export const useStore = create<AppState>()(
           
           set((state: AppState) => {
             const keys = Object.keys(state.snippetContents);
-            let newContents = { ...state.snippetContents, [id]: content };
+            const newContents = { ...state.snippetContents, [id]: content };
+            
             if (keys.length > 50) {
-              const firstKey = keys[0];
-              const { [firstKey]: _, ...rest } = newContents;
-              newContents = rest as Record<number, string>;
+              const firstKey = parseInt(keys[0]);
+              if (!isNaN(firstKey) && firstKey !== id) {
+                delete newContents[firstKey];
+              }
             }
 
             return {
