@@ -519,132 +519,139 @@ export const ProjectVault: React.FC = () => {
           MAPPING_VAULT_TOPOLOGY...
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
-          {allProjects.map(p => {
-            const s = stats[p.id!];
-            const health = calculateHealth(s);
-            return (
-              <div 
-                key={p.id} 
-                className="bg-[#151515] border border-[var(--border)] p-6 hover:border-[var(--accent)]/50 transition-all group cursor-pointer relative flex flex-col h-full"
-                onClick={() => { playSound('transition'); setSelectedProjectId(p.id); }}
-                onMouseEnter={() => playSound('hover')}
-              >
-                <div className="flex justify-between items-start mb-6">
-                  {editingProjectId === p.id ? (
-                    <div className="flex flex-col gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type="text"
-                        value={inlineEditName}
-                        onChange={(e) => setInlineEditName(e.target.value)}
-                        className="font-main font-bold text-white bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 text-sm outline-none focus:border-[var(--accent)] uppercase tracking-[0.5px] w-full"
-                        placeholder="PROJECT_NAME..."
-                        autoFocus
-                      />
-                      <input
-                        type="text"
-                        value={inlineEditDesc}
-                        onChange={(e) => setInlineEditDesc(e.target.value)}
-                        className="text-[#adaaad] font-mono text-[9px] bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 outline-none focus:border-[var(--accent)] w-full"
-                        placeholder="Description..."
-                      />
-                      <div className="flex gap-2 mt-1">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); saveInlineEdit(p.id!); }}
-                          className="px-2 py-1 bg-[var(--accent)] text-white text-[9px] font-bold uppercase"
-                        >
-                          <Check size={12} />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); cancelInlineEdit(); }}
-                          className="px-2 py-1 border border-[var(--border)] text-[#adaaad] text-[9px] font-bold uppercase"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 group-hover:bg-[var(--accent)] group-hover:text-white transition-all">
-                          {p.id === -1 ? <Inbox className="w-5 h-5" /> : <FolderGit2 className="w-5 h-5" />}
+        <div className="flex-1 overflow-hidden min-h-[400px]">
+          <VirtuosoGrid
+            style={{ height: '100%' }}
+            totalCount={allProjects.length}
+            itemContent={(index) => {
+              const p = allProjects[index];
+              const s = stats[p.id!];
+              const health = calculateHealth(s);
+              return (
+                <div className="p-3 h-full">
+                  <div 
+                    className="bg-[#151515] border border-[var(--border)] p-6 hover:border-[var(--accent)]/50 transition-all group cursor-pointer relative flex flex-col h-full"
+                    onClick={() => { playSound('transition'); setSelectedProjectId(p.id); }}
+                    onMouseEnter={() => playSound('hover')}
+                  >
+                    <div className="flex justify-between items-start mb-6">
+                      {editingProjectId === p.id ? (
+                        <div className="flex flex-col gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="text"
+                            value={inlineEditName}
+                            onChange={(e) => setInlineEditName(e.target.value)}
+                            className="font-main font-bold text-white bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 text-sm outline-none focus:border-[var(--accent)] uppercase tracking-[0.5px] w-full"
+                            placeholder="PROJECT_NAME..."
+                            autoFocus
+                          />
+                          <input
+                            type="text"
+                            value={inlineEditDesc}
+                            onChange={(e) => setInlineEditDesc(e.target.value)}
+                            className="text-[#adaaad] font-mono text-[9px] bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 outline-none focus:border-[var(--accent)] w-full"
+                            placeholder="Description..."
+                          />
+                          <div className="flex gap-2 mt-1">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); saveInlineEdit(p.id!); }}
+                              className="px-2 py-1 bg-[var(--accent)] text-white text-[9px] font-bold uppercase"
+                            >
+                              <Check size={12} />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); cancelInlineEdit(); }}
+                              className="px-2 py-1 border border-[var(--border)] text-[#adaaad] text-[9px] font-bold uppercase"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                          <h3 className="font-main font-bold text-white tracking-[0.5px] uppercase">{p.name}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-[9px] font-black uppercase font-mono tracking-widest ${health.color}`}>
-                              {health.label}
-                            </span>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 group-hover:bg-[var(--accent)] group-hover:text-white transition-all">
+                              {p.id === -1 ? <Inbox className="w-5 h-5" /> : <FolderGit2 className="w-5 h-5" />}
+                            </div>
+                            <div className="flex flex-col">
+                              <h3 className="font-main font-bold text-white tracking-[0.5px] uppercase">{p.name}</h3>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className={`text-[9px] font-black uppercase font-mono tracking-widest ${health.color}`}>
+                                  {health.label}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {p.id !== -1 && (
+                              <div className="flex items-center gap-2 mr-2">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); startInlineEdit(p); }}
+                                  className="p-2 bg-[#1a1a1a] border border-[#333] text-[#adaaad] hover:text-[var(--accent)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all"
+                                  title="Edit"
+                                >
+                                  <Edit2 size={16} />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openDeleteModal(p.id!); }}
+                                  className="p-2 bg-[#1a1a1a] border border-[#333] text-[#adaaad] hover:text-[var(--accent)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all"
+                                  title="Purge"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            )}
+                            <ChevronRight className="w-5 h-5 text-[#adaaad] group-hover:text-[var(--accent)] transform transition-transform group-hover:translate-x-1" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    
+                    {s ? (
+                      <div className="grid grid-cols-2 gap-y-6 gap-x-4 pb-6 border-b border-[var(--border)] flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-black/40 rounded text-[#3b82f6]"><PieChart size={14} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[14px] font-mono font-bold text-white">{s.active_snippets}</span>
+                            <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Active_Nodes</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-black/40 rounded text-[#ff0000]"><AlertTriangle size={14} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[14px] font-mono font-bold text-white">{s.stale_snippets}</span>
+                            <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Stale_Detect</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-black/40 rounded text-white"><Activity size={14} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[14px] font-mono font-bold text-white">{s.total_copies}</span>
+                            <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Usage_Metric</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-black/40 rounded text-[#facc15]"><Code2 size={14} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[12px] font-mono font-bold text-white truncate max-w-[80px]">{s.main_language || 'Mixed'}</span>
+                            <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Dominant_Lang</span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {p.id !== -1 && (
-                          <div className="flex items-center gap-2 mr-2">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); startInlineEdit(p); }}
-                              className="p-2 bg-[#1a1a1a] border border-[#333] text-[#adaaad] hover:text-[var(--accent)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all"
-                              title="Edit"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); openDeleteModal(p.id!); }}
-                              className="p-2 bg-[#1a1a1a] border border-[#333] text-[#adaaad] hover:text-[var(--accent)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all"
-                              title="Purge"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        )}
-                        <ChevronRight className="w-5 h-5 text-[#adaaad] group-hover:text-[var(--accent)] transform transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </>
-                  )}
-                </div>
-                
-                {s ? (
-                  <div className="grid grid-cols-2 gap-y-6 gap-x-4 pb-6 border-b border-[var(--border)] flex-1">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-black/40 rounded text-[#3b82f6]"><PieChart size={14} /></div>
-                      <div className="flex flex-col">
-                        <span className="text-[14px] font-mono font-bold text-white">{s.active_snippets}</span>
-                        <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Active_Nodes</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-black/40 rounded text-[#ff0000]"><AlertTriangle size={14} /></div>
-                      <div className="flex flex-col">
-                        <span className="text-[14px] font-mono font-bold text-white">{s.stale_snippets}</span>
-                        <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Stale_Detect</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-black/40 rounded text-white"><Activity size={14} /></div>
-                      <div className="flex flex-col">
-                        <span className="text-[14px] font-mono font-bold text-white">{s.total_copies}</span>
-                        <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Usage_Metric</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-black/40 rounded text-[#facc15]"><Code2 size={14} /></div>
-                      <div className="flex flex-col">
-                        <span className="text-[12px] font-mono font-bold text-white truncate max-w-[80px]">{s.main_language || 'Mixed'}</span>
-                        <span className="text-[8px] text-[#adaaad] uppercase font-mono tracking-tighter">Dominant_Lang</span>
-                      </div>
+                    ) : (
+                      <div className="flex-1 animate-pulse bg-[#19191c] mb-4 h-[120px]" />
+                    )}
+                    
+                    <div className="pt-4 flex justify-between items-center text-[9px] font-mono text-[#adaaad] uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
+                       PROJECT_RECON_DATA // ID_{p.id === -1 ? '000' : p.id}
+                       {p.description && <span className="italic normal-case truncate max-w-[150px]">— {p.description}</span>}
                     </div>
                   </div>
-                ) : (
-                  <div className="flex-1 animate-pulse bg-[#19191c] mb-4 h-[120px]" />
-                )}
-                
-                <div className="pt-4 flex justify-between items-center text-[9px] font-mono text-[#adaaad] uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
-                   PROJECT_RECON_DATA // ID_{p.id === -1 ? '000' : p.id}
-                   {p.description && <span className="italic normal-case truncate max-w-[150px]">— {p.description}</span>}
                 </div>
-              </div>
-            );
-          })}
+              );
+            }}
+            listClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2 pb-20"
+          />
         </div>
       )}
 
