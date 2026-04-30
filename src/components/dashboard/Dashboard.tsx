@@ -113,7 +113,8 @@ export const Dashboard: React.FC = () => {
         userId: user.id,
         includeArchived: includeArchived,
         includeDeleted: includeDeleted,
-        bypass_cache: force
+        bypass_cache: force,
+        load_content: false // Optimization: Don't load full code content in the list
       });
       if (response.success) {
         setSnippets(response.data || []);

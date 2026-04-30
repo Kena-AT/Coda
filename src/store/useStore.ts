@@ -15,7 +15,7 @@ export interface Snippet {
   user_id: number;
   project_id?: number | null;
   title: string;
-  content: string;
+  content?: string;
   language: string;
   tags: string | null;
   tag_nodes?: Tag[] | null;
@@ -73,6 +73,8 @@ interface AppError {
 interface AppState {
   user: { id: number; username: string } | null;
   snippets: Snippet[];
+  snippetContents: Record<number, string>;
+  snippetContentLoading: Record<number, boolean>;
   loading: boolean;
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -84,6 +86,8 @@ interface AppState {
   addSnippet: (snippet: Snippet) => void;
   removeSnippet: (id: number) => void;
   updateSnippetInStore: (id: number, updates: Partial<Snippet>) => void;
+  fetchSnippetContent: (id: number) => Promise<string | null>;
+  setSnippetContent: (id: number, content: string) => void;
 
   sessionCopies: Record<number, number>;
   incrementCopy: (id: number) => void;
@@ -118,29 +122,84 @@ export const useStore = create<AppState>()(
     (set) => ({
       user: null,
       snippets: [],
+      snippetContents: {},
+      snippetContentLoading: {},
       loading: false,
       activeTab: 'library',
-      setActiveTab: (activeTab) => set({ activeTab }),
+      setActiveTab: (activeTab: string) => set({ activeTab }),
       selectedSnippetId: null,
 
-      setUser: (user) => set({ user }),
-      setSnippets: (snippets) => set({ snippets }),
-      setLoading: (loading) => set({ loading }),
+      setUser: (user: { id: number; username: string } | null) => set({ user }),
+      setSnippets: (snippets: Snippet[]) => set({ snippets }),
+      setLoading: (loading: boolean) => set({ loading }),
 
-      addSnippet: (snippet) => set((state) => ({ snippets: [snippet, ...state.snippets] })),
-      removeSnippet: (id) => set((state) => ({ 
-        snippets: state.snippets.filter((s) => s.id !== id) 
+      addSnippet: (snippet: Snippet) => set((state: AppState) => ({ snippets: [snippet, ...state.snippets] })),
+      removeSnippet: (id: number) => set((state: AppState) => ({ 
+        snippets: state.snippets.filter((s: Snippet) => s.id !== id) 
       })),
-      updateSnippetInStore: (id, updates) => set((state) => ({
-        snippets: state.snippets.map((s) => s.id === id ? { ...s, ...updates } : s)
+      updateSnippetInStore: (id: number, updates: Partial<Snippet>) => set((state: AppState) => ({
+        snippets: state.snippets.map((s: Snippet) => s.id === id ? { ...s, ...updates } : s),
+        snippetContents: updates.content !== undefined 
+          ? { ...state.snippetContents, [id]: updates.content } 
+          : state.snippetContents
       })),
 
-      setSelectedSnippetId: (id) => set({ selectedSnippetId: id }),
+      setSnippetContent: (id: number, content: string) => set((state: AppState) => ({
+        snippetContents: { ...state.snippetContents, [id]: content }
+      })),
+
+      fetchSnippetContent: async (id: number): Promise<string | null> => {
+        // Use set to access state instead of useStore.getState() to avoid circularity issues in some TS versions
+        let currentContent: string | undefined;
+        let isLoading: boolean | undefined;
+        
+        set((state: AppState) => {
+          currentContent = state.snippetContents[id];
+          isLoading = state.snippetContentLoading[id];
+          return {};
+        });
+
+        if (currentContent) return currentContent;
+        if (isLoading) return null;
+
+        set((state: AppState) => ({
+          snippetContentLoading: { ...state.snippetContentLoading, [id]: true }
+        }));
+
+        try {
+          const { invoke } = await import('@tauri-apps/api/core');
+          const content = await invoke<string>('get_snippet_content', { snippetId: id });
+          
+          set((state: AppState) => {
+            const keys = Object.keys(state.snippetContents);
+            let newContents = { ...state.snippetContents, [id]: content };
+            if (keys.length > 50) {
+              const firstKey = keys[0];
+              const { [firstKey]: _, ...rest } = newContents;
+              newContents = rest as Record<number, string>;
+            }
+
+            return {
+              snippetContents: newContents,
+              snippetContentLoading: { ...state.snippetContentLoading, [id]: false }
+            };
+          });
+          return content;
+        } catch (e) {
+          console.error('Failed to fetch snippet content:', e);
+          set((state: AppState) => ({
+            snippetContentLoading: { ...state.snippetContentLoading, [id]: false }
+          }));
+          return null;
+        }
+      },
+
+      setSelectedSnippetId: (id: number | null | -1) => set({ selectedSnippetId: id }),
       selectedProjectId: null,
-      setSelectedProjectId: (id) => set({ selectedProjectId: id }),
+      setSelectedProjectId: (id: number | null) => set({ selectedProjectId: id }),
 
       projects: [],
-      setProjects: (projects) => set({ projects }),
+      setProjects: (projects: Project[]) => set({ projects }),
 
       settings: {
         lockoutThreshold: 3,
@@ -156,21 +215,21 @@ export const useStore = create<AppState>()(
         },
         voiceEnabled: true
       },
-      setSettings: (newSettings) => set((state) => ({ 
+      setSettings: (newSettings: Partial<Settings>) => set((state: AppState) => ({ 
         settings: { ...state.settings, ...newSettings } 
       })),
 
       searchQuery: '',
-      setSearchQuery: (query) => set({ searchQuery: query }),
+      setSearchQuery: (query: string) => set({ searchQuery: query }),
 
       preSelectedProjectId: null,
-      setPreSelectedProjectId: (id) => set({ preSelectedProjectId: id }),
+      setPreSelectedProjectId: (id: number | null) => set({ preSelectedProjectId: id }),
 
       globalError: null,
-      setGlobalError: (globalError) => set({ globalError }),
+      setGlobalError: (globalError: AppError | null) => set({ globalError }),
 
       sessionCopies: {},
-      incrementCopy: (id) => set((state) => ({
+      incrementCopy: (id: number) => set((state: AppState) => ({
         sessionCopies: { 
           ...state.sessionCopies, 
           [id]: (state.sessionCopies[id] || 0) + 1 
@@ -178,7 +237,7 @@ export const useStore = create<AppState>()(
       })),
 
       sidebarOpen: false,
-      setSidebarOpen: (sidebarOpen) => set({ sidebarOpen })
+      setSidebarOpen: (sidebarOpen: boolean) => set({ sidebarOpen })
     }),
     {
       name: 'coda-storage',
