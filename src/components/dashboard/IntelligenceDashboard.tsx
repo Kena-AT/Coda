@@ -57,7 +57,8 @@ export const IntelligenceDashboard: React.FC = () => {
       const response: any = await invoke('list_snippets', {
         userId: user.id,
         includeArchived: false,
-        bypass_cache: force
+        bypass_cache: force,
+        load_content: false // Optimization: Don't load full code content here
       });
       if (response.success) {
         setSnippets(response.data || []);
