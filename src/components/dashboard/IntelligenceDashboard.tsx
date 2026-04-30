@@ -120,16 +120,15 @@ export const IntelligenceDashboard: React.FC = () => {
       );
     }
     
+    const filteredAll = unarchived;
+
     // Top Snippets (Elite Criteria: min 5 copies, stable edits, used in last 90 days)
     const topSnippets = [...unarchived]
       .filter(s => {
         const copies = s.copy_count || 0;
-        // Normalize SQLite date string (space to T) for JS Date compatibility
         const lastUsedStr = s.last_used_at ? s.last_used_at.replace(' ', 'T') : null;
         const lastUsed = lastUsedStr ? new Date(lastUsedStr).getTime() : 0;
         const isRecent = !s.last_used_at || (new Date().getTime() - lastUsed) < 180 * 24 * 60 * 60 * 1000;
-        
-        // Relaxed criteria: 5+ copies and used in last 6 months
         return copies >= 5 && isRecent;
       })
       .sort((a, b) => (b.copy_count || 0) - (a.copy_count || 0))
@@ -160,8 +159,10 @@ export const IntelligenceDashboard: React.FC = () => {
       })
       .slice(0, 4);
 
-    return { topSnippets, continueWorking, projScores, stale };
-  }, [snippets, projects]);
+    return { topSnippets, continueWorking, projScores, stale, filteredAll };
+  }, [snippets, projects, selectedCategory, selectedTag, localSearch]);
+
+  const isFiltering = selectedCategory || selectedTag || localSearch;
 
   const renderSnippetRow = (title: string, icon: React.ReactNode, list: Snippet[], emptyText: string) => (
     <div className="mb-12">
@@ -257,43 +258,49 @@ export const IntelligenceDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="mb-12">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 bg-[var(--border)]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
-          <h2 className="text-lg md:text-xl font-bold font-main uppercase text-white tracking-header">Active Projects</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {sections.projScores.map(p => p && (
-            <div 
-              key={p.id} 
-              onClick={() => {
-                playSound('transition');
-                setSelectedProjectId(p.id);
-                setActiveTab('projects');
-              }}
-              onMouseEnter={() => playSound('hover')}
-              className="bg-[#151515] border border-[var(--border)] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <Folder className="w-5 h-5 text-[var(--accent)]" />
-                <span className="text-[#adaaad] text-[9px] font-mono tracking-premium">{p.snippetCount} ITEMS</span>
-              </div>
-              <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[var(--accent)] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-[10px] text-[#adaaad] font-mono">ACTIVITY SCORE: {p.score}</p>
-                <div className="flex items-center gap-1">
-                  <Copy size={10} className="text-[var(--accent)]" />
-                  <span className="text-[10px] text-white font-mono font-bold">{p.totalCopies}</span>
-                </div>
-              </div>
+      {isFiltering ? (
+        renderSnippetRow('Filtered Results', <Search size={18} />, sections.filteredAll, 'No snippets match your filter protocol')
+      ) : (
+        <>
+          <div className="mb-12">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="p-2 bg-[var(--border)]/50 rounded text-[var(--accent)]"><Activity size={18} /></div>
+              <h2 className="text-lg md:text-xl font-bold font-main uppercase text-white tracking-header">Active Projects</h2>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {sections.projScores.map(p => p && (
+                <div 
+                  key={p.id} 
+                  onClick={() => {
+                    playSound('transition');
+                    setSelectedProjectId(p.id);
+                    setActiveTab('projects');
+                  }}
+                  onMouseEnter={() => playSound('hover')}
+                  className="bg-[#151515] border border-[var(--border)] p-5 hover:border-[var(--accent)]/50 transition-colors cursor-pointer group"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <Folder className="w-5 h-5 text-[var(--accent)]" />
+                    <span className="text-[#adaaad] text-[9px] font-mono tracking-premium">{p.snippetCount} ITEMS</span>
+                  </div>
+                  <h3 className="text-sm font-bold font-main text-white uppercase line-clamp-1 group-hover:text-[var(--accent)] transition-colors">{p.name || 'UNTITLED_PROJECT'}</h3>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-[10px] text-[#adaaad] font-mono">ACTIVITY SCORE: {p.score}</p>
+                    <div className="flex items-center gap-1">
+                      <Copy size={10} className="text-[var(--accent)]" />
+                      <span className="text-[10px] text-white font-mono font-bold">{p.totalCopies}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-      {renderSnippetRow('Continue Working', <Clock size={18} />, sections.continueWorking, 'No recent edits found')}
-      {renderSnippetRow('Top Snippets', <Flame size={18} className="text-[var(--accent)]" />, sections.topSnippets, 'Use snippets to build analytics')}
-      {renderSnippetRow('Needs Cleanup', <Archive size={18} />, sections.stale, 'Vault is entirely clean')}
+          {renderSnippetRow('Continue Working', <Clock size={18} />, sections.continueWorking, 'No recent edits found')}
+          {renderSnippetRow('Top Snippets', <Flame size={18} className="text-[var(--accent)]" />, sections.topSnippets, 'Use snippets to build analytics')}
+          {renderSnippetRow('Needs Cleanup', <Archive size={18} />, sections.stale, 'Vault is entirely clean')}
+        </>
+      )}
 
       {/* Vault Health / Efficiency Footer */}
       <div className="mt-16 pt-8 border-t border-[var(--border)] flex flex-col md:flex-row justify-between items-center gap-8">

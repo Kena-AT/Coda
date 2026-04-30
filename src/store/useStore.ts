@@ -113,6 +113,11 @@ interface AppState {
   globalError: AppError | null;
   setGlobalError: (error: AppError | null) => void;
 
+  selectedTag: string | null;
+  setSelectedTag: (tag: string | null) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
+
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
 }
@@ -237,6 +242,11 @@ export const useStore = create<AppState>()(
           [id]: (state.sessionCopies[id] || 0) + 1 
         }
       })),
+
+      selectedTag: null,
+      setSelectedTag: (selectedTag: string | null) => set({ selectedTag }),
+      selectedCategory: null,
+      setSelectedCategory: (selectedCategory: string | null) => set({ selectedCategory }),
 
       sidebarOpen: false,
       setSidebarOpen: (sidebarOpen: boolean) => set({ sidebarOpen })
