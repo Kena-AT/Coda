@@ -58,10 +58,24 @@ export const HardwareVisualization: React.FC = () => {
   };
 
   const res = snapshot?.latest_resource;
+  const ramVal = res?.ram_mb || 0;
+
+  // Memory Monitoring & Throttling
+  useEffect(() => {
+    if (ramVal > 300) { // High memory threshold (300MB)
+      toast('HIGH_MEMORY_USAGE :: TRIGGERING_OPTIMIZATION', {
+        icon: '⚠️',
+        style: { borderRadius: '0', background: '#131313', color: '#ff0000', border: '1px solid #ff0000', fontSize: '10px', fontFamily: 'monospace' }
+      });
+      // Optionally auto-purge if it gets critical
+      if (ramVal > 500) {
+        invoke('purge_snippet_cache_all');
+      }
+    }
+  }, [ramVal]);
   
   // Normalize values for visualization
   const cpuVal = res?.cpu_percent || 0;
-  const ramVal = res?.ram_mb || 0;
   
   // Use real vault state for DB size if available
   const realDbSize = vaultState?.db_size_mb || 0;
@@ -231,26 +245,35 @@ export const HardwareVisualization: React.FC = () => {
                  {vaultState?.issues_found} ISSUES
                </span>
              )}
-             <div className="flex gap-2 mt-2">
-               <button 
-                 onClick={handleRunMaintenance}
-                 disabled={isRunning}
-                 className="bg-[var(--accent)] text-white px-3 py-1 flex items-center gap-1 group overflow-hidden relative disabled:opacity-50"
-               >
-                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-                  <span className="text-[8px] font-bold">{isRunning ? '...' : 'RUN'}</span>
-               </button>
+             <div className="flex flex-col gap-2 mt-2 w-full">
+               <div className="flex gap-2">
+                 <button 
+                   onClick={handleRunMaintenance}
+                   disabled={isRunning}
+                   className="flex-1 bg-[var(--accent)] text-white px-3 py-1 flex items-center justify-center gap-1 group overflow-hidden relative disabled:opacity-50"
+                 >
+                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                    <span className="text-[8px] font-bold">{isRunning ? '...' : 'RUN_MAINT'}</span>
+                 </button>
+                 <button 
+                   onClick={handlePurgeCache}
+                   className="flex-1 bg-white/5 border border-white/20 text-[#adaaad] px-3 py-1 flex items-center justify-center gap-1 group hover:bg-[var(--accent)] hover:text-white transition-colors"
+                 >
+                    <span className="text-[8px] font-bold uppercase tracking-tighter">PURGE_CACHE</span>
+                 </button>
+               </div>
                <button 
                  onClick={handleAddMonitor}
-                 className="bg-[var(--border)] border border-[var(--accent)] text-[var(--accent)] px-3 py-1 flex items-center gap-1 group overflow-hidden relative hover:bg-[var(--accent)] hover:text-white transition-colors"
+                 className="w-full bg-[var(--border)] border border-[var(--accent)] text-[var(--accent)] px-3 py-1 flex items-center justify-center gap-1 group overflow-hidden relative hover:bg-[var(--accent)] hover:text-white transition-colors"
                >
                   <span className="text-[8px] font-bold">+</span>
-                  <span className="text-[8px] font-bold uppercase tracking-tighter">Add Monitor</span>
+                  <span className="text-[8px] font-bold uppercase tracking-tighter">Add Monitor Protocol</span>
                </button>
              </div>
           </div>
         </div>
       </div>
+v>
 
       {/* Footer metrics */}
       <div className="flex gap-4 text-[9px] font-main text-[#adaaad] uppercase tracking-[1px]">
