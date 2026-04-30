@@ -23,6 +23,7 @@ import toast from 'react-hot-toast';
 import { filterSnippets } from '../../utils/searchEngine';
 import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { ConfirmationModal } from './ConfirmationModal';
+import { VirtuosoGrid } from 'react-virtuoso';
 
 export const ProjectVault: React.FC = () => {
   const { 
@@ -83,7 +84,8 @@ export const ProjectVault: React.FC = () => {
       const response: any = await invoke('list_snippets', { 
         userId: user.id, 
         includeArchived: true,
-        bypass_cache: force 
+        bypass_cache: force,
+        load_content: false // Optimization: Metadata only
       });
       if (response.success) setSnippets(response.data || []);
     } catch (e) {
@@ -438,16 +440,20 @@ export const ProjectVault: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 p-4 md:p-8 overflow-hidden">
           {scopedSnippets.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[10px] md:text-[11px] px-4 text-center">
+            <div className="h-full flex flex-col items-center justify-center border border-dashed border-[var(--border)] rounded-xl text-[#adaaad] uppercase font-mono text-[10px] md:text-[11px] px-4 text-center">
               {localSearch || searchQuery ? 'NO_MATCHING_CODE_ENTRIES' : 'PROJECT_VAULT_EMPTY'}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
-              {scopedSnippets.map(snippet => (
-                <div key={snippet.id} className="h-[220px]">
-                   <SnippetCard 
+            <VirtuosoGrid
+              style={{ height: '100%' }}
+              totalCount={scopedSnippets.length}
+              itemContent={(index) => {
+                const snippet = scopedSnippets[index];
+                return (
+                  <div className="h-[220px] p-2">
+                    <SnippetCard 
                       snippet={snippet}
                       onEdit={() => { playSound('transition'); setSelectedSnippetId(snippet.id!); }}
                       onDelete={() => {
@@ -458,10 +464,12 @@ export const ProjectVault: React.FC = () => {
                         playSound('click');
                         invoke('archive_snippet', { id: snippet.id, userId: user?.id }).then(() => { playSound('success'); fetchSnippets(); });
                       }}
-                   />
-                </div>
-              ))}
-            </div>
+                    />
+                  </div>
+                );
+              }}
+              listClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-20"
+            />
           )}
         </div>
 
