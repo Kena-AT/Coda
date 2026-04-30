@@ -48,6 +48,16 @@ export const HardwareVisualization: React.FC = () => {
     }
   };
 
+  const handlePurgeCache = async () => {
+    try {
+      await invoke('purge_snippet_cache_all');
+      toast.success('Snippet Cache Purged');
+      fetchVaultStatus();
+    } catch (e: any) {
+      toast.error(`Purge failed: ${e.toString()}`);
+    }
+  };
+
   const handleAddMonitor = async () => {
     try {
       await invoke('add_vault_monitor', { name: 'Health Check', interval: 300 });
