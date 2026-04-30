@@ -685,7 +685,7 @@ export const ProjectVault: React.FC = () => {
       {/* Floating Action Button for Creating Projects */}
       <button
         onClick={() => setShowCreateModal(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 bg-[var(--accent)] flex items-center justify-center hover:bg-[#ff0000] hover:scale-105 transition-all shadow-[0_0_20px_var(--accent-glow)0.3)] z-50"
+        className="fixed bottom-8 right-24 w-14 h-14 bg-[var(--accent)] flex items-center justify-center hover:bg-[#ff0000] hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,0,0,0.3)] z-50 rounded-full"
         title="Create New Project"
       >
         <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />

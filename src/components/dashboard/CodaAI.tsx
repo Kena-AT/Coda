@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2, Mic, MicOff } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Send, Sparkles, Loader2, Mic, MicOff } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import logo from '../../assets/logo.png';
 import toast from 'react-hot-toast';
@@ -269,13 +270,19 @@ export const CodaAI: React.FC = () => {
   };
 
   return (
-    <div ref={aiContainerRef}>
+    <motion.div 
+      ref={aiContainerRef}
+      drag
+      dragMomentum={false}
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+      className="fixed bottom-6 right-6 z-[9999]"
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 group shadow-lg ${
+        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 group shadow-lg ${
           isOpen
             ? 'bg-[var(--border)] hover:bg-red-500/20'
-            : 'bg-[var(--accent)] hover:scale-110 shadow-[0_0_20px_var(--accent-glow)]'
+            : 'bg-[var(--accent)] hover:scale-110 shadow-[0_0_20px_rgba(255,0,0,0.3)]'
         }`}
       >
         {isOpen ? (
@@ -288,11 +295,14 @@ export const CodaAI: React.FC = () => {
         )}
       </button>
 
-      {isOpen && (
-        <div
-          className="fixed bottom-24 right-6 z-[9998] w-[380px] max-h-[520px] flex flex-col bg-[#0a0a0a] border border-[var(--border)] rounded-lg shadow-2xl overflow-hidden animate-in"
-          style={{ animation: 'slideUp 0.3s ease-out' }}
-        >
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="absolute bottom-20 right-0 z-[9998] w-[380px] max-h-[520px] flex flex-col bg-[#0a0a0a] border border-[var(--border)] rounded-lg shadow-2xl overflow-hidden origin-bottom-right"
+          >
           <div className="px-5 py-4 bg-[#111] border-b border-[var(--border)] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-[#1a1a1a] border border-[var(--border)] rounded-full flex items-center justify-center relative overflow-hidden">
@@ -411,16 +421,9 @@ export const CodaAI: React.FC = () => {
             <p className="text-[7px] font-mono text-[#adaaad]/30 text-center mt-2 tracking-widest uppercase">
               {isListening ? 'Neural Uplink Active' : isSpeaking ? 'JARVIS SPEAKING...' : `Powered by ${activeModel}`}
             </p>
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(16px) scale(0.96); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
