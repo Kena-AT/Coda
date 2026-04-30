@@ -66,7 +66,9 @@ export const ProjectVault: React.FC = () => {
   const [projectToDeleteName, setProjectToDeleteName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  const allProjects = projects;
+  const allProjects = useMemo(() => {
+    return [{ id: -1, name: 'INBOX', description: 'UNSORTED_ENTRIES', user_id: user?.id || 0, color: null, created_at: '' } as Project, ...projects];
+  }, [projects, user]);
 
   const fetchProjects = async () => {
     if (!user) return;
@@ -92,6 +94,13 @@ export const ProjectVault: React.FC = () => {
       console.error('Failed to fetch snippets', e);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchProjects();
+      fetchSnippets();
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -496,7 +505,7 @@ export const ProjectVault: React.FC = () => {
 
   // Overview Tier
   return (
-    <div className="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar bg-[var(--bg-primary)]">
+    <div className="flex-1 p-6 md:p-10 flex flex-col overflow-hidden bg-[var(--bg-primary)]">
       <div className="mb-8 md:mb-10 flex justify-between items-end gap-2 border-b border-[var(--border)] pb-6 md:pb-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl md:text-3xl font-main font-bold text-white tracking-[-1px] md:tracking-[-1.5px] uppercase">Project Vault</h1>
