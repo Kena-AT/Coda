@@ -96,7 +96,7 @@ export const SnippetEditor: React.FC = () => {
       if (response && response.success) {
         const tags = response.data || [];
         setSavedTags(tags);
-        console.log(`[SnippetEditor] Tags loaded: ${tags.length}`);
+
       } else {
         console.warn('[SnippetEditor] list_tags returned failure:', response?.message);
       }

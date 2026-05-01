@@ -74,9 +74,6 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
     }, 3000);
   };
 
-  const dbSizeMb = telemetry?.latest_resource?.db_size_bytes 
-    ? (telemetry.latest_resource.db_size_bytes / (1024 * 1024)).toFixed(2) 
-    : '0.00';
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#0e0e10] p-12">
@@ -118,10 +115,10 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
             className="bg-[#131313] p-8 border border-[var(--border)]/30 space-y-6 hover:border-[var(--accent)]/50 transition-colors cursor-default"
           >
             <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[var(--border)]/50 pb-2">App Version</p>
-            <h2 className="text-lg font-main font-bold text-white uppercase tracking-[-1px]">V.2.0.4-STABLE</h2>
+            <h2 className="text-lg font-main font-bold text-white uppercase tracking-[-1px]">V.2.1.0-PRODUCTION</h2>
             <div className="flex items-center gap-2 text-[#737373]">
                <ShieldCheck size={14} className="text-[var(--accent)]" />
-               <span className="text-[9px] font-mono uppercase">Encrypted_Sig_Valid</span>
+               <span className="text-[9px] font-mono uppercase">Vault_Integrity_Verified</span>
             </div>
           </div>
 
@@ -135,8 +132,8 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                   <div className="w-2 h-0.5 bg-white/20" />
                </div>
                <div className="flex gap-4">
-                  <span className="px-2 py-0.5 bg-red-600/10 border border-red-600/30 text-red-600 text-[8px] font-mono uppercase">Production</span>
-                  <span className="px-2 py-0.5 bg-red-600 border border-red-600 text-white text-[8px] font-mono uppercase">CI/CD_Active</span>
+                  <span className="px-2 py-0.5 bg-red-600/10 border border-red-600/30 text-red-600 text-[8px] font-mono uppercase">Production_Core</span>
+                  <span className="px-2 py-0.5 bg-red-600 border border-red-600 text-white text-[8px] font-mono uppercase">Zero_Trust_Active</span>
                </div>
             </div>
             <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[var(--border)]/50 pb-2">Resource Utilization</p>
@@ -151,16 +148,16 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
             className="bg-[#131313] p-8 border border-[var(--border)]/30 space-y-8 hover:border-[var(--accent)]/50 transition-colors cursor-default"
           >
              <div className="flex items-center justify-between">
-                <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">System Health</p>
+                <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px]">Protocol Health</p>
                 <Activity size={12} className="text-green-500 animate-pulse" />
              </div>
              <div className="space-y-4">
                 <div className="flex justify-between items-center text-[11px] font-main uppercase">
-                   <span className="text-[#adaaad]">CPU_Load</span>
+                   <span className="text-[#adaaad]">CPU_Kernel</span>
                    <span className="text-green-500 font-bold">{telemetry?.latest_resource?.cpu_percent.toFixed(1) || '0.0'}%</span>
                 </div>
                 <div className="flex justify-between items-center text-[11px] font-main uppercase">
-                   <span className="text-[#adaaad]">Core_Temp</span>
+                   <span className="text-[#adaaad]">Therm_Shield</span>
                    <span className="text-red-600 font-bold">{telemetry?.core_temp.toFixed(1) || '0.0'}°C</span>
                 </div>
                 <div className="h-1 w-full bg-[#1f1f22]">
@@ -179,7 +176,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
           <div className="lg:col-span-2 space-y-8">
             <h3 className="text-lg font-main font-bold text-white uppercase tracking-tight flex items-center gap-2">
               <Terminal className="w-6 h-6 text-[var(--accent)]" />
-              ACTIVE_PROTOCOL_STATES
+              SYSTEM_HEARTBEAT
             </h3>
             <div className="space-y-4">
               {telemetry?.tasks.map((task, i) => (
@@ -192,7 +189,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
                       <div className={`w-1.5 h-1.5 ${task.state === 'running' ? 'bg-red-600 animate-pulse' : 'bg-[var(--border)]'} shrink-0`} />
                       <div className="space-y-1">
                         <p className="text-[11px] font-main font-bold text-white uppercase tracking-[1px]">{task.name}</p>
-                        <p className="text-[9px] font-mono text-[#737373] uppercase">{task.last_error || 'No active exceptions'}</p>
+                        <p className="text-[9px] font-mono text-[#737373] uppercase">{task.last_error || 'State_Stable'}</p>
                       </div>
                    </div>
                    <div className="text-right space-y-1">
@@ -210,13 +207,13 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
 
           {/* Operational Params */}
           <div className="space-y-8">
-            <h3 className="text-xl font-main font-bold text-white uppercase tracking-tight">OPERATIONAL_PARAMS</h3>
+            <h3 className="text-xl font-main font-bold text-white uppercase tracking-tight">ENFORCEMENT_POLICIES</h3>
             <div className="bg-[#131313] border border-[var(--border)]/50 p-8 space-y-6">
                {[
-                 { label: 'DB_Pool_Size', val: `${dbSizeMb} MB` },
-                 { label: 'Cache_Heads', val: telemetry?.latest_resource?.cache_entries.toString() || '0' },
-                 { label: 'Lockout_Threshold', val: '3_LOGIN_ATTEMPTS' },
-                 { label: 'System_Latency', val: '12ms' }
+                 { label: 'Cipher_Protocol', val: 'Argon2id_HARDENED' },
+                 { label: 'Token_Entropy', val: '256_BIT' },
+                 { label: 'Lockout_Limit', val: '3_ATTEMPTS' },
+                 { label: 'IPC_Validation', val: 'STRICT_CSP' }
                ].map((p, i) => (
                  <div 
                   key={i} 

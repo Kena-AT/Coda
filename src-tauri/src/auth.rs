@@ -13,6 +13,11 @@ use dashmap::DashMap;
 const SECRET_KEY: &[u8] = b"coda_prod_master_access_key_2026_secure_protocol";
 const REFRESH_SECRET_KEY: &[u8] = b"coda_prod_master_refresh_key_2026_vault_integrity";
 
+const DEFAULT_MAX_LOCKOUT_ATTEMPTS: i32 = 3;
+const DEFAULT_LOCKOUT_DURATION_MINS: i64 = 20;
+const ACCESS_TOKEN_EXPIRY_HOURS: i64 = 24;
+const REFRESH_TOKEN_EXPIRY_DAYS: i64 = 30;
+
 // Standardized Argon2 Parameters for production hardening
 // Memory: 64MB, Iterations: 3, Parallelism: 4
 fn get_hardened_argon2() -> Argon2<'static> {
@@ -20,7 +25,92 @@ fn get_hardened_argon2() -> Argon2<'static> {
     Argon2::new(argon2::Algorithm::Argon2id, argon2::Version::V0x13, params)
 }
 
-// ... existing code ...
+// In-memory session storage for non-remember-me sessions
+pub struct SessionStore {
+    sessions: DashMap<String, SessionData>, // token -> session data
+}
+
+pub struct SessionData {
+    pub user_id: i32,
+    pub username: String,
+    pub _created_at: i64,
+}
+
+impl SessionStore {
+    pub fn new() -> Self {
+        Self {
+            sessions: DashMap::new(),
+        }
+    }
+
+    pub fn store_session(&self, token: String, user_id: i32, username: String) {
+        self.sessions.insert(token, SessionData {
+            user_id,
+            username,
+            _created_at: Utc::now().timestamp(),
+        });
+    }
+
+    pub fn get_session(&self, token: &str) -> Option<(i32, String)> {
+        self.sessions.get(token).map(|s| (s.user_id, s.username.clone()))
+    }
+
+    pub fn remove_session(&self, token: &str) {
+        self.sessions.remove(token);
+    }
+
+    pub fn clear_user_sessions(&self, user_id: i32) {
+        let tokens_to_remove: Vec<String> = self.sessions
+            .iter()
+            .filter(|entry| entry.value().user_id == user_id)
+            .map(|entry| entry.key().clone())
+            .collect();
+        
+        for token in tokens_to_remove {
+            self.sessions.remove(&token);
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.sessions.is_empty()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Claims {
+    pub sub: String,
+    pub exp: usize,
+    pub token_type: String, // "access" or "refresh"
+    pub user_id: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenPair {
+    pub access_token: String,
+    pub refresh_token: String,
+    pub access_expires_at: i64,
+    pub refresh_expires_at: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthResponse {
+    pub success: bool,
+    pub token: Option<String>,
+    pub refresh_token: Option<String>,
+    pub user_id: Option<i32>,
+    pub username: Option<String>,
+    pub access_expires_at: Option<i64>,
+    pub refresh_expires_at: Option<i64>,
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RefreshResponse {
+    pub success: bool,
+    pub access_token: Option<String>,
+    pub access_expires_at: Option<i64>,
+    pub message: String,
+}
 
 #[tauri::command]
 pub fn signup(app_handle: AppHandle, username: String, password: String) -> Result<AuthResponse, String> {
@@ -37,7 +127,6 @@ pub fn signup(app_handle: AppHandle, username: String, password: String) -> Resu
         "INSERT INTO users (username, master_password_hash) VALUES (?, ?)",
         [&username, &password_hash],
     ) {
-// ...
         Ok(_) => Ok(AuthResponse {
             success: true,
             token: None,
@@ -125,7 +214,7 @@ pub fn login(
     }
 
     let parsed_hash = PasswordHash::new(&hash).map_err(|e| e.to_string())?;
-    let argon2 = Argon2::default();
+    let argon2 = get_hardened_argon2();
 
     if argon2.verify_password(password.as_bytes(), &parsed_hash).is_ok() {
         // Reset lockout on success
@@ -249,7 +338,7 @@ pub fn change_master_password(app_handle: AppHandle, user_id: i32, current_passw
     let conn = get_db_connection(&app_handle)?;
     let hash: String = conn.query_row("SELECT master_password_hash FROM users WHERE id = ?", [user_id], |row| row.get(0)).map_err(|_| "User not found".to_string())?;
     let parsed_hash = PasswordHash::new(&hash).map_err(|e| e.to_string())?;
-    let argon2 = Argon2::default();
+    let argon2 = get_hardened_argon2();
 
     if argon2.verify_password(current_password.as_bytes(), &parsed_hash).is_ok() {
         let salt = SaltString::generate(&mut OsRng);
