@@ -105,7 +105,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
             </div>
             <div className="p-6 md:p-8 space-y-6 md:space-y-8 relative z-10">
               <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
-                <Shield className="text-[var(--accent)]" size={20} md:size={24} />
+                <Shield className="text-[var(--accent)] md:w-6 md:h-6" size={20} />
                 LOCKOUT POLICY
               </h3>
               
@@ -163,7 +163,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
             </div>
             <div className="p-6 md:p-8 space-y-6 md:space-y-8">
               <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
-                <Bell className="text-[var(--accent)]" size={20} md:size={24} />
+                <Bell className="text-[var(--accent)] md:w-6 md:h-6" size={20} />
                 NOTIFICATIONS
               </h3>
 
@@ -190,7 +190,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
                   </div>
                   <button 
                     onClick={() => handleUpdateSetting({ soundEffects: !settings.soundEffects })}
-                    className={`w-12 h-6 rounded-sm transition-all relative shrink-0 ${settings.soundEffects ? 'bg-white/40' : 'bg-[var(--border)]'}`}
+                    className={`w-12 h-6 rounded-sm transition-all relative shrink-0 ${settings.soundEffects ? 'bg-[var(--accent)]' : 'bg-[var(--border)]'}`}
                   >
                     <div className={`absolute top-1 w-4 h-4 bg-white transition-all ${settings.soundEffects ? 'right-1' : 'left-1'}`} />
                   </button>
@@ -208,7 +208,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               {/* Theme Selection */}
               <div className="space-y-6 md:space-y-8">
                 <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
-                  <Palette className="text-[var(--accent)]" size={20} md:size={24} />
+                  <Palette className="text-[var(--accent)] md:w-6 md:h-6" size={20} />
                   THEME_ENGINE
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-1">
@@ -231,7 +231,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
               {/* Font Configuration */}
               <div className="space-y-6 md:space-y-8">
                 <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
-                  <Type className="text-[var(--accent)]" size={20} md:size={24} />
+                  <Type className="text-[var(--accent)] md:w-6 md:h-6" size={20} />
                   FONT_CONFIG
                 </h3>
                 <div className="space-y-4">
@@ -266,7 +266,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack, onNavigate }
             </div>
             <div className="p-6 md:p-8 space-y-6">
               <h3 className="text-lg md:text-xl font-bold flex items-center gap-3 tracking-tight">
-                <Activity className="text-[var(--accent)]" size={20} md:size={24} />
+                <Activity className="text-[var(--accent)] md:w-6 md:h-6" size={20} />
                 AI_CONFIG
               </h3>
               <div className="space-y-4">
