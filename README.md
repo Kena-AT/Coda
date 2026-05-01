@@ -87,5 +87,4 @@ Coda operates on a **Zero-Trust** model. All local data is isolated, and neural 
 
 ## 📄 License
 
-Copyright © 2026 Coda Systems. All rights reserved.
-Licensed under the Proprietary License - See LICENSE for details.
+Copyright © 2026 K.A.Y.E. All rights reserved.
