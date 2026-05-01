@@ -192,29 +192,35 @@ export const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchSnippets();
-    fetchProjects();
-
-    const checkArchivable = async () => {
-      if (!user) return;
-      try {
-        const candidates = await invoke<any[]>('get_archive_candidates', { userId: user.id });
-        setHasCandidates(candidates.length > 0);
-        if (candidates.length > 0) {
-          setIsArchiveModalOpen(true);
-          toast.success(
-            `Smart Archiver: ${candidates.length} stale snippets detected`,
-            { icon: '🗄️', duration: 10000, style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)' } }
-          );
+    if (!user) return;
+    
+    const initData = async () => {
+      // 1. Parallelize core data loading
+      await Promise.all([fetchSnippets(), fetchProjects()]);
+      
+      // 2. Defer non-critical background checks
+      const archiverTimeout = setTimeout(async () => {
+        try {
+          const candidates = await invoke<any[]>('get_archive_candidates', { userId: user.id });
+          setHasCandidates(candidates.length > 0);
+          if (candidates.length > 0) {
+            setIsArchiveModalOpen(true);
+            toast.success(
+              `Smart Archiver: ${candidates.length} stale snippets detected`,
+              { icon: '🗄️', duration: 10000, style: { background: '#1a1a1a', color: '#fff', border: '1px solid var(--accent)' } }
+            );
+          }
+        } catch (e) {
+          console.error('Archiver check failed:', e);
+          setHasCandidates(false);
         }
-      } catch (e) {
-        console.error('Archiver check failed:', e);
-        toast.error('Smart Archiver scan failed');
-        setHasCandidates(false);
-      }
+      }, 3000);
+
+      return () => clearTimeout(archiverTimeout);
     };
-    checkArchivable();
-  }, [user, activeTab, !!searchQuery]);
+
+    initData();
+  }, [user]);
 
   // Keyboard Shortcuts Support (Sprint 10)
   useEffect(() => {
