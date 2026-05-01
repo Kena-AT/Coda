@@ -97,10 +97,11 @@ export const ProjectVault: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      fetchProjects();
-      fetchSnippets();
+      // Only fetch if store is empty to reduce startup noise
+      if (projects.length === 0) fetchProjects();
+      if (snippets.length === 0) fetchSnippets();
     }
-  }, [user]);
+  }, [user, projects.length, snippets.length]);
 
   useEffect(() => {
     const fetchStats = async () => {

@@ -59,7 +59,11 @@ export const IntelligenceDashboard: React.FC = () => {
   useEffect(() => {
     fetchTags();
     fetchAnalytics();
-    fetchSnippets(true);
+    
+    // Only fetch snippets if the store is empty
+    if (snippets.length === 0) {
+      fetchSnippets();
+    }
   }, [user]);
 
   const fetchSnippets = async (force = false) => {

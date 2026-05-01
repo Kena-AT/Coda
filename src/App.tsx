@@ -6,7 +6,7 @@ import { Dashboard } from './components/dashboard/Dashboard';
 import { GlobalErrorModal } from './components/dashboard/GlobalErrorModal';
 import { useStore } from './store/useStore';
 import { Toaster } from 'react-hot-toast';
-import { sessionManager, authApi } from './store/authStore';
+import { sessionManager } from './store/authStore';
 import toast from 'react-hot-toast';
 
 type AuthStep = 'welcome' | 'signup' | 'signin';
@@ -29,25 +29,17 @@ function App() {
       try {
         // Check if we have a stored session
         if (sessionManager.isSessionValid()) {
-          // Try to refresh the access token if needed
+          // refreshIfNeeded returns true if token is valid or successfully refreshed
           const refreshed = await sessionManager.refreshIfNeeded();
           
           if (refreshed) {
             const session = sessionManager.getSession();
             if (session) {
-              // Validate the token with the backend
-              const isValid = await authApi.validateToken(session.accessToken, 'access');
-              
-              if (isValid) {
-                setUser({ id: session.userId, username: session.username });
-                toast.success(`Welcome back, ${session.username}`);
-              } else {
-                // Token invalid, clear session and require login
-                sessionManager.clearSession();
-              }
+              // Optimization: If refresh succeeded, the token is already valid
+              setUser({ id: session.userId, username: session.username });
+              toast.success(`Welcome back, ${session.username}`);
             }
           } else {
-            // Refresh failed, clear session
             sessionManager.clearSession();
           }
         }
