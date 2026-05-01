@@ -36,3 +36,10 @@ password-hash = { version = "0.6.0", features = ["getrandom"] }
 dashmap = "6.1.0"
 sysinfo = "0.32"
 
+[profile.release]
+panic = "abort" # Strip expensive panic infrastructure
+codegen-units = 1 # Optimize across all modules
+lto = true # Link Time Optimization
+opt-level = "s" # Optimize for size
+strip = true # Strip symbols from binary
+
