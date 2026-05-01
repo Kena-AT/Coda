@@ -97,7 +97,10 @@ export const Dashboard: React.FC = () => {
     // Initial delay to avoid startup congestion
     const timer = setTimeout(checkStatus, 2000);
     const interval = setInterval(checkStatus, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   const fetchSnippets = async (force = false) => {

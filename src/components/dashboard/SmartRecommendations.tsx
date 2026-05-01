@@ -35,7 +35,7 @@ interface SmartRecommendationsProps {
 const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
 export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({ currentLanguage, currentTags, onPreview }) => {
-  const { user, selectedSnippetId, settings, snippets } = useStore();
+  const { user, selectedSnippetId, snippets } = useStore();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [aiStatus, setAiStatus] = useState<'idle' | 'syncing' | 'online' | 'error'>('idle');

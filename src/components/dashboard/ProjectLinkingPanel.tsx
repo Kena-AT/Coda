@@ -69,7 +69,7 @@ export const ProjectLinkingPanel: React.FC<ProjectLinkingPanelProps> = ({ snippe
     try {
       const relatedContext = related.map(r => `- ${r.title} (Project: ${r.project_name || 'Root'}, Type: ${r.link_type}, Strength: ${r.strength}%)`).join('\n');
       const prompt = `Analyze this code snippet titled "${currentSnippet.title}":
-${currentSnippet.content.substring(0, 1000)}
+${(currentSnippet.content || '').substring(0, 1000)}
 
 It has behavioral cross-project links to these other snippets:
 ${relatedContext}

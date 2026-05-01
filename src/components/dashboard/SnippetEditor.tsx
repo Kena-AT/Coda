@@ -25,7 +25,7 @@ import { useSoundEffect } from '../../hooks/useSoundEffect';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Tags, ChevronDown, RefreshCw, Search } from 'lucide-react';
+import { Tags, ChevronDown, RefreshCw } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

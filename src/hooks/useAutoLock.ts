@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 export const useAutoLock = () => {
   const { user, setUser, settings } = useStore();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const logout = useCallback(() => {
     if (!user) return;
