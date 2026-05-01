@@ -37,7 +37,6 @@ import { ChangePasswordPage } from './ChangePasswordPage';
 import { VersionInfoPage } from './VersionInfoPage';
 import { LogoutConfirmationPage } from './LogoutConfirmationPage';
 import { CodaAI } from './CodaAI';
-import { sessionManager, authApi } from '../../store/authStore';
 import { useAuthSession } from '../../hooks/useAuthSession';
 import { useAutoLock } from '../../hooks/useAutoLock';
 import { listen } from '@tauri-apps/api/event';
@@ -45,7 +44,6 @@ import { listen } from '@tauri-apps/api/event';
 export const Dashboard: React.FC = () => {
   const { 
     user, 
-    setUser, 
     snippets, 
     setSnippets, 
     setLoading, 
@@ -57,7 +55,6 @@ export const Dashboard: React.FC = () => {
     activeTab,
     setActiveTab,
     settings,
-    sidebarOpen,
     setSidebarOpen
   } = useStore();
 
@@ -97,7 +94,8 @@ export const Dashboard: React.FC = () => {
         console.error('System status check failed:', e);
       }
     };
-    checkStatus();
+    // Initial delay to avoid startup congestion
+    const timer = setTimeout(checkStatus, 2000);
     const interval = setInterval(checkStatus, 5000);
     return () => clearInterval(interval);
   }, []);

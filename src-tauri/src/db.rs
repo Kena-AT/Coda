@@ -343,9 +343,19 @@ pub fn init_db(app_handle: &AppHandle) -> Result<(), String> {
         [],
     ).map_err(|e| e.to_string())?;
 
-    // Cleanup legacy INBOX projects if they were manually created
+    // Add performance indices
     conn.execute(
-        "DELETE FROM projects WHERE name = 'INBOX' OR name = 'UNSORTED' OR name = 'INBOX / UNSORTED'",
+        "CREATE INDEX IF NOT EXISTS idx_snippets_user_updated ON snippets(user_id, updated_at DESC)",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_snippets_user_archived ON snippets(user_id, is_archived)",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_snippets_deleted ON snippets(user_id) WHERE deleted_at IS NOT NULL",
         [],
     ).map_err(|e| e.to_string())?;
 
