@@ -152,13 +152,13 @@ export const BackupRestorePage: React.FC<BackupRestorePageProps> = ({ onBack }) 
           <div className="bg-[#131313] border border-[var(--border)]/30 p-6 md:p-10 space-y-8 md:space-y-10 relative overflow-hidden group">
              {/* Decor */}
              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Database size={60} md:size={80} className="text-[var(--accent)]" />
+                <Database className="text-[var(--accent)] md:w-20 md:h-20" size={60} />
              </div>
 
              <div className="space-y-2 relative z-10">
-                <h3 className="text-base md:text-lg font-main font-bold text-white uppercase tracking-tight">EXECUTE_SNAPSHOT</h3>
+                <h3 className="text-base md:text-lg font-main font-bold text-white uppercase tracking-tight">EXECUTE_FULL_SNAPSHOT</h3>
                 <p className="text-[10px] md:text-[11px] font-main text-[#737373] uppercase leading-relaxed max-w-xs">
-                  Generate a complete encrypted clone of the current database state for off-site archival.
+                  Generate a high-integrity clone of your entire vault. Snapshots include all <span className="text-white">snippets</span>, <span className="text-white">projects</span>, <span className="text-white">tags</span>, and <span className="text-white">system settings</span>.
                 </p>
              </div>
 
