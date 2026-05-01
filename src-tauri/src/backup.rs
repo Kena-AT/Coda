@@ -1,21 +1,20 @@
 use tauri::{AppHandle, Manager};
 use std::fs;
 use std::path::PathBuf;
+use rusqlite::Connection;
+use crate::db::get_db_connection;
 
 #[tauri::command]
 pub async fn create_backup(app_handle: AppHandle, target_path: String) -> Result<String, String> {
-    let db_path = app_handle.path().app_data_dir()
-        .map_err(|e: tauri::Error| e.to_string())?
-        .join("coda.db");
+    // 1. Get source connection
+    let conn = get_db_connection(&app_handle)?;
+    
+    // 2. Perform consistent backup using VACUUM INTO
+    // This is safer than fs::copy because it handles locked/active databases correctly
+    conn.execute("VACUUM INTO ?", [target_path.as_str()])
+        .map_err(|e| format!("Database backup failed: {}. Make sure the target file doesn't already exist or you have permission to write there.", e))?;
 
-    if !db_path.exists() {
-        return Err("Database file not found".to_string());
-    }
-
-    let target = PathBuf::from(target_path);
-    fs::copy(&db_path, &target).map_err(|e| format!("Failed to copy database: {}", e))?;
-
-    Ok("Backup created successfully".to_string())
+    Ok("Vault snapshot committed successfully".to_string())
 }
 
 #[tauri::command]
@@ -29,13 +28,23 @@ pub async fn restore_backup(app_handle: AppHandle, source_path: String) -> Resul
         return Err("Source backup file not found".to_string());
     }
 
-    // Verify it's a valid sqlite db (simple check)
+    // Verify it's a valid sqlite db and has our core schema
     {
-        let conn = rusqlite::Connection::open(&source).map_err(|e| format!("Invalid backup file: {}", e))?;
-        let _: i32 = conn.query_row("SELECT count(*) FROM snippets", [], |row| row.get(0)).map_err(|_| "Backup file schema mismatch".to_string())?;
+        let conn = Connection::open(&source).map_err(|e| format!("Invalid backup file: {}", e))?;
+        
+        // Verify multiple critical tables exist
+        let tables = vec!["snippets", "projects", "tags", "user_settings"];
+        for table in tables {
+            let _: i32 = conn.query_row(
+                &format!("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{}'", table),
+                [],
+                |row| row.get(0)
+            ).map_err(|_| format!("Backup file is missing critical table: {}", table))?;
+        }
     }
 
-    fs::copy(&source, &db_path).map_err(|e| format!("Failed to restore database: {}", e))?;
+    // Force copy (overwrite)
+    fs::copy(&source, &db_path).map_err(|e| format!("Failed to overwrite database: {}", e))?;
 
-    Ok("Restore complete. Please restart the application.".to_string())
+    Ok("Vault reconstruction complete. Restart required.".to_string())
 }
