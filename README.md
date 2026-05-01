@@ -1,6 +1,6 @@
 # 🌌 CODA: Intelligent Snippet Vault
 
-![Version](https://img.shields.io/badge/version-2.1.0--PRODUCTION-red?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-2.1.1--PRODUCTION-red?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-Hardened-green?style=for-the-badge)
 ![AI](https://img.shields.io/badge/AI-Gemini_Powered-blue?style=for-the-badge)
 
@@ -41,8 +41,8 @@ The production installers are optimized for Windows x64 and include all security
 
 | File Type                    | Download Link                                                      | Description                                                   |
 | :--------------------------- | :----------------------------------------------------------------- | :------------------------------------------------------------ |
-| **Standard Installer** | [Coda_2.1.0_x64-setup.exe](./release_output/Coda_2.1.0_x64-setup.exe) | Recommended for most users. Includes auto-update support.     |
-| **Enterprise MSI**     | [Coda_2.1.0_x64_en-US.msi](./release_output/Coda_2.1.0_x64_en-US.msi) | Designed for silent installations and system-wide deployment. |
+| **Standard Installer** | [Coda_2.1.1_x64-setup.exe](./release_output/Coda_2.1.1_x64-setup.exe) | Recommended for most users. Includes auto-update support.     |
+| **Enterprise MSI**     | [Coda_2.1.1_x64_en-US.msi](./release_output/Coda_2.1.1_x64_en-US.msi) | Designed for silent installations and system-wide deployment. |
 
 > [!IMPORTANT]
 > These files are located in the `/release_output` directory of this repository.
