@@ -35,7 +35,7 @@
 
 ---
 
-## 📦 Latest Release (v1.0.0)
+## 📦 Latest Release (v2.1.1)
 
 The production installers are optimized for Windows x64 and include all security hardening features.
 
