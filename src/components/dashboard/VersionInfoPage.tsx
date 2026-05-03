@@ -115,7 +115,7 @@ export const VersionInfoPage: React.FC<VersionInfoPageProps> = ({ onBack }) => {
             className="bg-[#131313] p-8 border border-[var(--border)]/30 space-y-6 hover:border-[var(--accent)]/50 transition-colors cursor-default"
           >
             <p className="text-[10px] font-mono text-[#737373] uppercase tracking-[1px] border-b border-[var(--border)]/50 pb-2">App Version</p>
-            <h2 className="text-lg font-main font-bold text-white uppercase tracking-[-1px]">V.2.1.1-PRODUCTION</h2>
+            <h2 className="text-lg font-main font-bold text-white uppercase tracking-[-1px]">V.1.0.0-PRODUCTION</h2>
             <div className="flex items-center gap-2 text-[#737373]">
                <ShieldCheck size={14} className="text-[var(--accent)]" />
                <span className="text-[9px] font-mono uppercase">Vault_Integrity_Verified</span>
