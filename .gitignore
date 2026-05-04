@@ -23,3 +23,17 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Unnecessary app files / Scratch files
+scratch/
+release_output/
+*.docx
+*.txt
+*.pen
+*.py
+~$*.docx
+app-icon*.jpg
