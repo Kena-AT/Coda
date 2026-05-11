@@ -46,6 +46,7 @@ The production installers are optimized for Windows x64 and include all security
 
 > [!IMPORTANT]
 > These files are located in the `/release_output` directory of this repository.
+> Mirrors: The application and `.msi` installers are also hosted at [coda-snippet.vercel.app](https://coda-snippet.vercel.app).
 
 ---
 
